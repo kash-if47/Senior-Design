@@ -258,7 +258,8 @@ class Ui_MainWindow(object):
                                          "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:18pt; font-weight:400; font-style:normal;\">\n"
                                          "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:24pt; font-weight:600; font-style:italic; color:#ff0000;\">Login</span></p></body></html>",
                                          None))
-        self.hideMain()
+        self.hideall()
+        self.showLogin()
         self.label_reg.setText(_translate("MainWindow", "Email ID", None))
         self.Reg_reg_btn.setText(_translate("MainWindow", "Register", None))
         self.Usernamereg.setText(_translate("MainWindow", "Username", None))
@@ -289,10 +290,10 @@ class Ui_MainWindow(object):
         self.LogDate.show()
         self.LogCancel.show()
         self.LogOk.show()
+        self.LogStudentIdText.show()
+        self.LogDateText.show()
 
-
-    def hideLog(self):
-        #hide registration page
+    def hideall(self):
         self.label.hide()
         self.label_2.hide()
         self.pushButton.hide()
@@ -307,13 +308,11 @@ class Ui_MainWindow(object):
         self.textEdit.hide()
         self.Login_uname.hide()
         self.Login_password.hide()
-
         self.Reg_reg_btn.hide()
         self.Reg_email.hide()
         self.Reg_username.hide()
         self.Reg_password.hide()
         self.Usernamereg.hide()
-        self.label_reg.show()
         self.label_3reg.hide()
         #hiding main admin page
         self.RegisterStaff.hide()
@@ -326,49 +325,17 @@ class Ui_MainWindow(object):
         self.LogOffAdmin.hide()  
         #hiding registration
         #show registration page
-        self.Reg_reg_btn.hide()
-        self.Reg_email.hide()
-        self.Reg_username.hide()
-        self.Reg_password.hide()
         self.textEditreg.hide()
-        self.label_3reg.hide()
-        self.Usernamereg.hide()
         self.label_reg.hide()      
-
-
-
-    def hideMain(self):
-        #hide for login
-        self.label.hide()
-        self.label_2.hide()
-        self.pushButton.hide()
-        self.pushButton_3.hide()
-        self.pushButton_2.hide()
-        self.pushButton_4.hide()
-        self.listWidget_2.hide()
-        self.listWidget.hide()
-        self.Usernamereg.hide()        
-        self.Reg_reg_btn.hide()
-        self.Reg_email.hide()
-        self.Reg_username.hide()
-        self.Reg_password.hide()
-        self.label_reg.hide()
-        self.textEditreg.hide()
-        self.label_3reg.hide()
-        #hiding main admin page
-        self.RegisterStaff.hide()
-        self.EditStudent.hide()
-        self.AddStudent.hide()
-        self.RemoveStudent.hide()
-        self.RemoveStaff.hide()
-        self.EditStaff.hide()
-        self.StudentLog.hide()
-        self.LogOffAdmin.hide()
-        #hide log
         self.LogStudendid.hide()
         self.LogDate.hide()
         self.LogCancel.hide()
         self.LogOk.hide()
+        self.listWidget_2.hide()
+        self.LogStudentIdText.hide()
+        self.LogDateText.hide()
+
+       
 
 
 
@@ -394,61 +361,7 @@ class Ui_MainWindow(object):
         self.StudentLog.show()
         self.LogOffAdmin.show()
 
-    def hideMainAdmin(self):
-        #hide Admin Page
-        self.label.hide()
-        self.label_2.hide()
-        self.pushButton.hide()
-        self.pushButton_3.hide()
-        self.pushButton_2.hide()
-        self.pushButton_4.hide()
-        self.listWidget.hide()
-        self.listWidget_2.hide()
-        #hide login
-        self.label.hide()
-        self.label_2.hide()
-        self.pushButton.hide()
-        self.pushButton_3.hide()
-        self.pushButton_2.hide()
-        self.pushButton_4.hide()
-        self.listWidget_2.hide()
-        self.listWidget.hide()
-        self.Usernamereg.hide()        
-        self.Reg_reg_btn.hide()
-        self.Reg_email.hide()
-        self.Reg_username.hide()
-        self.Reg_password.hide()
-        self.label_reg.hide()
-        self.textEditreg.hide()
-        self.label_3reg.hide()
 
-        self.label.hide()
-        self.label_2.hide()
-        self.pushButton.hide()
-        self.pushButton_3.hide()
-        self.pushButton_2.hide()
-        self.pushButton_4.hide()
-        self.listWidget.hide()
-        self.Username.hide()
-        self.Password.hide()
-        self.Login_login_btn.hide()
-        self.Login_registration_btn.hide()
-        self.textEdit.hide()
-        self.Login_uname.hide()
-        self.Login_password.hide()
-
-        self.Reg_reg_btn.hide()
-        self.Reg_email.hide()
-        self.Reg_username.hide()
-        self.Reg_password.hide()
-        self.Usernamereg.hide()
-        self.label_reg.hide()
-        self.label_3reg.hide()
-        #hide log
-        self.LogStudendid.hide()
-        self.LogDate.hide()
-        self.LogCancel.hide()
-        self.LogOk.hide()
 
 
 
@@ -464,67 +377,8 @@ class Ui_MainWindow(object):
         self.Usernamereg.show()
         self.label_reg.show()
        
-    def hideRegistration(self):
-        #hide registration page
-        self.label.hide()
-        self.label_2.hide()
-        self.pushButton.hide()
-        self.pushButton_3.hide()
-        self.pushButton_2.hide()
-        self.pushButton_4.hide()
-        self.listWidget.hide()
-        self.Username.hide()
-        self.Password.hide()
-        self.Login_login_btn.hide()
-        self.Login_registration_btn.hide()
-        self.textEdit.hide()
-        self.Login_uname.hide()
-        self.Login_password.hide()
 
-        self.Reg_reg_btn.hide()
-        self.Reg_email.hide()
-        self.Reg_username.hide()
-        self.Reg_password.hide()
-        self.Usernamereg.hide()
-        self.label_reg.show()
-        self.label_3reg.hide()
-        #hiding main admin page
-        self.RegisterStaff.hide()
-        self.EditStudent.hide()
-        self.AddStudent.hide()
-        self.RemoveStudent.hide()
-        self.RemoveStaff.hide()
-        self.EditStaff.hide()
-        self.StudentLog.hide()
-        self.LogOffAdmin.hide()
-        #hide log
-        self.LogStudendid.hide()
-        self.LogDate.hide()
-        self.LogCancel.hide()
-        self.LogOk.hide()
 
-          
-    def hideLogin(self):
-        self.Username.hide()
-        self.Password.hide()
-        self.Login_login_btn.hide()
-        self.Login_registration_btn.hide()
-        self.textEdit.hide()
-        self.Login_uname.hide()
-        self.Login_password.hide()
-
-        self.Reg_reg_btn.hide()
-        self.Reg_email.hide()
-        self.Reg_username.hide()
-        self.Reg_password.hide()
-        self.Usernamereg.hide()
-        self.textEditreg.hide()
-        self.label_3reg.hide()
-        #hide log
-        self.LogStudendid.hide()
-        self.LogDate.hide()
-        self.LogCancel.hide()
-        self.LogOk.hide()
 
     def showLogin(self):
         self.Username.show()
@@ -545,32 +399,34 @@ class Ui_MainWindow(object):
 
     def loginfunc(self, MainWindow):
         #when Login button is clicked
-        self.hideLogin()
+        self.hideall()
         self.showMain()
         print("login clicked")
 
     def Registrationfunc(self, MainWindow):
         #when Registration is clicked
-        self.hideRegistration()
+        self.hideall()
         self.showRegistration()
         ##print("Registration clicked")
 
     def MainAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
-        self.hideMainAdmin()
+        self.hideall()
         self.showMainAdmin()
         ##print("Registration clicked")
 
     def LogOffAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
-        self.hideLogin()
+        '''self.hideLogin()
         self.hideRegistration()
-        self.hideMainAdmin()
+        self.hideMainAdmin()'''
+        self.hideall()
         self.showLogin()
         ##print("Registration clicked")
     def LogAdminfunc(self, MainWindow):
+        self.hideall()
         self.showLog()
-        self.hideog()
+
         
 
 
