@@ -119,6 +119,12 @@ class Ui_MainWindow(object):
         self.textEdit = QtGui.QTextEdit(MainWindow)
         self.textEdit.setGeometry(QtCore.QRect(330, 90, 421, 61))
         self.textEdit.setObjectName(_fromUtf8("textEdit"))
+
+        self.LogOffstaff = QtGui.QCommandLinkButton(MainWindow)
+        self.LogOffstaff.setGeometry(QtCore.QRect(790, 780, 187, 41))
+        self.LogOffstaff.setObjectName(_fromUtf8("LogOffstaff"))
+        #when Registration is clicked
+        self.LogOffstaff.clicked.connect(self.LogOffStafffunc)
         #=======================================================
         #Registration Page
 
@@ -159,6 +165,13 @@ class Ui_MainWindow(object):
         self.textEditreg = QtGui.QTextEdit(MainWindow)
         self.textEditreg.setGeometry(QtCore.QRect(380, 60, 421, 61))
         self.textEditreg.setObjectName(_fromUtf8("textEditreg"))
+
+
+        self.CancleReg = QtGui.QCommandLinkButton(MainWindow)
+        self.CancleReg.setGeometry(QtCore.QRect(790, 780, 187, 41))
+        self.CancleReg.setObjectName(_fromUtf8("CancleReg"))
+        #when Registration is clicked
+        self.CancleReg.clicked.connect(self.MainAdminfunc)
 
         #=======================================================
         # main admin page
@@ -221,10 +234,14 @@ class Ui_MainWindow(object):
         self.LogCancel = QtGui.QPushButton(MainWindow)
         self.LogCancel.setGeometry(QtCore.QRect(70, 180, 99, 27))
         self.LogCancel.setObjectName(_fromUtf8("LogCancel"))
+
+        self.LogCancel.clicked.connect(self.CancleRegfunc)
+
         self.LogOk = QtGui.QPushButton(MainWindow)
         self.LogOk.setGeometry(QtCore.QRect(240, 180, 99, 27))
         self.LogOk.setObjectName(_fromUtf8("LogOk"))
 
+        
 
 
 
@@ -263,6 +280,9 @@ class Ui_MainWindow(object):
         self.label_reg.setText(_translate("MainWindow", "Email ID", None))
         self.Reg_reg_btn.setText(_translate("MainWindow", "Register", None))
         self.Usernamereg.setText(_translate("MainWindow", "Username", None))
+        self.LogOffAdmin.setText(_translate("MainWindow", "Log Off", None))
+        self.LogOffstaff.setText(_translate("MainWindow", "Log Off", None))
+        self.CancleReg.setText(_translate("MainWindow", "Cancel", None))
         self.label_3reg.setText(_translate("MainWindow", "Password", None))
         self.textEditreg.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -334,6 +354,9 @@ class Ui_MainWindow(object):
         self.listWidget_2.hide()
         self.LogStudentIdText.hide()
         self.LogDateText.hide()
+        self.LogOffstaff.hide()
+        self.CancleReg.hide()
+
 
        
 
@@ -349,6 +372,7 @@ class Ui_MainWindow(object):
         self.pushButton_4.show()
         self.listWidget.show()
         self.listWidget_2.show()
+        self.LogOffstaff.show()
 
     def showMainAdmin(self):
         #show admin page
@@ -376,6 +400,7 @@ class Ui_MainWindow(object):
         self.label_3reg.show()
         self.Usernamereg.show()
         self.label_reg.show()
+        self.CancleReg.show()
        
 
 
@@ -426,6 +451,15 @@ class Ui_MainWindow(object):
     def LogAdminfunc(self, MainWindow):
         self.hideall()
         self.showLog()
+
+    def LogOffStafffunc(self, MainWindow):
+        #when Admin Login is clicked is clicked
+        self.hideall()
+        self.showLogin()
+    def CancleRegfunc(self, MainWindow):
+        #when Admin Login is clicked is clicked
+        self.hideall()
+        self.showMainAdmin()      
 
         
 
