@@ -1,0 +1,154 @@
+6 SAFETY REQUIREMENTS
+
+The system shall store the checkout log in a file when students have been dismissed.
+
+DESCRIPTION
+
+When a staff who has logged in to the system checkout students, the action should be saved in a document with proper information such as , staff id , name of student, checkout time and checkout time.
+
+SOURCE
+
+The source of the requirements are the senior design team 2.
+
+CONSTRAINTS
+
+
+PRIORITY
+
+The priority of this requirement is critical. As it is a school, we are trying to keep make the product secure.
+
+
+
+
+Keep track of admin use
+
+DESCRIPTION
+
+Whenever the administrative panel perform any modification in the system such as add students, change students or change RFID tags, it shall store the log . This shall prevent the admin from doing unwanted stuff.
+
+SOURCE
+
+
+The source of the requirements are the senior design team 2.
+
+CONSTRAINTS
+
+
+PRIORITY
+
+The priority of this requirement is critical. As it is a school, we are trying to keep make the product secure.
+
+
+
+
+Admin login to make change in system
+
+DESCRIPTION
+
+The system allows the admin to modify the files in existing system. They can add student, remove student, add RFID tags , remove RFID tags , get the logs from the system. To perform any kind of operation mentioned above, the admin must first login with his email address and password.
+
+SOURCE
+
+
+The source of the requirements are the senior design team 2.
+
+CONSTRAINTS
+
+
+
+PRIORITY
+
+The priority of this requirement is critical. As it is a school, we are trying to keep make the product secure.
+
+
+Staff must write note for any change
+
+DESCRIPTION
+
+The application will provide only limited access to the staff. The only thing a staff can do after logging in to the system will be checking out the students based upon the arrival of their parents. However, if the staff checks out wrong student, he must write a note which will enhance the security and can be used for future reference.
+
+SOURCE
+
+
+The source of the requirements are the senior design team 2.
+
+CONSTRAINTS
+
+
+
+PRIORITY
+
+The priority of this requirement is critical. As it is a school, we are trying to keep make the product secure.
+
+
+
+
+The staff must not have admin privilege.
+
+DESCRIPTION
+
+The application will provide only limited access to the staff. The only thing a staff can do after logging in to the system will be checking out the students based upon the arrival of their parents. The staff should not be able to perform other administrative functions such as adding students, removing students and changing RFID tags.
+
+SOURCE
+
+The source of the requirements are the customers.
+
+CONSTRAINTS
+
+We will have to make separate GUI for staff and for admin. The one for the staff will only display limited buttons while the one for the admin will contain full functionality.
+
+
+PRIORITY
+
+This requirement has high priority because if a staff performs any changes in the system, it will be difficult to maintain high security.
+
+
+
+
+
+
+
+PERFORMANCE REQUIREMENT
+
+Read multiple form of RFID
+
+DESCRIPTION
+
+There are several types of RFID tags such as windshield stickers and cards. The scanner should be able to read any of them and send signal to the computer with correct information.
+
+SOURCE
+
+
+The source of the requirements are the senior design team 2.
+
+CONSTRAINTS
+
+The scanner will read a same tag multiple times but the application should filter the repetition and send only one notification for one RFID tag.
+
+PRIORITY
+
+This requirement has high priority parents may have any form of RFID tags and they should be handled carefully by the scanner as well as the application.
+
+PERFORMANCE REQUIREMENT
+Quick response to RFID detection
+
+DESCRIPTION
+
+When the scanner detects any RFID tags around , it sends signal to the application. The application should then display the name and image of a student who is linked to that RFID tag. This entire seconds should be done under 2 seconds once the scanner reads a tag.
+
+SOURCE
+
+
+The source of the requirements are the senior design team 2.
+
+CONSTRAINTS
+
+The speed of the computer used must meet the specifications standard so that the application can run smoothly.
+
+PRIORITY
+
+This requirement has moderate priority.
+
+
+
+

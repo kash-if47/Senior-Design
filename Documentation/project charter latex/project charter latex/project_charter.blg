@@ -1,0 +1,8 @@
+This is BibTeX, Version 0.99dThe top-level auxiliary file: project_charter.aux
+The style file: plain.bst
+Illegal, another \bibstyle command---line 42 of file project_charter.aux
+ : \bibstyle
+ :          {reference/IEEEtran_custom}
+I'm skipping whatever remains of this command
+Database file #1: reference/refs.bib
+(There was 1 error message)
