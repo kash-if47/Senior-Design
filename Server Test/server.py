@@ -81,11 +81,51 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.pushButton.clicked.connect(self.handleClear1)
 
+        #=======================================================
+        self.Username = QtGui.QLabel(MainWindow)
+        self.Username.setGeometry(QtCore.QRect(220, 180, 191, 101))
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        self.Username.setFont(font)
+        self.Username.setObjectName(_fromUtf8("Username"))
+        self.Password = QtGui.QLabel(MainWindow)
+        self.Password.setGeometry(QtCore.QRect(220, 260, 191, 101))
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        self.Password.setFont(font)
+        self.Password.setObjectName(_fromUtf8("Password"))
+        self.Login_uname = QtGui.QLineEdit(MainWindow)
+        self.Login_uname.setGeometry(QtCore.QRect(430, 210, 271, 41))
+        font = QtGui.QFont()
+        font.setPointSize(22)
+        self.Login_uname.setFont(font)
+        self.Login_uname.setObjectName(_fromUtf8("Login_uname"))
+        self.Login_password = QtGui.QLineEdit(MainWindow)
+        self.Login_password.setGeometry(QtCore.QRect(430, 290, 271, 41))
+        self.Login_password.setObjectName(_fromUtf8("Login_password"))
+        self.Login_login_btn = QtGui.QPushButton(MainWindow)
+        self.Login_login_btn.setGeometry(QtCore.QRect(270, 450, 211, 61))
+        self.Login_login_btn.setObjectName(_fromUtf8("Login_login_btn"))
+
+        self.Login_login_btn.clicked.connect(self.loginfunc)
+
+        self.Login_registration_btn = QtGui.QPushButton(MainWindow)
+        self.Login_registration_btn.setGeometry(QtCore.QRect(520, 450, 211, 61))
+        self.Login_registration_btn.setObjectName(_fromUtf8("Login_registration_btn"))
+
+        self.Login_registration_btn.clicked.connect(self.Registrationfunc)
+
+        self.textEdit = QtGui.QTextEdit(MainWindow)
+        self.textEdit.setGeometry(QtCore.QRect(330, 90, 421, 61))
+        self.textEdit.setObjectName(_fromUtf8("textEdit"))
+        #=======================================================
         self.workerThread = WorkerThread()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.workerThread.start()
+
+
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
@@ -95,6 +135,48 @@ class Ui_MainWindow(object):
         self.pushButton_3.setText(_translate("MainWindow", "Undo", None))
         self.pushButton_2.setText(_translate("MainWindow", "Clear", None))
         self.pushButton_4.setText(_translate("MainWindow", "Undo", None))
+        self.Username.setText(_translate("Dialog", "Username", None))
+        self.Password.setText(_translate("Dialog", "Password", None))
+        self.Login_login_btn.setText(_translate("Dialog", "Login", None))
+        self.Login_registration_btn.setText(_translate("Dialog", "Register", None))
+        self.textEdit.setHtml(_translate("Dialog",
+                                         "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                                         "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                         "p, li { white-space: pre-wrap; }\n"
+                                         "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:18pt; font-weight:400; font-style:normal;\">\n"
+                                         "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:24pt; font-weight:600; font-style:italic; color:#ff0000;\">Login</span></p></body></html>",
+                                         None))
+        self.hideMain()
+
+    def hideMain(self):
+        self.label.hide()
+        self.label_2.hide()
+        self.pushButton.hide()
+        self.pushButton_3.hide()
+        self.pushButton_2.hide()
+        self.pushButton_4.hide()
+        self.listWidget_2.hide()
+        self.listWidget.hide()
+
+    def showMain(self):
+        self.label.show()
+        self.label_2.show()
+        self.pushButton.show()
+        self.pushButton_3.show()
+        self.pushButton_2.show()
+        self.pushButton_4.show()
+        self.listWidget.show()
+        self.listWidget_2.show()
+
+    def hideLogin(self):
+        self.Username.hide()
+        self.Password.hide()
+        self.Login_login_btn.hide()
+        self.Login_registration_btn.hide()
+        self.textEdit.hide()
+        self.Login_uname.hide()
+        self.Login_password.hide()
+
 
     def handleClear1(self):
         items = ui.listWidget.count()
@@ -103,6 +185,14 @@ class Ui_MainWindow(object):
         for i in rangedList:
             if ui.listWidget.isItemSelected(ui.listWidget.item(i)) == True:
                 ui.listWidget.takeItem(i)
+
+    def loginfunc(self, MainWindow):
+        self.hideLogin()
+        self.showMain()
+        print("login clicked")
+
+    def Registrationfunc(self, MainWindow):
+        print("Registration clicked")
 
 class WorkerThread(QThread):
     def __init__(self, parent = None):
