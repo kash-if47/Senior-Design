@@ -1,0 +1,32 @@
+\contentsline {section}{\numberline {1}Vision}{4}
+\contentsline {section}{\numberline {2}Mission}{4}
+\contentsline {section}{\numberline {3}Success Criteria}{4}
+\contentsline {section}{\numberline {4}Background}{5}
+\contentsline {section}{\numberline {5}Related Work}{5}
+\contentsline {section}{\numberline {6}System Overview}{5}
+\contentsline {section}{\numberline {7}Roles \& Responsibilities}{5}
+\contentsline {section}{\numberline {8}Facilities \& Equipment}{6}
+\contentsline {section}{\numberline {9}Cost Proposal}{6}
+\contentsline {subsection}{\numberline {9.1}Preliminary Budget}{6}
+\contentsline {subsection}{\numberline {9.2}Current \& Pending Support}{6}
+\contentsline {section}{\numberline {10}Documentation \& Reporting}{6}
+\contentsline {subsection}{\numberline {10.1}Project Charter}{7}
+\contentsline {subsection}{\numberline {10.2}Product Backlog}{7}
+\contentsline {subsection}{\numberline {10.3}Sprint Planning}{7}
+\contentsline {subsubsection}{\numberline {10.3.1}Sprint Goal}{7}
+\contentsline {subsubsection}{\numberline {10.3.2}Sprint Backlog}{7}
+\contentsline {subsubsection}{\numberline {10.3.3}Task Breakdown}{7}
+\contentsline {subsection}{\numberline {10.4}Sprint Retrospective}{7}
+\contentsline {subsection}{\numberline {10.5}Individual Status Reports}{7}
+\contentsline {subsection}{\numberline {10.6}Engineering Notebooks}{7}
+\contentsline {subsection}{\numberline {10.7}Closeout Materials}{7}
+\contentsline {subsubsection}{\numberline {10.7.1}System Prototype}{7}
+\contentsline {subsubsection}{\numberline {10.7.2}Project Poster}{7}
+\contentsline {subsubsection}{\numberline {10.7.3}Web Page}{7}
+\contentsline {subsubsection}{\numberline {10.7.4}Demo Video}{7}
+\contentsline {subsubsection}{\numberline {10.7.5}Source Code}{8}
+\contentsline {subsubsection}{\numberline {10.7.6}Source Code Documentation}{8}
+\contentsline {subsubsection}{\numberline {10.7.7}Hardware Schematics}{8}
+\contentsline {subsubsection}{\numberline {10.7.8}CAD files}{8}
+\contentsline {subsubsection}{\numberline {10.7.9}Installation Scripts}{8}
+\contentsline {subsubsection}{\numberline {10.7.10}User Manual}{8}
