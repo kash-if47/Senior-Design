@@ -795,5 +795,4 @@ ui.setupUi(MainWindow)
 if __name__ == "__main__":
     MainWindow.show()
     print("Hello Austin")
-    print("Git test2")
     sys.exit(app.exec_())

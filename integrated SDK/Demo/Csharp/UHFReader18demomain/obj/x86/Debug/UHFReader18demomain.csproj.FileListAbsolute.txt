@@ -25,3 +25,17 @@ C:\Users\Austin Hastings\Documents\UTA7\Senior Design I\CF-RU5106.5112\integrate
 C:\Users\Austin Hastings\Documents\UTA7\Senior Design I\CF-RU5106.5112\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.csproj.CoreCompileInputs.cache
 C:\Users\Austin Hastings\Documents\UTA7\Senior Design I\CF-RU5106.5112\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.exe
 C:\Users\Austin Hastings\Documents\UTA7\Senior Design I\CF-RU5106.5112\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.pdb
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\bin\x86\Debug\UHFReader18demomain.exe
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\bin\x86\Debug\UHFReader18demomain.pdb
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.csprojResolveAssemblyReference.cache
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.ChangeIPdlg.resources
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.fNhSetDlg.resources
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.Form1.resources
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.fPhSetDlg.resources
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.fSetdlg.resources
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.locateForm.resources
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.Properties.Resources.resources
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.csproj.GenerateResource.Cache
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.csproj.CoreCompileInputs.cache
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.exe
+C:\Users\kash_\Google Drive\Senior-Design\integrated SDK\Demo\Csharp\UHFReader18demomain\obj\x86\Debug\UHFReader18demomain.pdb
