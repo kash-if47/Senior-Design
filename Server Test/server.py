@@ -433,12 +433,12 @@ class Ui_MainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         #MainWindow.setStatusBar(self.statusbar)
-  
+
 
         #self.LogCancel.clicked.connect(self.CancleRegfunc)
 
 
-       
+
 
         #=======================================================
         self.workerThread = WorkerThread()
@@ -508,7 +508,7 @@ class Ui_MainWindow(object):
         self.Log_label1.setText(_translate("MainWindow", "Start Date", None))
         self.Log_label2.setText(_translate("MainWindow", "End Date", None))
         self.LogButton_Generate.setText(_translate("MainWindow", "Generate", None))
-        
+
 
         #mainadmin
         self.LogOffAdmin2.setText(_translate("MainWindow", "Log Off", None))
@@ -583,11 +583,11 @@ class Ui_MainWindow(object):
         #self.RemoveStaff.hide()
         #self.EditStaff.hide()
         self.StudentLog.hide()
-        #self.LogOffAdmin.hide()  
+        #self.LogOffAdmin.hide()
         #hiding registration
         #show registration page
         self.textEditreg.hide()
-        self.label_reg.hide()      
+        self.label_reg.hide()
         #self.LogStudendid.hide()
         #self.LogDate.hide()
         #self.LogCancel.hide()
@@ -673,7 +673,7 @@ class Ui_MainWindow(object):
         self.Usernamereg.show()
         self.label_reg.show()
         self.CancleReg.show()
-       
+
 
     def showLogin(self):
         self.Username.show()
@@ -682,7 +682,7 @@ class Ui_MainWindow(object):
         self.Login_registration_btn.show()
         self.textEdit.show()
         self.Login_uname.show()
-        self.Login_password.show()        
+        self.Login_password.show()
 
     def handleClear1(self):
         items = ui.listWidget.count()
@@ -736,7 +736,7 @@ class Ui_MainWindow(object):
     def CancleRegfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
         self.hideall()
-        self.showMainAdmin()      
+        self.showMainAdmin()
 
 
 class WorkerThread(QThread):
@@ -795,6 +795,5 @@ ui.setupUi(MainWindow)
 if __name__ == "__main__":
     MainWindow.show()
     print("Hello Austin")
+    print("Git test2")
     sys.exit(app.exec_())
-
-
