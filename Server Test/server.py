@@ -795,4 +795,5 @@ ui.setupUi(MainWindow)
 if __name__ == "__main__":
     MainWindow.show()
     print("Hello Austin")
+    print("Hey man")
     sys.exit(app.exec_())
