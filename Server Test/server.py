@@ -1,3 +1,4 @@
+
 import socket
 import threading
 import os
@@ -80,6 +81,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
         self.pushButton.clicked.connect(self.handleClear1)
+        self.pushButton_2.clicked.connect(self.handleClear2)
 
         #=======================================================
         #login Page
@@ -689,6 +691,16 @@ class Ui_MainWindow(object):
         for i in rangedList:
             if ui.listWidget.isItemSelected(ui.listWidget.item(i)) == True:
                 ui.listWidget.takeItem(i)
+                break
+
+    def handleClear2(self):
+        items = ui.listWidget_2.count()
+        rangedList = range(items)
+        rangedList = rangedList.__reversed__()
+        for i in rangedList:
+            if ui.listWidget_2.isItemSelected(ui.listWidget_2.item(i)) == True:
+                ui.listWidget_2.takeItem(i)
+                break
 
     def loginfunc(self, MainWindow):
         #when Login button is clicked
@@ -752,9 +764,14 @@ class WorkerThread(QThread):
 
 def client_thread(clientsocket):
     message = clientsocket.recv(2048)
-    temp = search_query(message.decode("utf-8"))
-    item = QtGui.QListWidgetItem(temp)
-    ui.listWidget.addItem(item)
+    rfid = message.decode("utf-8")
+    temp = search_query(rfid[2:])
+    if(rfid[0:2] == "R1"):
+        item = QtGui.QListWidgetItem(temp)
+        ui.listWidget.addItem(item)
+    elif(rfid[0:2] == "R2"):
+        item = QtGui.QListWidgetItem(temp)
+        ui.listWidget_2.addItem(item)
     MainWindow.update()
     # MainWindow.show()
     # sys.exit(app.exec_())
