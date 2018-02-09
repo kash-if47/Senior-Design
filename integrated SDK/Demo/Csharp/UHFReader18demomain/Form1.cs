@@ -1271,7 +1271,18 @@ namespace UHFReader18demomain
                         if (sEPC==ListView1_EPC.Items[i].SubItems[1].Text)
                         {
                              aListItem = ListView1_EPC.Items[i];
-                             ChangeSubItem(aListItem, 1, sEPC);
+                            // API modification Kashif Iqbal - kashif.iqbal@mavs.uta.edu
+                            // Broadcasting RFID Tags on local host port 8086
+                            Console.WriteLine("Edit: ");
+                            Console.WriteLine(sEPC);
+                            //Socket soc = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                            //IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                            //System.Net.IPAddress ipAdd = System.Net.IPAddress.Parse("127.0.0.1");
+                            //System.Net.IPEndPoint remoteEP = new IPEndPoint(ipAdd, 8086);
+                            //soc.Connect(remoteEP);
+                            //byte[] byData = System.Text.Encoding.ASCII.GetBytes(sEPC);
+                            //soc.Send(byData);
+                            ChangeSubItem(aListItem, 1, sEPC);
                              isonlistview=true;
                         }
                       }
@@ -1282,6 +1293,15 @@ namespace UHFReader18demomain
                           aListItem.SubItems.Add("");
                           aListItem.SubItems.Add("");
                           s = sEPC;
+                          Console.WriteLine("First: ");
+                          Console.WriteLine(sEPC);
+                          Socket soc = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                          IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                          System.Net.IPAddress ipAdd = System.Net.IPAddress.Parse("127.0.0.1");
+                          System.Net.IPEndPoint remoteEP = new IPEndPoint(ipAdd, 8086);
+                          soc.Connect(remoteEP);
+                          byte[] byData = System.Text.Encoding.ASCII.GetBytes(sEPC);
+                          soc.Send(byData);
                           ChangeSubItem(aListItem, 1, s);
                           s = (sEPC.Length / 2).ToString().PadLeft(2, '0');
                           ChangeSubItem(aListItem, 2, s);
