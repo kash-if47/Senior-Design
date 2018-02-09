@@ -4,6 +4,7 @@ import os
 import sys
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import QThread
+
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -197,8 +198,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.EditStudent)
         self.RegisterStaff = QtGui.QPushButton(self.verticalLayoutWidget)
         self.RegisterStaff.setObjectName(_fromUtf8("RegisterStaff"))
-        #when Registration is clicked
-        self.RegisterStaff.clicked.connect(self.Registrationfunc)
+        #when Edit staff is clicked
+        self.RegisterStaff.clicked.connect(self.ShowStaffWindonFunc)
 
         self.horizontalLayout.addWidget(self.RegisterStaff)
         self.StudentLog = QtGui.QPushButton(self.verticalLayoutWidget)
@@ -486,6 +487,8 @@ class Ui_MainWindow(object):
         self.StudentButton_Remove = QtGui.QPushButton(MainWindow)
         self.StudentButton_Remove.setGeometry(QtCore.QRect(380, 780, 101, 23))
         self.StudentButton_Remove.setObjectName(_fromUtf8("StudentButton_Remove"))
+        self.StudentButton_Remove.clicked.connect(self.RemoveStudentfunc)
+
         self.StudentButton_Exit = QtGui.QPushButton(MainWindow)
         self.StudentButton_Exit.setGeometry(QtCore.QRect(790, 780, 75, 23))
         self.StudentButton_Exit.setObjectName(_fromUtf8("StudentButton_Exit"))
@@ -497,6 +500,9 @@ class Ui_MainWindow(object):
         self.StudentButton_Edit = QtGui.QPushButton(MainWindow)
         self.StudentButton_Edit.setGeometry(QtCore.QRect(250, 780, 91, 23))
         self.StudentButton_Edit.setObjectName(_fromUtf8("StudentButton_Edit"))
+        self.StudentButton_Edit.clicked.connect(self.addStudentfunc)
+
+
         self.LogOffAdmin = QtGui.QCommandLinkButton(MainWindow)
         self.LogOffAdmin.setGeometry(QtCore.QRect(1100, 10, 187, 41))
         self.LogOffAdmin.setObjectName(_fromUtf8("LogOffAdmin"))
@@ -547,6 +553,8 @@ class Ui_MainWindow(object):
         self.StudentButton_Add = QtGui.QPushButton(MainWindow)
         self.StudentButton_Add.setGeometry(QtCore.QRect(120, 780, 91, 23))
         self.StudentButton_Add.setObjectName(_fromUtf8("StudentButton_Add"))
+        self.StudentButton_Add.clicked.connect(self.addStudentfunc)
+
         self.StudentLabel_GName = QtGui.QLabel(MainWindow)
         self.StudentLabel_GName.setGeometry(QtCore.QRect(530, 270, 81, 31))
         font = QtGui.QFont()
@@ -558,16 +566,94 @@ class Ui_MainWindow(object):
         self.StudentView.setObjectName(_fromUtf8("StudentView"))
 
         #=================================================
+        #Staff Window
+        self.StaffText_Grade = QtGui.QLineEdit(MainWindow)
+        self.StaffText_Grade.setGeometry(QtCore.QRect(670, 200, 241, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffText_Grade.setFont(font)
+        self.StaffText_Grade.setObjectName(_fromUtf8("StaffText_Grade"))
+        self.StaffButton_Promote = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Promote.setGeometry(QtCore.QRect(520, 780, 101, 23))
+        self.StaffButton_Promote.setObjectName(_fromUtf8("StaffButton_Promote"))
+        self.StaffButton_Promote.clicked.connect(self.PromoteFunction)
 
+        self.StaffLabel_Email = QtGui.QLabel(MainWindow)
+        self.StaffLabel_Email.setGeometry(QtCore.QRect(550, 200, 121, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffLabel_Email.setFont(font)
+        self.StaffLabel_Email.setObjectName(_fromUtf8("StaffLabel_Email"))
+        self.StaffText_ID = QtGui.QLineEdit(MainWindow)
+        self.StaffText_ID.setGeometry(QtCore.QRect(670, 130, 241, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffText_ID.setFont(font)
+        self.StaffText_ID.setObjectName(_fromUtf8("StaffText_ID"))
+        self.StaffButton_Add = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Add.setGeometry(QtCore.QRect(120, 780, 91, 23))
+        self.StaffButton_Add.setObjectName(_fromUtf8("StaffButton_Add"))
+        self.StaffButton_Add.clicked.connect(self.AddStaffFunc)
 
+        self.StaffText_Name = QtGui.QLineEdit(MainWindow)
+        self.StaffText_Name.setGeometry(QtCore.QRect(670, 60, 241, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffText_Name.setFont(font)
+        self.StaffText_Name.setObjectName(_fromUtf8("StaffText_Name"))
+        self.StaffButton_Remove = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Remove.setGeometry(QtCore.QRect(380, 780, 101, 23))
+        self.StaffButton_Remove.setObjectName(_fromUtf8("StaffButton_Remove"))
+        self.StaffButton_Remove.clicked.connect(self.RemoveStudentfunc)
 
+        self.StaffText_GName = QtGui.QLineEdit(MainWindow)
+        self.StaffText_GName.setGeometry(QtCore.QRect(670, 270, 241, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffText_GName.setFont(font)
+        self.StaffText_GName.setObjectName(_fromUtf8("StaffText_GName"))
+        self.StaffView = QtGui.QListView(MainWindow)
+        self.StaffView.setGeometry(QtCore.QRect(10, 60, 450, 550))
+        self.StaffView.setObjectName(_fromUtf8("StaffView"))
+        self.StudentLabel_SearchName = QtGui.QLabel(MainWindow)
+        self.StudentLabel_SearchName.setGeometry(QtCore.QRect(10, 630, 91, 16))
+        self.StudentLabel_SearchName.setObjectName(_fromUtf8("StudentLabel_SearchName"))
+        self.LogOffAdmin_Staff = QtGui.QCommandLinkButton(MainWindow)
+        self.LogOffAdmin_Staff.setGeometry(QtCore.QRect(1100, 10, 187, 41))
+        self.LogOffAdmin_Staff.setObjectName(_fromUtf8("LogOffAdmin_Staff"))
+        self.LogOffAdmin_Staff.clicked.connect(self.LogOffAdminfunc)
 
+        self.StaffLabel_Name = QtGui.QLabel(MainWindow)
+        self.StaffLabel_Name.setGeometry(QtCore.QRect(550, 60, 81, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffLabel_Name.setFont(font)
+        self.StaffLabel_Name.setObjectName(_fromUtf8("StaffLabel_Name"))
+        self.StaffButton_Exit = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Exit.setGeometry(QtCore.QRect(790, 780, 75, 23))
+        self.StaffButton_Exit.setObjectName(_fromUtf8("StaffButton_Exit"))
+        self.StaffButton_Exit.clicked.connect(self.CancleRegfunc)
 
+        self.StaffButton_Edit = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Edit.setGeometry(QtCore.QRect(250, 780, 91, 23))
+        self.StaffButton_Edit.setObjectName(_fromUtf8("StaffButton_Edit"))
+        self.StaffButton_Edit.clicked.connect(self.AddStaffFunc)
 
-
-
-
-
+        self.StaffLabel_Password = QtGui.QLabel(MainWindow)
+        self.StaffLabel_Password.setGeometry(QtCore.QRect(550, 270, 81, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffLabel_Password.setFont(font)
+        self.StaffLabel_Password.setObjectName(_fromUtf8("StaffLabel_Password"))
+        self.StaffLabel_ID = QtGui.QLabel(MainWindow)
+        self.StaffLabel_ID.setGeometry(QtCore.QRect(550, 130, 81, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffLabel_ID.setFont(font)
+        self.StaffLabel_ID.setObjectName(_fromUtf8("StaffLabel_ID"))
+        self.StaffSearch_Name = QtGui.QLineEdit(MainWindow)
+        self.StaffSearch_Name.setGeometry(QtCore.QRect(10, 660, 451, 31))
+        self.StaffSearch_Name.setObjectName(_fromUtf8("StaffSearch_Name"))
 
         # =================================================
         self.workerThread = WorkerThread()
@@ -575,7 +661,6 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.workerThread.start()
-
 
 
     def retranslateUi(self, MainWindow):
@@ -667,9 +752,44 @@ class Ui_MainWindow(object):
         self.StudentButton_Add.setText(_translate("MainWindow", "Add Student", None))
         self.StudentLabel_GName.setText(_translate("MainWindow", "Guardian:", None))
 
+        #staff Window
+        self.StaffButton_Promote.setText(_translate("MainWindow", "Promote to Admin", None))
+        self.StaffLabel_Email.setText(_translate("MainWindow", "Email:", None))
+        self.StaffButton_Add.setText(_translate("MainWindow", "Add Staff", None))
+        self.StaffButton_Remove.setText(_translate("MainWindow", "Remove Staff", None))
+        self.StudentLabel_SearchName.setText(_translate("MainWindow", "Search Name:", None))
+        self.LogOffAdmin_Staff.setText(_translate("MainWindow", "Log Off", None))
+        self.StaffLabel_Name.setText(_translate("MainWindow", "Full Name:", None))
+        self.StaffButton_Exit.setText(_translate("MainWindow", "Exit", None))
+        self.StaffButton_Edit.setText(_translate("MainWindow", "Edit Staff", None))
+        self.StaffLabel_Password.setText(_translate("MainWindow", "Password:", None))
+        self.StaffLabel_ID.setText(_translate("MainWindow", "Staff ID:", None))
         self.hideall()
         self.showLogin()
 
+    def addstudentfun(self):
+        self.homewindow = QtGui.QDialog()
+        self.ui = Ui_DialogAdd()
+        self.ui.setupUi(self.homewindow)
+        self.homewindow.exec_()
+
+    def showStaffWindow(self):
+        self.StaffButton_Add.show()
+        self.StaffButton_Edit.show()
+        self.StaffButton_Exit.show()
+        self.StaffButton_Promote.show()
+        self.StaffButton_Remove.show()
+        self.StaffLabel_Email.show()
+        self.StaffLabel_ID.show()
+        self.StaffLabel_Name.show()
+        self.StaffLabel_Password.show()
+        self.StaffSearch_Name.show()
+        self.StaffText_GName.show()
+        self.StaffText_Grade.show()
+        self.StaffText_ID.show()
+        self.StaffText_Name.show()
+        self.StaffView.show()
+        self.LogOffAdmin_Staff.show()
     def showStudentWindow(self):
         self.StudentLabel_Grade.show()
         self.StudentLabel_ID.show()
@@ -821,7 +941,6 @@ class Ui_MainWindow(object):
         self.StudentLabel_RFID.hide()
         self.StudentButton_Add.hide()
         self.StudentLabel_GName.hide()
-
         self.StudentText_GName.hide()
         self.StudentText_Grade.hide()
         self.StudentText_ID.hide()
@@ -831,6 +950,24 @@ class Ui_MainWindow(object):
         self.StudentSearch_ID.hide()
         self.StudentSearch_Name.hide()
         self.StudentView.hide()
+
+        #hide all staff window
+        self.StaffButton_Add.hide()
+        self.StaffButton_Edit.hide()
+        self.StaffButton_Exit.hide()
+        self.StaffButton_Promote.hide()
+        self.StaffButton_Remove.hide()
+        self.StaffLabel_Email.hide()
+        self.StaffLabel_ID.hide()
+        self.StaffLabel_Name.hide()
+        self.StaffLabel_Password.hide()
+        self.StaffSearch_Name.hide()
+        self.StaffText_GName.hide()
+        self.StaffText_Grade.hide()
+        self.StaffText_ID.hide()
+        self.StaffText_Name.hide()
+        self.StaffView.hide()
+        self.LogOffAdmin_Staff.hide()
 
 
 
@@ -931,6 +1068,300 @@ class Ui_MainWindow(object):
     def ShowAdminFunc(self, MainWindow):
         self.hideall()
         self.showStudentWindow()
+    def ShowStaffWindonFunc(self,MainWondow):
+        self.hideall()
+        self.showStaffWindow()
+
+
+    def addStudentfunc(self):
+        self.homewindow = QtGui.QDialog()
+        self.ui = Ui_DialogAdd()
+        self.ui.setupUi(self.homewindow)
+        self.homewindow.exec_()
+
+    def RemoveStudentfunc(self):
+        self.homewindow = QtGui.QDialog()
+        self.ui = Ui_ConfirmRemove()
+        self.ui.setupUi(self.homewindow)
+        self.homewindow.exec_()
+
+    def AddStaffFunc(self):
+        self.homewindow = QtGui.QDialog()
+        self.ui = Ui_StaffDialog()
+        self.ui.setupUi(self.homewindow)
+        self.homewindow.exec_()
+
+    def PromoteFunction (self):
+        self.homewindow = QtGui.QDialog()
+        self.ui = Ui_ConfirmPromote()
+        self.ui.setupUi(self.homewindow)
+        self.homewindow.exec_()
+
+
+
+
+
+
+
+
+
+#classs for add and edit student
+
+class Ui_DialogAdd(object):
+    def setupUi(self, Dialog):
+        Dialog.setObjectName(_fromUtf8("Dialog"))
+        Dialog.resize(480, 640)
+        self.label = QtGui.QLabel(Dialog)
+        self.label.setGeometry(QtCore.QRect(10, 30, 91, 31))
+        self.label.setObjectName(_fromUtf8("label"))
+        self.lineEdit = QtGui.QLineEdit(Dialog)
+        self.lineEdit.setGeometry(QtCore.QRect(140, 30, 161, 27))
+        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
+        self.label_2 = QtGui.QLabel(Dialog)
+        self.label_2.setGeometry(QtCore.QRect(10, 140, 81, 17))
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.lineEdit_2 = QtGui.QLineEdit(Dialog)
+        self.lineEdit_2.setGeometry(QtCore.QRect(140, 130, 161, 27))
+        self.lineEdit_2.setObjectName(_fromUtf8("lineEdit_2"))
+        self.label_3 = QtGui.QLabel(Dialog)
+        self.label_3.setGeometry(QtCore.QRect(10, 200, 68, 17))
+        self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.label_4 = QtGui.QLabel(Dialog)
+        self.label_4.setGeometry(QtCore.QRect(10, 260, 121, 20))
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+        self.label_5 = QtGui.QLabel(Dialog)
+        self.label_5.setGeometry(QtCore.QRect(10, 320, 91, 20))
+        self.label_5.setObjectName(_fromUtf8("label_5"))
+        self.lineEdit_3 = QtGui.QLineEdit(Dialog)
+        self.lineEdit_3.setGeometry(QtCore.QRect(140, 190, 161, 27))
+        self.lineEdit_3.setObjectName(_fromUtf8("lineEdit_3"))
+        self.lineEdit_4 = QtGui.QLineEdit(Dialog)
+        self.lineEdit_4.setGeometry(QtCore.QRect(140, 250, 161, 27))
+        self.lineEdit_4.setObjectName(_fromUtf8("lineEdit_4"))
+        self.lineEdit_5 = QtGui.QLineEdit(Dialog)
+        self.lineEdit_5.setGeometry(QtCore.QRect(140, 310, 161, 27))
+        self.lineEdit_5.setObjectName(_fromUtf8("lineEdit_5"))
+        self.label_6 = QtGui.QLabel(Dialog)
+        self.label_6.setGeometry(QtCore.QRect(10, 380, 111, 17))
+        self.label_6.setObjectName(_fromUtf8("label_6"))
+        self.pushButton = QtGui.QPushButton(Dialog)
+        self.pushButton.setGeometry(QtCore.QRect(140, 380, 99, 27))
+        self.pushButton.setObjectName(_fromUtf8("pushButton"))
+        self.pushButton_2 = QtGui.QPushButton(Dialog)
+        self.pushButton_2.setGeometry(QtCore.QRect(140, 530, 61, 27))
+        self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
+        #self.pushButton_2.clicked.connect(self.cancelClicked)
+
+        self.pushButton_3 = QtGui.QPushButton(Dialog)
+        self.pushButton_3.setGeometry(QtCore.QRect(230, 530, 71, 27))
+        self.pushButton_3.setObjectName(_fromUtf8("pushButton_3"))
+        self.label_7 = QtGui.QLabel(Dialog)
+        self.label_7.setGeometry(QtCore.QRect(10, 90, 81, 17))
+        self.label_7.setObjectName(_fromUtf8("label_7"))
+        self.lineEdit_6 = QtGui.QLineEdit(Dialog)
+        self.lineEdit_6.setGeometry(QtCore.QRect(140, 80, 161, 27))
+        self.lineEdit_6.setObjectName(_fromUtf8("lineEdit_6"))
+
+        self.retranslateUi(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+
+
+    def addstudentclicked(self):
+	    username = self.Login_uname.text()
+	    password = self.Login_password.text()
+        #print(username)
+
+    def retranslateUi(self, Dialog):
+        Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
+        self.label.setText(_translate("Dialog", "First Name : ", None))
+        self.label_2.setText(_translate("Dialog", "Student Id :", None))
+        self.label_3.setText(_translate("Dialog", "Grade :", None))
+        self.label_4.setText(_translate("Dialog", "Guardian Name :", None))
+        self.label_5.setText(_translate("Dialog", "RFID Tag ID :", None))
+        self.label_6.setText(_translate("Dialog", "Upload Photo :", None))
+        self.pushButton.setText(_translate("Dialog", "Browse", None))
+        self.pushButton_2.setText(_translate("Dialog", "Cancel", None))
+        self.pushButton_3.setText(_translate("Dialog", "Add", None))
+        self.label_7.setText(_translate("Dialog", "Last Name : ", None))
+
+###class for remove student
+
+class Ui_ConfirmRemove(object):
+    def setupUi(self, ConfirmRemove):
+        ConfirmRemove.setObjectName(_fromUtf8("ConfirmRemove"))
+        ConfirmRemove.resize(400, 150)
+        ConfirmRemove.setMaximumSize(QtCore.QSize(400, 150))
+        ConfirmRemove.setBaseSize(QtCore.QSize(400, 300))
+        self.RemoveText = QtGui.QLabel(ConfirmRemove)
+        self.RemoveText.setGeometry(QtCore.QRect(20, -30, 371, 141))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.RemoveText.setFont(font)
+        self.RemoveText.setAlignment(QtCore.Qt.AlignCenter)
+        self.RemoveText.setObjectName(_fromUtf8("RemoveText"))
+        self.RemoveConfirm = QtGui.QPushButton(ConfirmRemove)
+        self.RemoveConfirm.setGeometry(QtCore.QRect(60, 100, 75, 23))
+        self.RemoveConfirm.setObjectName(_fromUtf8("RemoveConfirm"))
+
+        self.RemoveCancel = QtGui.QPushButton(ConfirmRemove)
+        self.RemoveCancel.setGeometry(QtCore.QRect(260, 100, 75, 23))
+        self.RemoveCancel.setObjectName(_fromUtf8("RemoveCancel"))
+        #self.RemoveCancel.clicked.connect(self.closeIt)
+
+        self.retranslateUi(ConfirmRemove)
+        QtCore.QMetaObject.connectSlotsByName(ConfirmRemove)
+
+
+
+    def retranslateUi(self, ConfirmRemove):
+        ConfirmRemove.setWindowTitle(_translate("ConfirmRemove", "Confirm", None))
+        self.RemoveText.setText(_translate("ConfirmRemove", "Are you sure you want to \n"
+"remove $student_staff? ", None))
+        self.RemoveConfirm.setText(_translate("ConfirmRemove", "Confirm", None))
+        self.RemoveCancel.setText(_translate("ConfirmRemove", "Cancel", None))
+
+
+
+
+#class for promoting staff to admin
+class Ui_ConfirmPromote(object):
+    def setupUi(self, ConfirmPromote):
+        ConfirmPromote.setObjectName(_fromUtf8("ConfirmPromote"))
+        ConfirmPromote.resize(400, 150)
+        ConfirmPromote.setMaximumSize(QtCore.QSize(400, 150))
+        ConfirmPromote.setBaseSize(QtCore.QSize(400, 300))
+        self.PromoteText = QtGui.QLabel(ConfirmPromote)
+        self.PromoteText.setGeometry(QtCore.QRect(20, -30, 371, 141))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.PromoteText.setFont(font)
+        self.PromoteText.setAlignment(QtCore.Qt.AlignCenter)
+        self.PromoteText.setObjectName(_fromUtf8("PromoteText"))
+        self.PromoteConfirm = QtGui.QPushButton(ConfirmPromote)
+        self.PromoteConfirm.setGeometry(QtCore.QRect(60, 100, 75, 23))
+        self.PromoteConfirm.setObjectName(_fromUtf8("PromoteConfirm"))
+        self.PromoteCancel = QtGui.QPushButton(ConfirmPromote)
+        self.PromoteCancel.setGeometry(QtCore.QRect(260, 100, 75, 23))
+        self.PromoteCancel.setObjectName(_fromUtf8("PromoteCancel"))
+        #self.PromoteCancel.clicked.connect(self.closeIt)
+
+        self.retranslateUi(ConfirmPromote)
+        QtCore.QMetaObject.connectSlotsByName(ConfirmPromote)
+
+
+
+    def retranslateUi(self, ConfirmPromote):
+        ConfirmPromote.setWindowTitle(_translate("ConfirmPromote", "Confirm", None))
+        self.PromoteText.setText(_translate("ConfirmPromote", "Are you sure you want to promote \n"
+"$staff_user to an admin? ", None))
+        self.PromoteConfirm.setText(_translate("ConfirmPromote", "Confirm", None))
+        self.PromoteCancel.setText(_translate("ConfirmPromote", "Cancel", None))
+
+
+
+
+
+#Class for add and edit staff
+class Ui_StaffDialog(object):
+    def setupUi(self, StaffDialog):
+        StaffDialog.setObjectName(_fromUtf8("StaffDialog"))
+        StaffDialog.resize(400, 220)
+        StaffDialog.setMaximumSize(QtCore.QSize(400, 220))
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(252, 254, 227))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(252, 254, 227))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(252, 254, 227))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(252, 254, 227))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
+        StaffDialog.setPalette(palette)
+        self.StaffLabel_Name = QtGui.QLabel(StaffDialog)
+        self.StaffLabel_Name.setGeometry(QtCore.QRect(20, 20, 81, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffLabel_Name.setFont(font)
+        self.StaffLabel_Name.setObjectName(_fromUtf8("StaffLabel_Name"))
+        self.StaffLabel_ID = QtGui.QLabel(StaffDialog)
+        self.StaffLabel_ID.setGeometry(QtCore.QRect(20, 60, 81, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffLabel_ID.setFont(font)
+        self.StaffLabel_ID.setObjectName(_fromUtf8("StaffLabel_ID"))
+        self.StaffLabel_Email = QtGui.QLabel(StaffDialog)
+        self.StaffLabel_Email.setGeometry(QtCore.QRect(20, 100, 121, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffLabel_Email.setFont(font)
+        self.StaffLabel_Email.setObjectName(_fromUtf8("StaffLabel_Email"))
+        self.StaffLabel_Password = QtGui.QLabel(StaffDialog)
+        self.StaffLabel_Password.setGeometry(QtCore.QRect(20, 140, 81, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffLabel_Password.setFont(font)
+        self.StaffLabel_Password.setObjectName(_fromUtf8("StaffLabel_Password"))
+        self.StaffText_Name = QtGui.QLineEdit(StaffDialog)
+        self.StaffText_Name.setGeometry(QtCore.QRect(140, 20, 241, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffText_Name.setFont(font)
+        self.StaffText_Name.setObjectName(_fromUtf8("StaffText_Name"))
+        self.StaffText_ID = QtGui.QLineEdit(StaffDialog)
+        self.StaffText_ID.setGeometry(QtCore.QRect(140, 60, 241, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffText_ID.setFont(font)
+        self.StaffText_ID.setObjectName(_fromUtf8("StaffText_ID"))
+        self.StaffText_Grade = QtGui.QLineEdit(StaffDialog)
+        self.StaffText_Grade.setGeometry(QtCore.QRect(140, 100, 241, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffText_Grade.setFont(font)
+        self.StaffText_Grade.setObjectName(_fromUtf8("StaffText_Grade"))
+        self.StaffText_GName = QtGui.QLineEdit(StaffDialog)
+        self.StaffText_GName.setGeometry(QtCore.QRect(140, 140, 241, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.StaffText_GName.setFont(font)
+        self.StaffText_GName.setObjectName(_fromUtf8("StaffText_GName"))
+        self.StaffConfirm = QtGui.QPushButton(StaffDialog)
+        self.StaffConfirm.setGeometry(QtCore.QRect(70, 190, 75, 23))
+        self.StaffConfirm.setObjectName(_fromUtf8("StaffConfirm"))
+        self.StaffCancel = QtGui.QPushButton(StaffDialog)
+        self.StaffCancel.setGeometry(QtCore.QRect(270, 190, 75, 23))
+        self.StaffCancel.setObjectName(_fromUtf8("StaffCancel"))
+        #self.StaffCancel.clicked.connect(self.closeIt)
+
+
+        self.retranslateUi(StaffDialog)
+        QtCore.QMetaObject.connectSlotsByName(StaffDialog)
+
+
+
+    def retranslateUi(self, StaffDialog):
+        StaffDialog.setWindowTitle(_translate("StaffDialog", "Staff Information", None))
+        self.StaffLabel_Name.setText(_translate("StaffDialog", "Full Name:", None))
+        self.StaffLabel_ID.setText(_translate("StaffDialog", "Staff ID:", None))
+        self.StaffLabel_Email.setText(_translate("StaffDialog", "Email:", None))
+        self.StaffLabel_Password.setText(_translate("StaffDialog", "Password:", None))
+        self.StaffConfirm.setText(_translate("StaffDialog", "Confirm", None))
+        self.StaffCancel.setText(_translate("StaffDialog", "Cancel", None))
+
+
+
+
 
 
 
