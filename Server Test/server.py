@@ -5,9 +5,13 @@ import sys
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import QThread
 import pymysql
-conn = pymysql.connect(host='localhost', port=3306, user='root', passwd='rfid1234', db='rfid')
 
-cur = conn.cursor()
+
+def connectDB():
+    conn = pymysql.connect(host='localhost', port=3306, user='root', passwd='rfid1234', db='rfid')
+    # cur = conn.cursor()
+    return conn
+
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -85,6 +89,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.pushButton.clicked.connect(self.handleClear1)
         self.pushButton_2.clicked.connect(self.handleClear2)
+        MainWindow.keyPressEvent = self.newOnKeyPressEvent
 
         #=======================================================
         #login Page
@@ -113,13 +118,15 @@ class Ui_MainWindow(object):
         self.Login_login_btn.setGeometry(QtCore.QRect(270, 450, 211, 61))
         self.Login_login_btn.setObjectName(_fromUtf8("Login_login_btn"))
         #when login is clicked
-        self.Login_login_btn.clicked.connect(self.loginfunc)
+        # self.Login_login_btn.clicked.connect(self.loginfunc)
 
         self.Login_registration_btn = QtGui.QPushButton(MainWindow)
         self.Login_registration_btn.setGeometry(QtCore.QRect(520, 450, 211, 61))
         self.Login_registration_btn.setObjectName(_fromUtf8("Login_registration_btn"))
         #when Login Admin is clicked
         self.Login_registration_btn.clicked.connect(self.MainAdminfunc)
+
+        # self.Login_registration_btn.keyPressEvent(QtCore.Qt.Key_Enter).connect(self.MainAdminfunc)
 
         self.textEdit = QtGui.QTextEdit(MainWindow)
         self.textEdit.setGeometry(QtCore.QRect(330, 90, 421, 61))
@@ -221,7 +228,7 @@ class Ui_MainWindow(object):
         self.StudentLog.clicked.connect(self.LogAdminfunc)
 
         #when Registration is clicked
-        self.StudentCheckout.clicked.connect(self.loginfunc)
+        # self.StudentCheckout.clicked.connect(self.loginfunc)
 
         self.horizontalLayout_2.addWidget(self.StudentCheckout)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
@@ -501,6 +508,7 @@ class Ui_MainWindow(object):
         self.StudentSearch_ID = QtGui.QLineEdit(MainWindow)
         self.StudentSearch_ID.setGeometry(QtCore.QRect(300, 660, 161, 31))
         self.StudentSearch_ID.setObjectName(_fromUtf8("StudentSearch_ID"))
+        self.StudentSearch_ID.setValidator(QIntValidator())
         self.StudentButton_Edit = QtGui.QPushButton(MainWindow)
         self.StudentButton_Edit.setGeometry(QtCore.QRect(250, 780, 91, 23))
         self.StudentButton_Edit.setObjectName(_fromUtf8("StudentButton_Edit"))
@@ -565,7 +573,7 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.StudentLabel_GName.setFont(font)
         self.StudentLabel_GName.setObjectName(_fromUtf8("StudentLabel_GName"))
-        self.StudentView = QtGui.QListView(MainWindow)
+        self.StudentView = QtGui.QListWidget(MainWindow)
         self.StudentView.setGeometry(QtCore.QRect(10, 60, 450, 550))
         self.StudentView.setObjectName(_fromUtf8("StudentView"))
 
@@ -665,6 +673,10 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.workerThread.start()
+    def newOnKeyPressEvent(self,event):
+        if event.key() == QtCore.Qt.Key_Enter :
+            print("emter ")
+            self.MainAdminfunc(MainWindow)
 
 
     def retranslateUi(self, MainWindow):
@@ -815,9 +827,38 @@ class Ui_MainWindow(object):
         self.StudentText_Name.show()
         self.StudentText_Picture.show()
         self.StudentText_RFID.show()
+        conn = connectDB()
+        cur = conn.cursor()
+        temp = cur.execute("SELECT * FROM student")
+        data = cur.fetchall()
+        for i in range(0, len(data)):
+            id = str(data[i][3])
+            name = data[i][0] + " " + data[i][1]
+            siz = len(name)
+            # for j in range(0, 70 - siz):
+            #     name = name + " "
+            item = QtGui.QListWidgetItem(name)
+            ui.StudentView.addItem(item)
+        self.StudentView.show()
+
+        # temp = self.StudentSearch_ID.text()
+        # if(temp != ''):
+        #     for i in range(0, len(data)):
+        #         if(data[3] == int(temp)):
+        #             name = data[i][0] + " " + data[i][1]
+        #             item = QtGui.QListWidgetItem(name)
+        #             self.StudentSearch_ID.scrollToItem()
         self.StudentSearch_ID.show()
         self.StudentSearch_Name.show()
-        self.StudentView.show()
+
+    def keyPressEvent(self,event):
+        if event.key() == QtCore.Qt.Key_0 :
+            self.close()
+
+
+
+
+
 
     def showLog(self):
         self.GenericReport_AppendText.show()
@@ -1043,27 +1084,6 @@ class Ui_MainWindow(object):
                 ui.listWidget_2.takeItem(i)
                 break
 
-    def loginfunc(self, MainWindow):
-        #when Login button is clicked
-        print("login clicked")
-        password = str(self.Login_password.text())
-        username = self.Login_uname.text()
-        try:
-            username = int(username)
-            temp = cur.execute("SELECT Password FROM STAFF WHERE StaffID = 1")
-            cur.execute("SELECT Password FROM STAFF WHERE StaffID = %s", username)
-            count = cur.rowcount
-            print(count)
-            if count > 0:
-                row = cur.fetchone()
-                if str(row[0]) == password:
-                    print("match")
-                    self.hideall()
-                    self.showMain()
-                else:
-                    print("Staff ID and Password do not match")
-        except ValueError:
-            print("Invalid Staff ID")
 
     def Registrationfunc(self, MainWindow):
         #when Registration is clicked
@@ -1073,25 +1093,32 @@ class Ui_MainWindow(object):
 
     def MainAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
-        password = str(self.Login_password.text())
+        conn = connectDB()
+        cur = conn.cursor()
+        userpassword = str(self.Login_password.text())
         username = self.Login_uname.text()
-        try:
-            username = int(username)
-            temp = cur.execute("SELECT Password FROM ADMIN WHERE AdminID = 1")
-            cur.execute("SELECT Password FROM ADMIN WHERE AdminID = %s", username)
-            count = cur.rowcount
-            print(count)
-            if count > 0:
-                row = cur.fetchone()
-                if str(row[0]) == password:
-                    print("match")
+        temp = cur.execute("Select * FROM staff WHERE Email = %s", username)
+        if temp == 0:
+            print("Invalid Username")
+        else:
+            check = cur.fetchone()
+            password = check[3]
+            isAdmin = check[5]
+            if (password == userpassword):
+                if (isAdmin == 1):
                     self.hideall()
                     self.showMainAdmin()
-                else:
-                    print("ADMIN ID and Password do not match")
+                    print("Show Admin Page")
+                elif (isAdmin == 0):
+                    self.hideall()
+                    self.showMain()
 
-        except ValueError:
-            print("Invalid ADMIN ID")
+
+                    print("Show Staff Page")
+            else:
+                print("Show Incorrect Password message!")
+        conn.close()
+
 
     def LogOffAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
