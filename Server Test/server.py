@@ -4,7 +4,10 @@ import os
 import sys
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import QThread
+import pymysql
+conn = pymysql.connect(host='localhost', port=3306, user='root', passwd='rfid1234', db='rfid')
 
+cur = conn.cursor()
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -1042,9 +1045,25 @@ class Ui_MainWindow(object):
 
     def loginfunc(self, MainWindow):
         #when Login button is clicked
-        self.hideall()
-        self.showMain()
         print("login clicked")
+        password = str(self.Login_password.text())
+        username = self.Login_uname.text()
+        try:
+            username = int(username)
+            temp = cur.execute("SELECT Password FROM STAFF WHERE StaffID = 1")
+            cur.execute("SELECT Password FROM STAFF WHERE StaffID = %s", username)
+            count = cur.rowcount
+            print(count)
+            if count > 0:
+                row = cur.fetchone()
+                if str(row[0]) == password:
+                    print("match")
+                    self.hideall()
+                    self.showMain()
+                else:
+                    print("Staff ID and Password do not match")
+        except ValueError:
+            print("Invalid Staff ID")
 
     def Registrationfunc(self, MainWindow):
         #when Registration is clicked
@@ -1054,9 +1073,25 @@ class Ui_MainWindow(object):
 
     def MainAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
-        self.hideall()
-        self.showMainAdmin()
-        ##print("Registration clicked")
+        password = str(self.Login_password.text())
+        username = self.Login_uname.text()
+        try:
+            username = int(username)
+            temp = cur.execute("SELECT Password FROM ADMIN WHERE AdminID = 1")
+            cur.execute("SELECT Password FROM ADMIN WHERE AdminID = %s", username)
+            count = cur.rowcount
+            print(count)
+            if count > 0:
+                row = cur.fetchone()
+                if str(row[0]) == password:
+                    print("match")
+                    self.hideall()
+                    self.showMainAdmin()
+                else:
+                    print("ADMIN ID and Password do not match")
+
+        except ValueError:
+            print("Invalid ADMIN ID")
 
     def LogOffAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
