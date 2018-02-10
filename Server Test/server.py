@@ -1097,14 +1097,6 @@ class Ui_MainWindow(object):
         self.ui.setupUi(self.homewindow)
         self.homewindow.exec_()
 
-
-
-
-
-
-
-
-
 #classs for add and edit student
 
 class Ui_DialogAdd(object):
