@@ -1,9 +1,6 @@
 
-.idea/Senior Design.iml
-.idea/inspectionProfiles/
-.idea/misc.xml
-.idea/workspace.xml
-integrated SDK/Demo/Csharp/UHFReader18demomain/.vs/UHFReader18demomain/v15/sqlite3/storage.ide
-integrated SDK/Demo/Csharp/UHFReader18demomain/obj/x86/Debug/DesignTimeResolveAssemblyReferencesInput.cache
-integrated SDK/Demo/Csharp/UHFReader18demomain/obj/x86/Debug/UHFReader18demomain.csproj.CoreCompileInputs.cache
+.idea/
+integrated SDK/Demo/Csharp/UHFReader18demomain/.vs/
+integrated SDK - R2/Demo/Csharp/UHFReader18demomain/.vs/
 *.xml
+*.cache
