@@ -1,3 +1,4 @@
+
 import socket
 import threading
 import os
@@ -81,6 +82,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
         self.pushButton.clicked.connect(self.handleClear1)
+        self.pushButton_2.clicked.connect(self.handleClear2)
 
         #=======================================================
         #login Page
@@ -193,8 +195,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.EditStudent = QtGui.QPushButton(self.verticalLayoutWidget)
         self.EditStudent.setObjectName(_fromUtf8("EditStudent"))
-        self.EditStudent.clicked.connect(self.ShowAdminFunc)
-
         self.horizontalLayout.addWidget(self.EditStudent)
         self.RegisterStaff = QtGui.QPushButton(self.verticalLayoutWidget)
         self.RegisterStaff.setObjectName(_fromUtf8("RegisterStaff"))
@@ -360,57 +360,23 @@ class Ui_MainWindow(object):
         #=======================================================
         #Log page
 
-        self.LogButton_Generate = QtGui.QPushButton(MainWindow)
-        self.LogButton_Generate.setGeometry(QtCore.QRect(370, 550, 75, 23))
-        self.LogButton_Generate.setMaximumSize(QtCore.QSize(1200, 900))
-        self.LogButton_Generate.setObjectName(_fromUtf8("LogButton_Generate"))
-        self.dateEdit_2 = QtGui.QDateEdit(MainWindow)
-        self.dateEdit_2.setGeometry(QtCore.QRect(190, 550, 110, 22))
-        self.dateEdit_2.setMaximumSize(QtCore.QSize(1200, 900))
-        self.dateEdit_2.setObjectName(_fromUtf8("dateEdit_2"))
-        self.LogButton_Exit = QtGui.QPushButton(MainWindow)
+        self.centralwidget = QtGui.QWidget(MainWindow)
+        self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
+        self.LogButton_Exit = QtGui.QPushButton(self.centralwidget)
         self.LogButton_Exit.setGeometry(QtCore.QRect(720, 550, 75, 23))
-        self.LogButton_Exit.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogButton_Exit.setObjectName(_fromUtf8("LogButton_Exit"))
-
-        self.LogButton_Exit.clicked.connect(self.CancleRegfunc)
-
-        self.dateEdit = QtGui.QDateEdit(MainWindow)
-        self.dateEdit.setGeometry(QtCore.QRect(20, 550, 110, 22))
-        self.dateEdit.setMaximumSize(QtCore.QSize(1200, 900))
-        self.dateEdit.setObjectName(_fromUtf8("dateEdit"))
-        self.Log_label = QtGui.QLabel(MainWindow)
-        self.Log_label.setGeometry(QtCore.QRect(310, 20, 251, 51))
-        self.Log_label.setMaximumSize(QtCore.QSize(1200, 900))
-        font = QtGui.QFont()
-        font.setPointSize(24)
-        self.Log_label.setFont(font)
-        self.Log_label.setObjectName(_fromUtf8("Log_label"))
-        self.Log_label1 = QtGui.QLabel(MainWindow)
-        self.Log_label1.setGeometry(QtCore.QRect(30, 530, 61, 21))
-        self.Log_label1.setMaximumSize(QtCore.QSize(1200, 900))
-        self.Log_label1.setObjectName(_fromUtf8("Log_label1"))
-        self.Log_label2 = QtGui.QLabel(MainWindow)
-        self.Log_label2.setGeometry(QtCore.QRect(200, 530, 61, 21))
-        self.Log_label2.setMaximumSize(QtCore.QSize(1200, 900))
-        self.Log_label2.setObjectName(_fromUtf8("Log_label2"))
-        self.LogOffAdminStudent = QtGui.QCommandLinkButton(MainWindow)
-        self.LogOffAdminStudent.setGeometry(QtCore.QRect(700, 10, 187, 41))
-        self.LogOffAdminStudent.setMaximumSize(QtCore.QSize(1200, 900))
-        self.LogOffAdminStudent.setObjectName(_fromUtf8("LogOffAdmin"))
-
-        self.LogOffAdminStudent.clicked.connect(self.LogOffAdminfunc)
-
-        self.DismissWidget = QtGui.QTabWidget(MainWindow)
-        self.DismissWidget.setGeometry(QtCore.QRect(10, 70, 781, 441))
-        self.DismissWidget.setMaximumSize(QtCore.QSize(1200, 900))
-        self.DismissWidget.setObjectName(_fromUtf8("DismissWidget"))
+        self.LogOffAdmin2 = QtGui.QCommandLinkButton(self.centralwidget)
+        self.LogOffAdmin2.setGeometry(QtCore.QRect(700, 10, 187, 41))
+        self.LogOffAdmin2.setObjectName(_fromUtf8("LogOffAdmin2"))
+        self.tabWidget = QtGui.QTabWidget(self.centralwidget)
+        self.tabWidget.setGeometry(QtCore.QRect(10, 70, 781, 441))
+        self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
         self.tab = QtGui.QWidget()
         self.tab.setObjectName(_fromUtf8("tab"))
         self.GenericReport_AppendText = QtGui.QTextEdit(self.tab)
         self.GenericReport_AppendText.setGeometry(QtCore.QRect(0, 10, 771, 401))
         self.GenericReport_AppendText.setObjectName(_fromUtf8("GenericReport_AppendText"))
-        self.DismissWidget.addTab(self.tab, _fromUtf8(""))
+        self.tabWidget.addTab(self.tab, _fromUtf8(""))
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
         self.horizontalLayoutWidget = QtGui.QWidget(self.tab_2)
@@ -424,7 +390,7 @@ class Ui_MainWindow(object):
         self.LogListView_Student2 = QtGui.QListView(self.horizontalLayoutWidget)
         self.LogListView_Student2.setObjectName(_fromUtf8("LogListView_Student2"))
         self.horizontalLayout.addWidget(self.LogListView_Student2)
-        self.DismissWidget.addTab(self.tab_2, _fromUtf8(""))
+        self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
         self.tab_3 = QtGui.QWidget()
         self.tab_3.setObjectName(_fromUtf8("tab_3"))
         self.horizontalLayoutWidget_2 = QtGui.QWidget(self.tab_3)
@@ -438,6 +404,7 @@ class Ui_MainWindow(object):
         self.LogListView_Staff2 = QtGui.QListView(self.horizontalLayoutWidget_2)
         self.LogListView_Staff2.setObjectName(_fromUtf8("LogListView_Staff2"))
         self.horizontalLayout_2.addWidget(self.LogListView_Staff2)
+<<<<<<< HEAD
         self.DismissWidget.addTab(self.tab_3, _fromUtf8(""))
 
   
@@ -654,8 +621,46 @@ class Ui_MainWindow(object):
         self.StaffSearch_Name = QtGui.QLineEdit(MainWindow)
         self.StaffSearch_Name.setGeometry(QtCore.QRect(10, 660, 451, 31))
         self.StaffSearch_Name.setObjectName(_fromUtf8("StaffSearch_Name"))
+=======
+        self.tabWidget.addTab(self.tab_3, _fromUtf8(""))
+        self.dateEdit = QtGui.QDateEdit(self.centralwidget)
+        self.dateEdit.setGeometry(QtCore.QRect(20, 550, 110, 22))
+        self.dateEdit.setObjectName(_fromUtf8("dateEdit"))
+        self.dateEdit_2 = QtGui.QDateEdit(self.centralwidget)
+        self.dateEdit_2.setGeometry(QtCore.QRect(190, 550, 110, 22))
+        self.dateEdit_2.setObjectName(_fromUtf8("dateEdit_2"))
+        self.Log_label = QtGui.QLabel(self.centralwidget)
+        self.Log_label.setGeometry(QtCore.QRect(310, 20, 251, 51))
+        font = QtGui.QFont()
+        font.setPointSize(24)
+        self.Log_label.setFont(font)
+        self.Log_label.setObjectName(_fromUtf8("Log_label"))
+        self.Log_label1 = QtGui.QLabel(self.centralwidget)
+        self.Log_label1.setGeometry(QtCore.QRect(30, 530, 61, 21))
+        self.Log_label1.setObjectName(_fromUtf8("Log_label1"))
+        self.Log_label2 = QtGui.QLabel(self.centralwidget)
+        self.Log_label2.setGeometry(QtCore.QRect(200, 530, 61, 21))
+        self.Log_label2.setObjectName(_fromUtf8("Log_label2"))
+        self.LogButton_Generate = QtGui.QPushButton(self.centralwidget)
+        self.LogButton_Generate.setGeometry(QtCore.QRect(370, 550, 75, 23))
+        self.LogButton_Generate.setObjectName(_fromUtf8("LogButton_Generate"))
+        #MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setObjectName(_fromUtf8("menubar"))
+        #MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtGui.QStatusBar(MainWindow)
+        self.statusbar.setObjectName(_fromUtf8("statusbar"))
+        #MainWindow.setStatusBar(self.statusbar)
 
-        # =================================================
+
+        #self.LogCancel.clicked.connect(self.CancleRegfunc)
+
+
+
+>>>>>>> Kashif
+
+        #=======================================================
         self.workerThread = WorkerThread()
 
         self.retranslateUi(MainWindow)
@@ -687,7 +692,7 @@ class Ui_MainWindow(object):
         self.label_reg.setText(_translate("MainWindow", "Email ID", None))
         self.Reg_reg_btn.setText(_translate("MainWindow", "Register", None))
         self.Usernamereg.setText(_translate("MainWindow", "Username", None))
-        self.LogOffAdmin1.setText(_translate("MainWindow", "Log Off", None))
+        #self.LogOffAdmin3.setText(_translate("MainWindow", "Log Offff", None))
         self.LogOffstaff.setText(_translate("MainWindow", "Log Off", None))
         self.CancleReg.setText(_translate("MainWindow", "Cancel", None))
         self.label_3reg.setText(_translate("MainWindow", "Password", None))
@@ -708,25 +713,24 @@ class Ui_MainWindow(object):
         #self.LogOffAdmin.setText(_translate("MainWindow", "Log Offff", None))
 
         #Log
-        self.LogButton_Generate.setText(_translate("MainWindow", "Generate", None))
         self.LogButton_Exit.setText(_translate("MainWindow", "Exit", None))
-        self.Log_label.setText(_translate("MainWindow", "Dismissal Log", None))
-        self.Log_label1.setText(_translate("MainWindow", "Start Date", None))
-        self.Log_label2.setText(_translate("MainWindow", "End Date", None))
-        #self.LogOffAdmin.setText(_translate("MainWindow", "Log Off", None))
-        self.LogOffAdminStudent.setText(_translate("MainWindow", "Log Off", None))
+        self.LogOffAdmin1.setText(_translate("MainWindow", "Log Off", None))
         self.GenericReport_AppendText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.5pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Write in this location to insert into the report.</span></p></body></html>", None))
-        self.DismissWidget.setTabText(self.DismissWidget.indexOf(self.tab), _translate("MainWindow", "Generic Report", None))
-        self.DismissWidget.setTabText(self.DismissWidget.indexOf(self.tab_2), _translate("MainWindow", "Student Report", None))
-        self.DismissWidget.setTabText(self.DismissWidget.indexOf(self.tab_3), _translate("MainWindow", "Staff Report", None))
-        
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Generic Report", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Student Report", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Staff Report", None))
+        self.Log_label.setText(_translate("MainWindow", "Dismissal Log", None))
+        self.Log_label1.setText(_translate("MainWindow", "Start Date", None))
+        self.Log_label2.setText(_translate("MainWindow", "End Date", None))
+        self.LogButton_Generate.setText(_translate("MainWindow", "Generate", None))
+
 
         #mainadmin
-        #self.LogOffAdmin2.setText(_translate("MainWindow", "Log Off", None))
+        self.LogOffAdmin2.setText(_translate("MainWindow", "Log Off", None))
         self.EditStudent.setText(_translate("MainWindow", "Edit Student", None))
         self.RegisterStaff.setText(_translate("MainWindow", "Edit Staff", None))
         self.StudentLog.setText(_translate("MainWindow", "Student Log", None))
@@ -736,6 +740,7 @@ class Ui_MainWindow(object):
         self.adminlabel_3.setText(_translate("MainWindow", "Add/Remove/Delete Staff", None))
         self.adminlabel_4.setText(_translate("MainWindow", "Student log generator", None))
         self.adminlabel_5.setText(_translate("MainWindow", "Ordinary Checkout staff", None))
+<<<<<<< HEAD
         # Student window
         self.StudentLabel_Grade.setText(_translate("MainWindow", "Grade Number:", None))
         self.StudentLabel_ID.setText(_translate("MainWindow", "Student ID:", None))
@@ -815,30 +820,36 @@ class Ui_MainWindow(object):
         self.StudentSearch_Name.show()
         self.StudentView.show()
 
+=======
+        self.hideall()
+        self.showLogin()
+
+>>>>>>> Kashif
     def showLog(self):
-        self.GenericReport_AppendText.show()
-        #self.centralwidgetlog.show()
+        #self.GenericReport_AppendText.show()
+
         self.LogButton_Exit.show()
-        #self.LogOffAdmin2.show()
+        '''self.LogOffAdmin2.show()
         self.GenericReport_AppendText.show()
         self.Log_label.show()
         self.Log_label1.show()
         self.Log_label2.show()
+	print("hello")
         self.LogButton_Generate.show()
         self.LogListView_Student1.show()
         self.LogListView_Student2.show()
         self.LogListView_Staff2.show()
         self.LogListView_Staff1.show()
-        self.LogOffAdminStudent.show()
+        self.centralwidget.show()
         self.tab.show()
-        #self.tabWidget.show()
+        self.tabWidget.show()
         self.tab_3.show()
         self.tab_2.show()
+
         self.dateEdit_2.show()
         self.menubar.show()
         self.statusbar.show()
-        self.dateEdit.show()
-        self.DismissWidget.show()
+        self.dateEdit.show()'''
 
 	#MainWindow.update()
 
@@ -873,11 +884,11 @@ class Ui_MainWindow(object):
         #self.RemoveStaff.hide()
         #self.EditStaff.hide()
         self.StudentLog.hide()
-        #self.LogOffAdmin.hide()  
+        #self.LogOffAdmin.hide()
         #hiding registration
         #show registration page
         self.textEditreg.hide()
-        self.label_reg.hide()      
+        self.label_reg.hide()
         #self.LogStudendid.hide()
         #self.LogDate.hide()
         #self.LogCancel.hide()
@@ -891,7 +902,7 @@ class Ui_MainWindow(object):
         self.EditStudent.hide()
         self.StudentLog.hide()
         self.LogOffAdmin1.hide()
-        #self.LogOffAdmin2.hide()
+        self.LogOffAdmin2.hide()
         #self.LogOffAdmin3.hide()
         self.adminlabel.hide()
         self.adminlabel_2.hide()
@@ -901,27 +912,26 @@ class Ui_MainWindow(object):
         self.StudentCheckout.hide()
         #for log
         self.LogButton_Exit.hide()
-
-
         #self.LogOffAdmin.hide()
         self.Log_label.hide()
         self.Log_label1.hide()
         self.Log_label2.hide()
         self.LogButton_Generate.hide()
-        #self.tabWidget.hide()
+        self.tabWidget.hide()
         self.LogListView_Student1.hide()
         self.LogListView_Student2.hide()
         self.LogListView_Staff2.hide()
         self.LogListView_Staff1.hide()
-        #self.centralwidgetlog.hide()
+        self.centralwidget.hide()
         self.tab.hide()
-        #self.tabWidget.hide()
+        self.tabWidget.hide()
         self.tab_3.hide()
         self.tab_2.hide()
         self.dateEdit.hide()
         self.dateEdit_2.hide()
         self.menubar.hide()
         self.statusbar.hide()
+<<<<<<< HEAD
         #self.LogOffAdmin2.hide()
         self.DismissWidget.hide()
         self.LogOffAdminStudent.hide()
@@ -969,6 +979,9 @@ class Ui_MainWindow(object):
         self.StaffView.hide()
         self.LogOffAdmin_Staff.hide()
 
+=======
+        self.LogOffAdmin2.hide()
+>>>>>>> Kashif
 
 
     def showMain(self):
@@ -1011,7 +1024,7 @@ class Ui_MainWindow(object):
         self.Usernamereg.show()
         self.label_reg.show()
         self.CancleReg.show()
-       
+
 
     def showLogin(self):
         self.Username.show()
@@ -1020,7 +1033,7 @@ class Ui_MainWindow(object):
         self.Login_registration_btn.show()
         self.textEdit.show()
         self.Login_uname.show()
-        self.Login_password.show()        
+        self.Login_password.show()
 
     def handleClear1(self):
         items = ui.listWidget.count()
@@ -1029,6 +1042,16 @@ class Ui_MainWindow(object):
         for i in rangedList:
             if ui.listWidget.isItemSelected(ui.listWidget.item(i)) == True:
                 ui.listWidget.takeItem(i)
+                break
+
+    def handleClear2(self):
+        items = ui.listWidget_2.count()
+        rangedList = range(items)
+        rangedList = rangedList.__reversed__()
+        for i in rangedList:
+            if ui.listWidget_2.isItemSelected(ui.listWidget_2.item(i)) == True:
+                ui.listWidget_2.takeItem(i)
+                break
 
     def loginfunc(self, MainWindow):
         #when Login button is clicked
@@ -1065,6 +1088,7 @@ class Ui_MainWindow(object):
         #when Admin Login is clicked is clicked
         self.hideall()
         self.showMainAdmin()
+<<<<<<< HEAD
     def ShowAdminFunc(self, MainWindow):
         self.hideall()
         self.showStudentWindow()
@@ -1363,6 +1387,8 @@ class Ui_StaffDialog(object):
 
 
 
+=======
+>>>>>>> Kashif
 
 
 class WorkerThread(QThread):
@@ -1390,9 +1416,14 @@ class WorkerThread(QThread):
 
 def client_thread(clientsocket):
     message = clientsocket.recv(2048)
-    temp = search_query(message.decode("utf-8"))
-    item = QtGui.QListWidgetItem(temp)
-    ui.listWidget.addItem(item)
+    rfid = message.decode("utf-8")
+    temp = search_query(rfid[2:])
+    if(rfid[0:2] == "R1"):
+        item = QtGui.QListWidgetItem(temp)
+        ui.listWidget.addItem(item)
+    elif(rfid[0:2] == "R2"):
+        item = QtGui.QListWidgetItem(temp)
+        ui.listWidget_2.addItem(item)
     MainWindow.update()
     # MainWindow.show()
     # sys.exit(app.exec_())
@@ -1416,6 +1447,5 @@ ui.setupUi(MainWindow)
 if __name__ == "__main__":
     MainWindow.show()
     print("Hello Austin")
+    print("Hey man")
     sys.exit(app.exec_())
-
-

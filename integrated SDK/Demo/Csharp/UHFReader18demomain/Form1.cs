@@ -1300,7 +1300,7 @@ namespace UHFReader18demomain
                           System.Net.IPAddress ipAdd = System.Net.IPAddress.Parse("127.0.0.1");
                           System.Net.IPEndPoint remoteEP = new IPEndPoint(ipAdd, 8086);
                           soc.Connect(remoteEP);
-                          byte[] byData = System.Text.Encoding.ASCII.GetBytes(sEPC);
+                          byte[] byData = System.Text.Encoding.ASCII.GetBytes("R1" + sEPC);
                           soc.Send(byData);
                           ChangeSubItem(aListItem, 1, s);
                           s = (sEPC.Length / 2).ToString().PadLeft(2, '0');
