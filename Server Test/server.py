@@ -25,6 +25,102 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
+
+class System(object):
+    studentList = []
+    staffList = []
+
+    def __init__(self):
+        conn = connectDB()
+        cur = conn.cursor()
+        temp = cur.execute("SELECT * FROM student")
+        data = cur.fetchall()
+
+        for i in range(0, len(data)):
+            fName = data[i][0]
+            lName = data[i][1]
+            tagId = data[i][2]
+            studentId = data[i][3]
+            guardian = data[i][4]
+            grade = data[i][5]
+            student = Student(fName, lName, studentId, tagId, guardian, "Placeholder", grade)
+            self.studentList.append(student)
+
+        temp = cur.execute("SELECT * FROM staff")
+        data2 = cur.fetchall()
+
+        for i in range(0, len(data2)):
+            fName = data2[i][0]
+            lName = data2[i][1]
+            email = data2[i][2]
+            password = data2[i][3]
+            staffId = data2[i][4]
+            isAdmin = data2[i][5]
+            staff = Staff(staffId, fName, lName, email, password, isAdmin)
+            self.staffList.append(staff)
+
+    def getStudentNames(self):
+        result = []
+        for i in range(0, len(self.studentList)):
+            name = self.studentList[i].fName + " " + self.studentList[i].lName
+            result.append(name)
+        return result
+
+    def searchByName(self, name):
+        result = []
+        for i in range(0, len(self.studentList)):
+            fullName = self.studentList[i].fName + " " + self.studentList[i].lName
+            if name in fullName:
+                print("found " + fullName)
+                result.append(self.studentList[i])
+        return result
+
+    def searchByID(self, id):
+        result = []
+        for i in range(0, len(self.studentList)):
+            idval = self.studentList[i].studentId
+            if int(id) == idval :
+                print("found " + id)
+                result.append(self.studentList[i])
+        return result
+
+class Student(object):
+    studentId = 0
+    tagId = ""
+    fName = ""
+    lName = ""
+    guardian = ""
+    image = ""
+    grade = 0
+
+    # The class "constructor" - It's actually an initializer
+    def __init__(self, fName, lName, studentId, tagId, guardian, image, grade):
+        self.studentId = studentId
+        self.fName = fName
+        self.lName = lName
+        self.guardian = guardian
+        self.tagId = tagId
+        self.image = image
+        self.grade = grade
+
+class Staff(object):
+    staffId = 0
+    fName = ""
+    lName = ""
+    email = ""
+    password = ""
+    isAdmin = 0
+
+    def __init__(self, staffId, fName, lName, email, password, isAdmin):
+        self.staffId = staffId
+        self.fName = fName
+        self.lName = lName
+        self.email = email
+        self.password = password
+        self.isAdmin = isAdmin
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
@@ -91,6 +187,7 @@ class Ui_MainWindow(object):
         self.pushButton_2.clicked.connect(self.handleClear2)
         MainWindow.keyPressEvent = self.newOnKeyPressEvent
 
+
         #=======================================================
         #login Page
         self.Username = QtGui.QLabel(MainWindow)
@@ -112,8 +209,11 @@ class Ui_MainWindow(object):
         self.Login_uname.setFont(font)
         self.Login_uname.setObjectName(_fromUtf8("Login_uname"))
         self.Login_password = QtGui.QLineEdit(MainWindow)
+        self.Login_password.setEchoMode(QtGui.QLineEdit.Password)
         self.Login_password.setGeometry(QtCore.QRect(430, 290, 271, 41))
         self.Login_password.setObjectName(_fromUtf8("Login_password"))
+        ########################################
+
         self.Login_login_btn = QtGui.QPushButton(MainWindow)
         self.Login_login_btn.setGeometry(QtCore.QRect(270, 450, 211, 61))
         self.Login_login_btn.setObjectName(_fromUtf8("Login_login_btn"))
@@ -585,12 +685,16 @@ class Ui_MainWindow(object):
         self.StudentLabel_Grade.setFont(font)
         self.StudentLabel_Grade.setObjectName(_fromUtf8("StudentLabel_Grade"))
         self.StudentText_Grade = QtGui.QLineEdit(MainWindow)
+        self.StudentText_Grade.setEnabled(False)
+
         self.StudentText_Grade.setGeometry(QtCore.QRect(650, 200, 241, 31))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.StudentText_Grade.setFont(font)
         self.StudentText_Grade.setObjectName(_fromUtf8("StudentText_Grade"))
         self.StudentText_Name = QtGui.QLineEdit(MainWindow)
+        self.StudentText_Name.setEnabled(False)
+
         self.StudentText_Name.setGeometry(QtCore.QRect(650, 60, 241, 31))
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -598,6 +702,8 @@ class Ui_MainWindow(object):
         self.StudentText_Name.setObjectName(_fromUtf8("StudentText_Name"))
         self.StudentLabel_ID = QtGui.QLabel(MainWindow)
         self.StudentLabel_ID.setGeometry(QtCore.QRect(530, 130, 81, 31))
+
+
         font = QtGui.QFont()
         font.setPointSize(12)
         self.StudentLabel_ID.setFont(font)
@@ -613,6 +719,8 @@ class Ui_MainWindow(object):
         self.StudentLabel_SearchID.setObjectName(_fromUtf8("StudentLabel_SearchID"))
         self.StudentText_ID = QtGui.QLineEdit(MainWindow)
         self.StudentText_ID.setGeometry(QtCore.QRect(650, 130, 241, 31))
+        self.StudentText_ID.setEnabled(False)
+
         font = QtGui.QFont()
         font.setPointSize(12)
         self.StudentText_ID.setFont(font)
@@ -625,7 +733,12 @@ class Ui_MainWindow(object):
         self.StudentButton_Exit.setObjectName(_fromUtf8("StudentButton_Exit"))
         self.StudentSearch_ID = QtGui.QLineEdit(MainWindow)
         self.StudentSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
+
+
         self.StudentSearch_ID.setObjectName(_fromUtf8("StudentSearch_ID"))
+        validator = QtGui.QIntValidator()
+        self.StudentSearch_ID.setValidator(validator)
+
         self.StudentButton_Edit = QtGui.QPushButton(MainWindow)
         self.StudentButton_Edit.setGeometry(QtCore.QRect(170, 830, 101, 23))
         self.StudentButton_Edit.setObjectName(_fromUtf8("StudentButton_Edit"))
@@ -634,12 +747,19 @@ class Ui_MainWindow(object):
         self.LogOffAdmin.setObjectName(_fromUtf8("LogOffAdmin"))
         self.StudentText_RFID = QtGui.QLineEdit(MainWindow)
         self.StudentText_RFID.setGeometry(QtCore.QRect(650, 340, 241, 31))
+        self.StudentText_RFID.setEnabled(False)
+
         font = QtGui.QFont()
         font.setPointSize(12)
         self.StudentText_RFID.setFont(font)
         self.StudentText_RFID.setObjectName(_fromUtf8("StudentText_RFID"))
         self.StudentText_GName = QtGui.QLineEdit(MainWindow)
         self.StudentText_GName.setGeometry(QtCore.QRect(650, 270, 241, 31))
+
+        self.StudentText_GName.setEnabled(False)
+        #self.StudentText_GName.focusable(False)
+
+
         font = QtGui.QFont()
         font.setPointSize(12)
         self.StudentText_GName.setFont(font)
@@ -668,6 +788,12 @@ class Ui_MainWindow(object):
         self.StudentSearch_Name = QtGui.QLineEdit(MainWindow)
         self.StudentSearch_Name.setGeometry(QtCore.QRect(10, 700, 281, 31))
         self.StudentSearch_Name.setObjectName(_fromUtf8("StudentSearch_Name"))
+
+        regex = QtCore.QRegExp("[a-z-A-Z_]+")
+        validator = QtGui.QRegExpValidator(regex)
+        self.StudentSearch_Name.setValidator(validator)
+
+
         self.StudentLabel_RFID = QtGui.QLabel(MainWindow)
         self.StudentLabel_RFID.setGeometry(QtCore.QRect(530, 340, 81, 31))
         font = QtGui.QFont()
@@ -686,9 +812,13 @@ class Ui_MainWindow(object):
         self.StudentView = QtGui.QListWidget(MainWindow)
         self.StudentView.setGeometry(QtCore.QRect(10, 60, 450, 550))
         self.StudentView.setObjectName(_fromUtf8("StudentView"))
+        self.StudentView.itemClicked.connect(self.handleViewDetail)
+
         self.StudentButton_ViewDetails = QtGui.QPushButton(MainWindow)
         self.StudentButton_ViewDetails.setGeometry(QtCore.QRect(360, 620, 99, 27))
         self.StudentButton_ViewDetails.setObjectName(_fromUtf8("StudentButton_ViewDetails"))
+        # self.StudentButton_ViewDetails.clicked.connect(self.handleViewDetail())
+
         self.StudentButton_SearchName = QtGui.QPushButton(MainWindow)
         self.StudentButton_SearchName.setGeometry(QtCore.QRect(10, 740, 121, 27))
         self.StudentButton_SearchName.setObjectName(_fromUtf8("StudentButton_SearchName"))
@@ -698,7 +828,7 @@ class Ui_MainWindow(object):
 
         self.StudentButton_Remove.clicked.connect(self.RemoveStudentfunc)
         self.StudentButton_Exit.clicked.connect(self.CancleRegfunc)
-        self.StudentButton_Edit.clicked.connect(self.addStudentfunc)
+        self.StudentButton_Edit.clicked.connect(self.enable)
         self.LogOffAdmin.clicked.connect(self.LogOffAdminfunc)
         self.StudentButton_Add.clicked.connect(self.addStudentfunc)
         #=================================================
@@ -748,6 +878,7 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.StaffText_GName.setFont(font)
         self.StaffText_GName.setObjectName(_fromUtf8("StaffText_GName"))
+
         self.StaffView = QtGui.QListView(MainWindow)
         self.StaffView.setGeometry(QtCore.QRect(10, 60, 450, 550))
         self.StaffView.setObjectName(_fromUtf8("StaffView"))
@@ -893,7 +1024,10 @@ class Ui_MainWindow(object):
         self.StudentLabel_GName.setText(_translate("MainWindow", "Guardian:", None))
         self.StudentButton_ViewDetails.setText(_translate("MainWindow", "View Details", None))
         self.StudentButton_SearchName.setText(_translate("MainWindow", "Search By Name", None))
+        self.StudentButton_SearchName.clicked.connect(self.searchByName)
         self.StudentButton_SearchID.setText(_translate("MainWindow", "Search By ID", None))
+        self.StudentButton_SearchID.clicked.connect(self.searchByID)
+
 
         #staff Window
         self.StaffButton_Promote.setText(_translate("MainWindow", "Promote to Admin", None))
@@ -909,6 +1043,42 @@ class Ui_MainWindow(object):
         self.StaffLabel_ID.setText(_translate("MainWindow", "Staff ID:", None))
         self.hideall()
         self.showLogin()
+
+    def searchByName(self):
+        name = self.StudentSearch_Name.text()
+        result = Sys.searchByName(name)
+        ui.StudentView.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].fName + " " + result[i].lName)
+            ui.StudentView.addItem(item)
+        self.StudentView.show()
+
+    def enable(self):
+        self.StudentText_ID.setEnabled(True)
+        self.StudentText_GName.setEnabled(True)
+        self.StudentText_Grade.setEnabled(True)
+        self.StudentText_Name.setEnabled(True)
+        self.StudentText_RFID.setEnabled(True)
+        self.StudentView.setEnabled(False)
+
+
+
+
+    def searchByID(self):
+        id = self.StudentSearch_ID.text()
+
+        try:
+            if(int(id)>0 and int(id)<1000):
+                result = Sys.searchByID(id)
+                ui.StudentView.clear()
+                for i in range(0, len(result)):
+                    item = QtGui.QListWidgetItem(result[i].fName + " " + result[i].lName)
+                    ui.StudentView.addItem(item)
+                self.StudentView.show()
+        except Exception:
+            print("enter only number")
+            pass
+
 
     def addstudentfun(self):
         self.homewindow = QtGui.QDialog()
@@ -960,18 +1130,12 @@ class Ui_MainWindow(object):
         self.StudentText_Name.show()
         self.StudentText_Picture.show()
         self.StudentText_RFID.show()
-        conn = connectDB()
-        cur = conn.cursor()
-        temp = cur.execute("SELECT * FROM student")
-        data = cur.fetchall()
-        for i in range(0, len(data)):
-            id = str(data[i][3])
-            name = data[i][0] + " " + data[i][1]
-            siz = len(name)
-            # for j in range(0, 70 - siz):
-            #     name = name + " "
-            item = QtGui.QListWidgetItem(name)
+
+        result = Sys.getStudentNames()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i])
             ui.StudentView.addItem(item)
+
         self.StudentView.show()
 
         # temp = self.StudentSearch_ID.text()
@@ -1222,6 +1386,27 @@ class Ui_MainWindow(object):
                 ui.listWidget_2.takeItem(i)
                 break
 
+    def handleViewDetail(self):
+        # item = self.StudentView.currentItem().text()
+        # print(item)
+        name = self.StudentSearch_Name.text()
+        num = self.StudentView.currentRow()
+        print(num)
+        if name == "":
+            student = Sys.studentList[num]
+        else:
+            result = Sys.searchByName(name)
+            print(len(result))
+            student = result[num]
+
+
+        self.StudentText_GName.setText(student.guardian)
+        self.StudentText_Grade.setText(str(student.grade))
+        self.StudentText_ID.setText(str(student.studentId))
+        self.StudentText_Name.setText(student.fName + " " + student.lName)
+        #self.StudentText_Picture.show()
+        self.StudentText_RFID.setText(student.tagId)
+        print("Do nothing")
 
     def Registrationfunc(self, MainWindow):
         #when Registration is clicked
@@ -1288,6 +1473,10 @@ class Ui_MainWindow(object):
         self.ui = Ui_DialogAdd()
         self.ui.setupUi(self.homewindow)
         self.homewindow.exec_()
+        print("addign")
+
+    #def addstudent(self):
+
 
     def RemoveStudentfunc(self):
         self.homewindow = QtGui.QDialog()
@@ -1360,7 +1549,7 @@ class Ui_DialogAdd(object):
         self.pushButton_2 = QtGui.QPushButton(Dialog)
         self.pushButton_2.setGeometry(QtCore.QRect(140, 530, 61, 27))
         self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
-        #self.pushButton_2.clicked.connect(self.cancelClicked)
+        self.pushButton_2.clicked.connect(self.cancelClicked)
 
         self.pushButton_3 = QtGui.QPushButton(Dialog)
         self.pushButton_3.setGeometry(QtCore.QRect(230, 530, 71, 27))
@@ -1372,10 +1561,14 @@ class Ui_DialogAdd(object):
         self.lineEdit_6.setGeometry(QtCore.QRect(140, 80, 161, 27))
         self.lineEdit_6.setObjectName(_fromUtf8("lineEdit_6"))
 
+
+
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-
+    def cancelClicked(self):
+        print("close is manually bitch")
+        self.close()
 
     def addstudentclicked(self):
 	    username = self.Login_uname.text()
@@ -1467,6 +1660,7 @@ class Ui_ConfirmPromote(object):
 "$staff_user to an admin? ", None))
         self.PromoteConfirm.setText(_translate("ConfirmPromote", "Confirm", None))
         self.PromoteCancel.setText(_translate("ConfirmPromote", "Cancel", None))
+
 
 
 
@@ -1631,6 +1825,9 @@ ui.setupUi(MainWindow)
 if __name__ == "__main__":
     MainWindow.show()
     print("Hello Austin")
+    Sys = System()
+
+
     sys.exit(app.exec_())
 
 
