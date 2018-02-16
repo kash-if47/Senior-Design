@@ -38,12 +38,25 @@ cur = conn.cursor()
 # loginCheck("hey hey", "hey")
 
 
-temp = cur.execute("SELECT * FROM student")
-data = cur.fetchall()
-for i in range(0, len(data)):
-    id = str(data[i][3])
-    name = data[i][0] + " " + data[i][1]
-    siz = len(name)
-    for j in range(0, 20 - siz):
-        name = name + " "
-    print(name + id)
+# temp = cur.execute("SELECT * FROM staff")
+# data2 = cur.fetchall()
+# print(data2)
+#
+# for i in range(0, len(data2)):
+#     fName = data2[i][0]
+#     lName = data2[i][1]
+#     email = data2[i][2]
+#     password = data2[i][3]
+#     staffId = data2[i][4]
+#     isAdmin = data2[i][5]
+#
+# self.StudentText_GName.show()
+# self.StudentText_Grade.show()
+# self.StudentText_ID.show()
+# self.StudentText_Name.show()
+# self.StudentText_Picture.show()
+# self.StudentText_RFID.show()
+
+result = []
+result.append("hello")
+print(result)
