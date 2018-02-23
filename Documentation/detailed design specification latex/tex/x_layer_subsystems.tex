@@ -8,9 +8,9 @@ RFID integrated readers by Chafon Technology co. This system requires the hardwa
 Windows 10 
 
 \subsection{Layer Software Dependencies}
-Chafon Technology co. provided the base C# API for the reader, modified to render tags in a readable format. 
+Chafon Technology co. provided the base C\# API for the reader, modified to render tags in a readable format. 
 
-\subsection{Subsystem 1}
+\subsection{RFID API Subsystem}
 This system has a single one-way interface, it parses the RFID tag from the reader into a format
 that the Control system can use.
 
@@ -28,12 +28,37 @@ API it will send the data to the Control model.
 Windows 10
 
 \subsubsection{Subsystem Software Dependencies}
-C# Chafon RFID API
+C\# Chafon RFID API
 
 
 \subsubsection{Subsystem Data Structures}
 HTTP message once the tag id has been read is broadcast to local host. Checking the Database if the tag matches the DB will retrieve the associated data to the queue gui 
 
+\subsection{Queue GUI Subsystem}
+This subsystem will be a two way with regards to the control subsystem, it will send events to
+update the visualized data.
+
+\subsubsection{Subsystem Hardware}
+This subsystem will identify the RFID tag that is scanned from the RFID Reader, utilizing the RFID
+API it will send the data to the Control model.
+
+\subsubsection{Subsystem Operating System}
+Windows 10
+
+\subsubsection{Subsystem Software Dependencies}
+C\# Chafon RFID API
 
 
+\subsubsection{Subsystem Data Structures}
+HTTP message once the tag id has been read is broadcast to local host. Checking the Database if the tag matches the DB will retrieve the associated data to the queue gui 
+
+\subsection{Control Subsystem}
+This subsystem handles all the data related to students needing to be dismissed by staff. This is the
+subsystem that handles forwarding and receiving information from the database.
+
+\subsubsection{Subsystem Operating System}
+Windows 10
+
+\subsubsection{Subsystem Software Dependencies}
+C\# Chafon RFID API
 
