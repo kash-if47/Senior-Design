@@ -4,3 +4,9 @@ integrated SDK/Demo/Csharp/UHFReader18demomain/.vs/
 integrated SDK - R2/Demo/Csharp/UHFReader18demomain/.vs/
 *.xml
 *.cache
+*.ver
+*.toc
+*.lot
+*.hst
+*.aux
+Documentation/detailed design specification latex/detailed_design_specification.pdf

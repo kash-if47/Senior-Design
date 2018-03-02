@@ -27,14 +27,14 @@
 
 %%% Definitions
 \definecolor{accentcolor}{rgb}{0.0,0.0,0.5} 
-\newcommand{\teamname}{Team Name}
-\newcommand{\productname}{Product Name}
+\newcommand{\teamname}{Team RFID}
+\newcommand{\productname}{RFID Automated Student Pickup}
 \newcommand{\coursename}{CSE 4317: Senior Design II}
 \newcommand{\semester}{Spring 2018}
 \newcommand{\docname}{Detailed Design Specification}
 \newcommand{\department}{Department of Computer Science \& Engineering}
 \newcommand{\university}{The University of Texas at Arlington}
-\newcommand{\authors}{Alan Turing \\ Grace Hopper \\ John Von Neumann \\ Ada Lovelace \\ Charles Babbage}
+\newcommand{\authors}{Bibek Khatakho \\ Austin Hastings \\ Kashif Iqbal \\ Nupur Pandey \\ Albaro Tinoco}
 
 %%% Headers and footers
 \usepackage{fancyhdr}
@@ -70,7 +70,7 @@
 \vspace{0.5 in}
 \begin{figure}[h!]
 	\centering
-   	\includegraphics[width=0.60\textwidth]{images/test_image}
+   	\includegraphics[width=0.60\textwidth]{images/Team_RFID}
 \end{figure}
 \vspace{0.5 in}
 {\centering \huge \color{accentcolor} \sc \textbf{\teamname \\ \productname} \par}
@@ -85,11 +85,9 @@
 
 %%% Revision History
 \begin{versionhistory}
-  	\vhEntry{0.1}{1.01.2016}{GH}{document creation}
-  	\vhEntry{0.2}{1.05.2016}{AT|GH}{complete draft}
-  	\vhEntry{0.3}{1.12.2016}{AT|GH}{release candidate 1}
-  	\vhEntry{1.0}{1.20.2016}{AT|GH|CB}{official release}
-  	\vhEntry{1.1}{1.31.2016}{AL}{added design review requests}
+  	\vhEntry{0.1}{2.13.2018}{AT|AH}{Document creation}
+	\vhEntry{0.2}{2.18.2018}{AT|AH|KI|BK}{Document updates}
+	\vhEntry{0.3}{2.23.2018}{AT|AH|KI|BK|NP}{Image updates}
 \end{versionhistory}
 \newpage
 
@@ -112,13 +110,13 @@
 %\section{Subsystem Definitions \& Data Flow}
 %\input{tex/data_flow.tex}
 \newpage
-\section{X Layer Subsystems}
+\section{Queue Display Subsystems}
 \input{tex/x_layer_subsystems.tex}
 \newpage
-\section{Y Layer Subsystems}
+\section{Student Management Subsystems}
 \input{tex/y_layer_subsystems.tex}
 \newpage
-\section{Z Layer Subsystems}
+\section{Database server Subsystems}
 \input{tex/z_layer_subsystems.tex}
 \newpage
 \section{Appendix A}

@@ -1,39 +1,64 @@
-In this section, the layer is described in terms of the hardware and software design. Specific implementation details, such as hardware components, programming languages, software dependencies, operating systems, etc. should be discussed. Any unnecessary items can be ommitted (for example, a pure software module without any specific hardware should not include a hardware subsection). The organization, titles, and content of the sections below can be modified as necessary for the project.
+	This subsystem will make various queries to the database as RFID tags become ready and display
+all the associated data to the Queue GUI.
 
 \subsection{Layer Hardware}
-A description of any involved hardware components for the layer. For example, if each subsystem is a software process running on an embedded computer, discuss the specifics of that device here. Do not list a hardware component that only exists at the subsystem level (include it in the following sections).
+RFID integrated readers by Chafon Technology co. This system requires the hardware to begin the process of scanning tags. The two RFID readers are attached to two 8ft speaker tripods by Pyle. The RFID readers are connected in two ways. 1st: To a 9v/3A AC adapter to supply the readers power source,  2nd: A 10ft serial connection to usb for the reader to send the data back to the server for processing the RFID tags. 
 
 \subsection{Layer Operating System}
-A description of any operating systems required by the layer.
+Windows 10 
 
 \subsection{Layer Software Dependencies}
-A description of any software dependencies (libraries, frameworks, etc) required by the layer.
+Chafon Technology co. provided the base C\# API for the reader, modified to render tags in a readable format. 
 
-\subsection{Subsystem 1}
-Descibe at a high level the purpose and basic design of this subsystem. Is it a piece of hardware, a class, a web service, or something else? Note that each of the subsystem items below are meant to be specific to that subystem and not a repeat of anything discussed above for the overall layer.
+\subsection{RFID API Subsystem}
+This system has a single one-way interface, it parses the RFID tag from the reader into a format
+that the Control system can use.
 
 \begin{figure}[h!]
 	\centering
- 	\includegraphics[width=0.60\textwidth]{images/subsystem}
- \caption{Example subsystem description diagram}
+ 	\includegraphics[width=0.60\textwidth]{images/ads_4}
+ \caption{Queue Display Subsystems}
 \end{figure}
 
 \subsubsection{Subsystem Hardware}
-A description of any involved hardware components for the subsystem.
+This subsystem will identify the RFID tag that is scanned from the RFID Reader, utilizing the RFID
+API it will send the data to the Control model.
 
 \subsubsection{Subsystem Operating System}
-A description of any operating systems required by the subsystem.
+Windows 10
 
 \subsubsection{Subsystem Software Dependencies}
-A description of any software dependencies (libraries, frameworks, design software for mechanical parts or circuits, etc) required by the subsystem.
+C\# Chafon RFID API
 
-\subsubsection{Subsystem Programming Languages}
-A description of any programming languages used by the subsystem.
 
 \subsubsection{Subsystem Data Structures}
-A description of any classes or other data structures that are worth discussing for the subsystem. For example, data being transmitted from a microcontroller to a PC via USB should be first be assembled into packets. What is the structure of the packets?
+HTTP message once the tag id has been read is broadcast to local host. Checking the Database if the tag matches the DB will retrieve the associated data to the queue gui 
 
-\subsubsection{Subsystem Data Processing}
-A description of any algorithms or processing strategies that are worth discussing for the subsystem. If you are implementing a well-known algorithm, list it. If it is something unique to this project, discuss it in greater detail.
+\subsection{Queue GUI Subsystem}
+This subsystem will be a two way with regards to the control subsystem, it will send events to
+update the visualized data.
 
+\subsubsection{Subsystem Hardware}
+This subsystem will identify the RFID tag that is scanned from the RFID Reader, utilizing the RFID
+API it will send the data to the Control model.
+
+\subsubsection{Subsystem Operating System}
+Windows 10
+
+\subsubsection{Subsystem Software Dependencies}
+C\# Chafon RFID API
+
+
+\subsubsection{Subsystem Data Structures}
+HTTP message once the tag id has been read is broadcast to local host. Checking the Database if the tag matches the DB will retrieve the associated data to the queue gui 
+
+\subsection{Control Subsystem}
+This subsystem handles all the data related to students needing to be dismissed by staff. This is the
+subsystem that handles forwarding and receiving information from the database.
+
+\subsubsection{Subsystem Operating System}
+Windows 10
+
+\subsubsection{Subsystem Software Dependencies}
+C\# Chafon RFID API
 
