@@ -1,11 +1,15 @@
 import socket
 import threading
+import glob
+import shutil
 import os
 import sys
 from PyQt4 import QtCore, QtGui
+from PyQt4.QtGui import QFileDialog
 from PyQt4.QtCore import QThread
 import pymysql
 
+filename = ""
 
 def connectDB():
     conn = pymysql.connect(host='localhost', port=3306, user='root', passwd='rfid1234', db='rfid')
@@ -25,8 +29,6 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-
-
 class System(object):
     studentList = []
     staffList = []
@@ -37,71 +39,205 @@ class System(object):
             cur = conn.cursor()
             temp = cur.execute("SELECT * FROM student")
             data = cur.fetchall()
-
             for i in range(0, len(data)):
-                fName = data[i][0]
-                lName = data[i][1]
-                tagId = data[i][2]
-                studentId = data[i][3]
-                guardian = data[i][4]
-                grade = data[i][5]
-                student = Student(fName, lName, studentId, tagId, guardian, "Placeholder", grade)
+                Name = data[i][0]
+                tagId = data[i][1]
+                studentId = data[i][2]
+                guardian = data[i][3]
+                grade = data[i][4]
+                pic = data[i][5]
+                student = Student(Name, studentId, tagId, guardian, pic,grade)
                 self.studentList.append(student)
-
             temp = cur.execute("SELECT * FROM staff")
             data2 = cur.fetchall()
-
             for i in range(0, len(data2)):
                 fName = data2[i][0]
-                lName = data2[i][1]
-                email = data2[i][2]
-                password = data2[i][3]
-                staffId = data2[i][4]
-                isAdmin = data2[i][5]
-                staff = Staff(staffId, fName, lName, email, password, isAdmin)
+                email = data2[i][1]
+                password = data2[i][2]
+                staffId = data2[i][3]
+                isAdmin = data2[i][4]
+                staff = Staff(staffId, fName, email, password, isAdmin)
                 self.staffList.append(staff)
         except:
             print("db error HEHE")
 
+    def redraw(self):
+        self.searchByName("")
+
     def getStudentNames(self):
         result = []
         for i in range(0, len(self.studentList)):
-            name = self.studentList[i].fName + " " + self.studentList[i].lName
+            name = self.studentList[i].Name
+            result.append(name)
+        return result
+
+    def getStaffNames(self):
+        result = []
+        for i in range(0, len(self.staffList)):
+            name = self.staffList[i].Name
             result.append(name)
         return result
 
     def searchByName(self, name):
         result = []
         for i in range(0, len(self.studentList)):
-            fullName = self.studentList[i].fName + " " + self.studentList[i].lName
+            fullName = self.studentList[i].Name
             if name in fullName:
                 print("found " + fullName)
                 result.append(self.studentList[i])
+        return result
+
+    def searchByNameStaff(self, name):
+        result = []
+        for i in range(0, len(self.staffList)):
+            fullName = self.staffList[i].Name
+            if name in fullName:
+                print("found " + fullName)
+                result.append(self.staffList[i])
         return result
 
     def searchByID(self, id):
         result = []
         for i in range(0, len(self.studentList)):
             idval = self.studentList[i].studentId
-            if int(id) == idval :
+            if int(id) == int(idval) :
                 print("found " + id)
                 result.append(self.studentList[i])
+        if(len(result) == 0):
+            print("not found")
         return result
+
+    def searchByIdStaff(self, id):
+        result = []
+        for i in range(0, len(self.staffList)):
+            idval = self.staffList[i].staffId
+            if int(id) == int(idval) :
+                print("found " + id)
+                result.append(self.staffList[i])
+        if(len(result) == 0):
+            print("not found")
+        return result
+
+    def checkDuplicateID(self,id):
+        result = False
+        for i in range(0, len(self.studentList)):
+            idval = self.studentList[i].studentId
+            if int(id) == idval:
+                print("found " + id)
+                result = True
+
+        return result
+
+    def checkDuplicateIDStaff(self,id):
+        result = False
+        for i in range(0, len(self.staffList)):
+            idval = self.staffList[i].staffId
+            if int(id) == idval:
+                print("found " + id)
+                result = True
+        return result
+
+    def addnewStudent(self,name,id,rfid,gname,pic,grade):
+        conn = connectDB()
+        cur = conn.cursor()
+        query3 = "INSERT INTO STUDENT (Name, TagId, StudentID, GuardianName, grade, pic) VALUES (%s,%s,%s,%s,%s,%s);"
+        queryval = (name,rfid,id,gname,grade,pic)
+        addq = cur.execute(query3,queryval)
+        conn.commit()
+        conn.close()
+
+    def addnewStaff(self,name,id,email,password,is_admin):
+        conn = connectDB()
+        cur = conn.cursor()
+        query3 = "INSERT INTO STAFF (Fname, Email, Password, StaffID, isAdmin) VALUES (%s,%s,%s,%s,%s);"
+        queryval = (name, email, password, id, is_admin)
+        addq = cur.execute(query3,queryval)
+        conn.commit()
+        conn.close()
+
+    def removeStudent(self,id):
+        for i in range(0, len(self.studentList)):
+            idval = self.studentList[i].studentId
+            print(idval)
+            if int(id) == int(idval):
+                print("found " + id)
+                del self.studentList[i]
+
+    def removeStaff(self,id,user):
+        for i in range(0, len(self.staffList)):
+            idval = self.staffList[i].staffId
+            print(idval)
+            if int(id) == int(idval):
+                print("found " + id)
+                if(user == self.staffList[i].Name):
+                    return 0
+                else:
+                    del self.staffList[i]
+                    return 1
+
+    def promoteStaff(self,id):
+        for i in range(0, len(self.staffList)):
+            idval = self.staffList[i].staffId
+            if int(id) == int(idval):
+                if (self.staffList[i].isAdmin):
+                    return True
+                else:
+                    return False
+
+
+    def editStudent(self,id,grade,rfid,name,gname,pic):
+
+        conn = connectDB()
+        cur = conn.cursor()
+        cur.execute ("""   UPDATE student   SET Name=%s, TagId=%s, GuardianName=%s, grade=%s ,pic=%s  WHERE StudentID=%s""", (name, rfid, gname, grade, pic, id,))
+        conn.commit()
+        temp = cur.execute("SELECT * FROM student")
+        data = cur.fetchall()
+        self.studentList = []
+        for i in range(0, len(data)):
+            Name = data[i][0]
+            tagId = data[i][1]
+            studentId = data[i][2]
+            guardian = data[i][3]
+            grade = data[i][4]
+            pic = data[i][5]
+            student = Student(Name, studentId, tagId, guardian, pic, grade)
+            self.studentList.append(student)
+
+        conn.close()
+
+    def editStaff(self,name,email,password,id):
+
+        conn = connectDB()
+        cur = conn.cursor()
+        cur.execute ("""   UPDATE staff  SET Fname=%s, Email=%s, Password=%s  WHERE StaffID=%s""", (name, email, password, id,))
+        conn.commit()
+        temp = cur.execute("SELECT * FROM staff")
+        data = cur.fetchall()
+        self.staffList = []
+        for i in range(0, len(data)):
+            fName = data[i][0]
+            email = data[i][1]
+            password = data[i][2]
+            staffId = data[i][3]
+            isAdmin = data[i][4]
+            staff = Staff(staffId, fName, email, password, isAdmin)
+            self.staffList.append(staff)
+
+        conn.close()
 
 class Student(object):
     studentId = 0
     tagId = ""
-    fName = ""
-    lName = ""
+    Name = ""
     guardian = ""
     image = ""
     grade = 0
 
     # The class "constructor" - It's actually an initializer
-    def __init__(self, fName, lName, studentId, tagId, guardian, image, grade):
+    def __init__(self, Name, studentId, tagId, guardian, image, grade):
         self.studentId = studentId
-        self.fName = fName
-        self.lName = lName
+        self.Name = Name
         self.guardian = guardian
         self.tagId = tagId
         self.image = image
@@ -109,30 +245,24 @@ class Student(object):
 
 class Staff(object):
     staffId = 0
-    fName = ""
-    lName = ""
+    Name = ""
     email = ""
     password = ""
     isAdmin = 0
 
-    def __init__(self, staffId, fName, lName, email, password, isAdmin):
+    def __init__(self, staffId, Name, email, password, isAdmin):
         self.staffId = staffId
-        self.fName = fName
-        self.lName = lName
+        self.Name = Name
         self.email = email
         self.password = password
         self.isAdmin = isAdmin
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(1200, 900)
-
         #MessageBox for Statuses
         self.PopupMessage = QtGui.QMessageBox()
-
-
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
@@ -236,10 +366,14 @@ class Ui_MainWindow(object):
 
         # self.Login_registration_btn.keyPressEvent(QtCore.Qt.Key_Enter).connect(self.MainAdminfunc)
 
-        self.textEdit = QtGui.QTextEdit(MainWindow)
-        self.textEdit.setGeometry(QtCore.QRect(330, 90, 421, 61))
+        self.textEdit = QtGui.QLabel(MainWindow)
+        self.textEdit.setGeometry(QtCore.QRect(450, 90, 421, 80))
         self.textEdit.setObjectName(_fromUtf8("textEdit"))
-
+        self.textEdit.setText("Login")
+        font = QtGui.QFont()
+        font.setPointSize(50)
+        self.textEdit.setFont(font)
+        self.textEdit.setStyleSheet('color: red')
         self.LogOffstaff = QtGui.QCommandLinkButton(MainWindow)
         self.LogOffstaff.setGeometry(QtCore.QRect(790, 780, 187, 41))
         self.LogOffstaff.setObjectName(_fromUtf8("LogOffstaff"))
@@ -259,11 +393,7 @@ class Ui_MainWindow(object):
         self.Reg_email.setObjectName(_fromUtf8("Reg_email"))
         self.Reg_reg_btn = QtGui.QPushButton(MainWindow)
         self.Reg_reg_btn.setGeometry(QtCore.QRect(420, 490, 211, 61))
-
-
         self.Reg_reg_btn.setObjectName(_fromUtf8("Reg_reg_btn"))
-
-
         self.Usernamereg = QtGui.QLabel(MainWindow)
         self.Usernamereg.setGeometry(QtCore.QRect(290, 150, 191, 101))
         font = QtGui.QFont()
@@ -285,8 +415,6 @@ class Ui_MainWindow(object):
         self.textEditreg = QtGui.QTextEdit(MainWindow)
         self.textEditreg.setGeometry(QtCore.QRect(380, 60, 421, 61))
         self.textEditreg.setObjectName(_fromUtf8("textEditreg"))
-
-
         self.CancleReg = QtGui.QCommandLinkButton(MainWindow)
         self.CancleReg.setGeometry(QtCore.QRect(790, 780, 187, 41))
         self.CancleReg.setObjectName(_fromUtf8("CancleReg"))
@@ -296,13 +424,11 @@ class Ui_MainWindow(object):
         #=======================================================
         # main admin page
 
-
         self.LogOffAdmin1 = QtGui.QCommandLinkButton(MainWindow)
         self.LogOffAdmin1.setGeometry(QtCore.QRect(990, 10, 187, 41))
         self.LogOffAdmin1.setObjectName(_fromUtf8("LogOffAdmin1"))
         #when Registration is clicked
         self.LogOffAdmin1.clicked.connect(self.LogOffAdminfunc)
-
         self.verticalLayoutWidget = QtGui.QWidget(MainWindow)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 169, 1071, 271))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
@@ -313,17 +439,13 @@ class Ui_MainWindow(object):
         self.EditStudent = QtGui.QPushButton(self.verticalLayoutWidget)
         self.EditStudent.setObjectName(_fromUtf8("EditStudent"))
         self.EditStudent.clicked.connect(self.ShowAdminFunc)
-
         self.horizontalLayout.addWidget(self.EditStudent)
         self.RegisterStaff = QtGui.QPushButton(self.verticalLayoutWidget)
         self.RegisterStaff.setObjectName(_fromUtf8("RegisterStaff"))
-        #when Edit staff is clicked
         self.RegisterStaff.clicked.connect(self.ShowStaffWindonFunc)
-
         self.horizontalLayout.addWidget(self.RegisterStaff)
         self.StudentLog = QtGui.QPushButton(self.verticalLayoutWidget)
         self.StudentLog.setObjectName(_fromUtf8("StudentLog"))
-
         self.horizontalLayout.addWidget(self.StudentLog)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
@@ -332,12 +454,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem)
         self.StudentCheckout = QtGui.QPushButton(self.verticalLayoutWidget)
         self.StudentCheckout.setObjectName(_fromUtf8("StudentCheckout"))
-        #when Registration is clicked
         self.StudentLog.clicked.connect(self.LogAdminfunc)
-
-        #when Registration is clicked
-        # self.StudentCheckout.clicked.connect(self.loginfunc)
-
         self.horizontalLayout_2.addWidget(self.StudentCheckout)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem1)
@@ -361,20 +478,6 @@ class Ui_MainWindow(object):
         self.adminlabel_5.setGeometry(QtCore.QRect(480, 410, 191, 16))
         self.adminlabel_5.setObjectName(_fromUtf8("adminlabel_5"))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         #=======================================================
         #Log page
 
@@ -390,9 +493,7 @@ class Ui_MainWindow(object):
         self.LogButton_Exit.setGeometry(QtCore.QRect(720, 550, 75, 23))
         self.LogButton_Exit.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogButton_Exit.setObjectName(_fromUtf8("LogButton_Exit"))
-
-        self.LogButton_Exit.clicked.connect(self.CancleRegfunc)
-
+        self.LogButton_Exit.clicked.connect(self.CancelRegfunc)
         self.dateEdit = QtGui.QDateEdit(MainWindow)
         self.dateEdit.setGeometry(QtCore.QRect(20, 550, 110, 22))
         self.dateEdit.setMaximumSize(QtCore.QSize(1200, 900))
@@ -416,9 +517,7 @@ class Ui_MainWindow(object):
         self.LogOffAdminStudent.setGeometry(QtCore.QRect(700, 10, 187, 41))
         self.LogOffAdminStudent.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogOffAdminStudent.setObjectName(_fromUtf8("LogOffAdmin"))
-
         self.LogOffAdminStudent.clicked.connect(self.LogOffAdminfunc)
-
         self.DismissWidget = QtGui.QTabWidget(MainWindow)
         self.DismissWidget.setGeometry(QtCore.QRect(10, 70, 781, 441))
         self.DismissWidget.setMaximumSize(QtCore.QSize(1200, 900))
@@ -458,230 +557,177 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.LogListView_Staff2)
         self.DismissWidget.addTab(self.tab_3, _fromUtf8(""))
 
-  
-
-        #self.LogCancel.clicked.connect(self.CancleRegfunc)
         #=======================================================
 
         #student window
+        #generic font
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        #validators
+        validator = QtGui.QIntValidator()
+        regex = QtCore.QRegExp("[a-z-A-Z _]+")
+        azvalidator = QtGui.QRegExpValidator(regex)
+        #Labels
+        self.StudentLabel_Name = QtGui.QLabel(MainWindow)
+        self.StudentLabel_Name.setGeometry(QtCore.QRect(530, 60, 81, 31))
+        self.StudentLabel_Name.setFont(font)
+        self.StudentLabel_Name.setObjectName(_fromUtf8("StudentLabel_Name"))
+
+        self.StudentLabel_ID = QtGui.QLabel(MainWindow)
+        self.StudentLabel_ID.setGeometry(QtCore.QRect(530, 130, 81, 31))
+        self.StudentLabel_ID.setFont(font)
+        self.StudentLabel_ID.setObjectName(_fromUtf8("StudentLabel_ID"))
 
         self.StudentLabel_Grade = QtGui.QLabel(MainWindow)
         self.StudentLabel_Grade.setGeometry(QtCore.QRect(530, 200, 121, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.StudentLabel_Grade.setFont(font)
         self.StudentLabel_Grade.setObjectName(_fromUtf8("StudentLabel_Grade"))
-        self.StudentText_Grade = QtGui.QLineEdit(MainWindow)
-        self.StudentText_Grade.setEnabled(False)
 
-        self.StudentText_Grade.setGeometry(QtCore.QRect(650, 200, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentText_Grade.setFont(font)
-        self.StudentText_Grade.setObjectName(_fromUtf8("StudentText_Grade"))
-        self.StudentText_Name = QtGui.QLineEdit(MainWindow)
-        self.StudentText_Name.setEnabled(False)
+        self.StudentLabel_GName = QtGui.QLabel(MainWindow)
+        self.StudentLabel_GName.setGeometry(QtCore.QRect(530, 270, 81, 31))
+        self.StudentLabel_GName.setFont(font)
+        self.StudentLabel_GName.setObjectName(_fromUtf8("StudentLabel_GName"))
 
-        validator = QtGui.QIntValidator()
-        self.StudentText_Grade.setValidator(validator)
+        self.StudentLabel_RFID = QtGui.QLabel(MainWindow)
+        self.StudentLabel_RFID.setGeometry(QtCore.QRect(530, 340, 81, 31))
+        self.StudentLabel_RFID.setFont(font)
+        self.StudentLabel_RFID.setObjectName(_fromUtf8("StudentLabel_RFID"))
 
+        self.StudentLabel_Picture = QtGui.QLabel(MainWindow)
+        self.StudentLabel_Picture.setGeometry(QtCore.QRect(530, 410, 81, 31))
+        self.StudentLabel_Picture.setFont(font)
+        self.StudentLabel_Picture.setObjectName(_fromUtf8("StudentLabel_Picture"))
 
-        self.StudentText_Name.setGeometry(QtCore.QRect(650, 60, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentText_Name.setFont(font)
-        self.StudentText_Name.setObjectName(_fromUtf8("StudentText_Name"))
-        self.StudentLabel_ID = QtGui.QLabel(MainWindow)
-        self.StudentLabel_ID.setGeometry(QtCore.QRect(530, 130, 81, 31))
-
-        regex = QtCore.QRegExp("[a-z-A-Z _]+")
-        validator = QtGui.QRegExpValidator(regex)
-        self.StudentText_Name.setValidator(validator)
-
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentLabel_ID.setFont(font)
-        self.StudentLabel_ID.setObjectName(_fromUtf8("StudentLabel_ID"))
         self.StudentLabel_Picture_2 = QtGui.QLabel(MainWindow)
         self.StudentLabel_Picture_2.setGeometry(QtCore.QRect(530, 460, 361, 271))
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.StudentLabel_Picture_2.setFont(font)
         self.StudentLabel_Picture_2.setObjectName(_fromUtf8("StudentLabel_Picture_2"))
+
+        self.StudentLabel_SearchName = QtGui.QLabel(MainWindow)
+        self.StudentLabel_SearchName.setGeometry(QtCore.QRect(10, 700, 31, 16))
+        self.StudentLabel_SearchName.setObjectName(_fromUtf8("StudentLabel_SearchName"))
+
         self.StudentLabel_SearchID = QtGui.QLabel(MainWindow)
         self.StudentLabel_SearchID.setGeometry(QtCore.QRect(310, 680, 91, 16))
         self.StudentLabel_SearchID.setObjectName(_fromUtf8("StudentLabel_SearchID"))
+
+        #textfields
+        self.StudentText_Name = QtGui.QLineEdit(MainWindow)
+        self.StudentText_Name.setEnabled(False)
+        self.StudentText_Name.setGeometry(QtCore.QRect(650, 60, 241, 31))
+        self.StudentText_Name.setFont(font)
+        self.StudentText_Name.setObjectName(_fromUtf8("StudentText_Name"))
+        self.StudentText_Name.setValidator(azvalidator)
+
         self.StudentText_ID = QtGui.QLineEdit(MainWindow)
         self.StudentText_ID.setGeometry(QtCore.QRect(650, 130, 241, 31))
         self.StudentText_ID.setEnabled(False)
-
-        validator = QtGui.QIntValidator()
         self.StudentText_ID.setValidator(validator)
-
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.StudentText_ID.setFont(font)
         self.StudentText_ID.setObjectName(_fromUtf8("StudentText_ID"))
+
+        self.StudentText_Grade = QtGui.QLineEdit(MainWindow)
+        self.StudentText_Grade.setEnabled(False)
+        self.StudentText_Grade.setGeometry(QtCore.QRect(650, 200, 241, 31))
+        self.StudentText_Grade.setFont(font)
+        self.StudentText_Grade.setObjectName(_fromUtf8("StudentText_Grade"))
+        self.StudentText_Grade.setValidator(validator)
+
+        self.StudentText_GName = QtGui.QLineEdit(MainWindow)
+        self.StudentText_GName.setGeometry(QtCore.QRect(650, 270, 241, 31))
+        self.StudentText_GName.setEnabled(False)
+        self.StudentText_GName.setFont(font)
+        self.StudentText_GName.setObjectName(_fromUtf8("StudentText_GName"))
+        self.StudentText_GName.setValidator(azvalidator)
+
+        self.StudentText_RFID = QtGui.QLineEdit(MainWindow)
+        self.StudentText_RFID.setGeometry(QtCore.QRect(650, 340, 241, 31))
+        self.StudentText_RFID.setEnabled(False)
+        self.StudentText_RFID.setFont(font)
+        self.StudentText_RFID.setObjectName(_fromUtf8("StudentText_RFID"))
+
+        #this text is depreciated and needs to be removed everywhere
+        self.StudentText_Picture = QtGui.QLineEdit(MainWindow)
+        self.StudentText_Picture.setGeometry(QtCore.QRect(650, 410, 241, 31))
+        self.StudentText_Picture.setFont(font)
+        self.StudentText_Picture.setObjectName(_fromUtf8("StudentText_Picture"))
+
+        #Buttons
         self.StudentButton_Remove = QtGui.QPushButton(MainWindow)
         self.StudentButton_Remove.setGeometry(QtCore.QRect(330, 830, 111, 23))
         self.StudentButton_Remove.setObjectName(_fromUtf8("StudentButton_Remove"))
+        self.StudentButton_Remove.clicked.connect(self.RemoveStudentfunc)
 
         self.StudentButton_Exit = QtGui.QPushButton(MainWindow)
         self.StudentButton_Exit.setGeometry(QtCore.QRect(790, 780, 75, 23))
         self.StudentButton_Exit.setObjectName(_fromUtf8("StudentButton_Exit"))
+        self.StudentButton_Exit.clicked.connect(self.CancelRegfunc)
 
         self.StudentButton_Save = QtGui.QPushButton(MainWindow)
         self.StudentButton_Save.setGeometry(QtCore.QRect(1000, 130, 75, 23))
         self.StudentButton_Save.setObjectName(_fromUtf8("StudentButton_Save"))
         self.StudentButton_Save.clicked.connect(self.handleAddSave)
 
+        self.StudentButton_Picture = QtGui.QPushButton(MainWindow)
+        self.StudentButton_Picture.setGeometry(QtCore.QRect(700, 410, 81, 31))
+        self.StudentButton_Picture.setObjectName(_fromUtf8("StudentButton_Save"))
+        self.StudentButton_Picture.setText(_translate("MainWindow", "Browse", None))
+        self.StudentButton_Picture.clicked.connect(self.handleBrowse)
+
         self.StudentButton_Save2 = QtGui.QPushButton(MainWindow)
         self.StudentButton_Save2.setGeometry(QtCore.QRect(1000, 130, 75, 23))
         self.StudentButton_Save2.setObjectName(_fromUtf8("StudentButton_Save2"))
-        self.StudentButton_Save2.clicked.connect(self.handleEditSave)
+        self.StudentButton_Save2.clicked.connect(self.confirmsavestudent)
 
         self.StudentButton_Cancel = QtGui.QPushButton(MainWindow)
         self.StudentButton_Cancel.setGeometry(QtCore.QRect(1000, 200, 75, 23))
         self.StudentButton_Cancel.setObjectName(_fromUtf8("StudentButton_Cancel"))
         self.StudentButton_Cancel.clicked.connect(self.handleAddCancel)
 
-
-        self.StudentSearch_ID = QtGui.QLineEdit(MainWindow)
-        self.StudentSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
-
-
-        self.StudentSearch_ID.setObjectName(_fromUtf8("StudentSearch_ID"))
-        validator = QtGui.QIntValidator()
-        self.StudentSearch_ID.setValidator(validator)
-
         self.StudentButton_Edit = QtGui.QPushButton(MainWindow)
         self.StudentButton_Edit.setGeometry(QtCore.QRect(170, 830, 101, 23))
         self.StudentButton_Edit.setObjectName(_fromUtf8("StudentButton_Edit"))
-        self.LogOffAdmin = QtGui.QCommandLinkButton(MainWindow)
-        self.LogOffAdmin.setGeometry(QtCore.QRect(1100, 10, 187, 41))
-        self.LogOffAdmin.setObjectName(_fromUtf8("LogOffAdmin"))
-        self.StudentText_RFID = QtGui.QLineEdit(MainWindow)
-        self.StudentText_RFID.setGeometry(QtCore.QRect(650, 340, 241, 31))
-        self.StudentText_RFID.setEnabled(False)
+        self.StudentButton_Edit.clicked.connect(self.editStudentfunc)
 
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentText_RFID.setFont(font)
-        self.StudentText_RFID.setObjectName(_fromUtf8("StudentText_RFID"))
-        self.StudentText_GName = QtGui.QLineEdit(MainWindow)
-        self.StudentText_GName.setGeometry(QtCore.QRect(650, 270, 241, 31))
-
-        self.StudentText_GName.setEnabled(False)
-        #self.StudentText_GName.focusable(False)
-
-
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentText_GName.setFont(font)
-        self.StudentText_GName.setObjectName(_fromUtf8("StudentText_GName"))
-        self.StudentLabel_Name = QtGui.QLabel(MainWindow)
-        self.StudentLabel_Name.setGeometry(QtCore.QRect(530, 60, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-
-        regex = QtCore.QRegExp("[a-z-A-Z_ ]+")
-        validator = QtGui.QRegExpValidator(regex)
-        self.StudentText_GName.setValidator(validator)
-
-        self.StudentLabel_Name.setFont(font)
-        self.StudentLabel_Name.setObjectName(_fromUtf8("StudentLabel_Name"))
-        self.StudentLabel_Picture = QtGui.QLabel(MainWindow)
-        self.StudentLabel_Picture.setGeometry(QtCore.QRect(530, 410, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentLabel_Picture.setFont(font)
-        self.StudentLabel_Picture.setObjectName(_fromUtf8("StudentLabel_Picture"))
-        self.StudentLabel_SearchName = QtGui.QLabel(MainWindow)
-        self.StudentLabel_SearchName.setGeometry(QtCore.QRect(10, 700, 31, 16))
-        self.StudentLabel_SearchName.setObjectName(_fromUtf8("StudentLabel_SearchName"))
-        self.StudentText_Picture = QtGui.QLineEdit(MainWindow)
-        self.StudentText_Picture.setGeometry(QtCore.QRect(650, 410, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentText_Picture.setFont(font)
-        self.StudentText_Picture.setObjectName(_fromUtf8("StudentText_Picture"))
-        self.StudentSearch_Name = QtGui.QLineEdit(MainWindow)
-        self.StudentSearch_Name.setGeometry(QtCore.QRect(10, 700, 281, 31))
-        self.StudentSearch_Name.setObjectName(_fromUtf8("StudentSearch_Name"))
-
-        regex = QtCore.QRegExp("[a-z-A-Z_]+")
-        validator = QtGui.QRegExpValidator(regex)
-        self.StudentSearch_Name.setValidator(validator)
-
-
-        self.StudentLabel_RFID = QtGui.QLabel(MainWindow)
-        self.StudentLabel_RFID.setGeometry(QtCore.QRect(530, 340, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentLabel_RFID.setFont(font)
-        self.StudentLabel_RFID.setObjectName(_fromUtf8("StudentLabel_RFID"))
         self.StudentButton_Add = QtGui.QPushButton(MainWindow)
         self.StudentButton_Add.setGeometry(QtCore.QRect(30, 830, 91, 23))
         self.StudentButton_Add.setObjectName(_fromUtf8("StudentButton_Add"))
         self.StudentButton_Add.clicked.connect(self.addStudentfunc)
 
-        self.StudentLabel_GName = QtGui.QLabel(MainWindow)
-        self.StudentLabel_GName.setGeometry(QtCore.QRect(530, 270, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StudentLabel_GName.setFont(font)
-        self.StudentLabel_GName.setObjectName(_fromUtf8("StudentLabel_GName"))
+        self.StudentButton_SearchName = QtGui.QPushButton(MainWindow)
+        self.StudentButton_SearchName.setGeometry(QtCore.QRect(10, 740, 121, 27))
+        self.StudentButton_SearchName.setObjectName(_fromUtf8("StudentButton_SearchName"))
+
+        self.StudentButton_SearchID = QtGui.QPushButton(MainWindow)
+        self.StudentButton_SearchID.setGeometry(QtCore.QRect(310, 740, 121, 27))
+        self.StudentButton_SearchID.setObjectName(_fromUtf8("StudentButton_SearchID"))
+
+        #Searchfield
+        self.StudentSearch_ID = QtGui.QLineEdit(MainWindow)
+        self.StudentSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
+        self.StudentSearch_ID.setObjectName(_fromUtf8("StudentSearch_ID"))
+        self.StudentSearch_ID.setValidator(validator)
+
+        self.StudentSearch_Name = QtGui.QLineEdit(MainWindow)
+        self.StudentSearch_Name.setGeometry(QtCore.QRect(10, 700, 281, 31))
+        self.StudentSearch_Name.setObjectName(_fromUtf8("StudentSearch_Name"))
+        self.StudentSearch_Name.setValidator(azvalidator)
+
+        #Logoff Button
+        self.LogOffAdmin = QtGui.QCommandLinkButton(MainWindow)
+        self.LogOffAdmin.setGeometry(QtCore.QRect(1100, 10, 187, 41))
+        self.LogOffAdmin.setObjectName(_fromUtf8("LogOffAdmin"))
+        self.LogOffAdmin.clicked.connect(self.LogOffAdminfunc)
+
+        #Student List
         self.StudentView = QtGui.QListWidget(MainWindow)
         self.StudentView.setGeometry(QtCore.QRect(10, 60, 450, 550))
         self.StudentView.setObjectName(_fromUtf8("StudentView"))
         self.StudentView.itemClicked.connect(self.handleViewDetail)
 
-        self.StudentButton_ViewDetails = QtGui.QPushButton(MainWindow)
-        self.StudentButton_ViewDetails.setGeometry(QtCore.QRect(360, 620, 99, 27))
-        self.StudentButton_ViewDetails.setObjectName(_fromUtf8("StudentButton_ViewDetails"))
-        # self.StudentButton_ViewDetails.clicked.connect(self.handleViewDetail())
-
-        self.StudentButton_SearchName = QtGui.QPushButton(MainWindow)
-        self.StudentButton_SearchName.setGeometry(QtCore.QRect(10, 740, 121, 27))
-        self.StudentButton_SearchName.setObjectName(_fromUtf8("StudentButton_SearchName"))
-        self.StudentButton_SearchID = QtGui.QPushButton(MainWindow)
-        self.StudentButton_SearchID.setGeometry(QtCore.QRect(310, 740, 121, 27))
-        self.StudentButton_SearchID.setObjectName(_fromUtf8("StudentButton_SearchID"))
-
-        self.StudentButton_Remove.clicked.connect(self.RemoveStudentfunc)
-        self.StudentButton_Exit.clicked.connect(self.CancleRegfunc)
-        self.StudentButton_Edit.clicked.connect(self.editStudentfunc)
-        self.LogOffAdmin.clicked.connect(self.LogOffAdminfunc)
-        #self.StudentButton_Add.clicked.connect(self.addStudentfunc)
         #=================================================
         #Staff Window
-        self.StaffText_Grade = QtGui.QLineEdit(MainWindow)
-        self.StaffText_Grade.setGeometry(QtCore.QRect(670, 200, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffText_Grade.setFont(font)
-        self.StaffText_Grade.setObjectName(_fromUtf8("StaffText_Grade"))
-        self.StaffButton_Promote = QtGui.QPushButton(MainWindow)
-        self.StaffButton_Promote.setGeometry(QtCore.QRect(520, 780, 101, 23))
-        self.StaffButton_Promote.setObjectName(_fromUtf8("StaffButton_Promote"))
-        self.StaffButton_Promote.clicked.connect(self.PromoteFunction)
-
-        self.StaffLabel_Email = QtGui.QLabel(MainWindow)
-        self.StaffLabel_Email.setGeometry(QtCore.QRect(550, 200, 121, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffLabel_Email.setFont(font)
-        self.StaffLabel_Email.setObjectName(_fromUtf8("StaffLabel_Email"))
-        self.StaffText_ID = QtGui.QLineEdit(MainWindow)
-        self.StaffText_ID.setGeometry(QtCore.QRect(670, 130, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffText_ID.setFont(font)
-        self.StaffText_ID.setObjectName(_fromUtf8("StaffText_ID"))
-        self.StaffButton_Add = QtGui.QPushButton(MainWindow)
-        self.StaffButton_Add.setGeometry(QtCore.QRect(120, 780, 91, 23))
-        self.StaffButton_Add.setObjectName(_fromUtf8("StaffButton_Add"))
-        self.StaffButton_Add.clicked.connect(self.AddStaffFunc)
+        # StaffSearch_Name ,
 
         self.StaffText_Name = QtGui.QLineEdit(MainWindow)
         self.StaffText_Name.setGeometry(QtCore.QRect(670, 60, 241, 31))
@@ -689,24 +735,111 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.StaffText_Name.setFont(font)
         self.StaffText_Name.setObjectName(_fromUtf8("StaffText_Name"))
+
+        self.StaffText_ID = QtGui.QLineEdit(MainWindow)
+        self.StaffText_ID.setGeometry(QtCore.QRect(670, 130, 241, 31))
+        self.StaffText_ID.setFont(font)
+        self.StaffText_ID.setObjectName(_fromUtf8("StaffText_ID"))
+
+        self.StaffText_Email = QtGui.QLineEdit(MainWindow)
+        self.StaffText_Email.setGeometry(QtCore.QRect(670, 200, 241, 31))
+        self.StaffText_Email.setFont(font)
+        self.StaffText_Email.setObjectName(_fromUtf8("StaffText_Email"))
+
+        self.StaffText_Pass = QtGui.QLineEdit(MainWindow)
+        self.StaffText_Pass.setGeometry(QtCore.QRect(670, 270, 241, 31))
+        self.StaffText_Pass.setEchoMode(QtGui.QLineEdit.Password)
+        self.StaffText_Pass.setFont(font)
+        self.StaffText_Pass.setObjectName(_fromUtf8("StaffText_Pass"))
+
+        self.StaffText_CPass = QtGui.QLineEdit(MainWindow)
+        self.StaffText_CPass.setGeometry(QtCore.QRect(670, 340, 241, 31))
+        self.StaffText_CPass.setEchoMode(QtGui.QLineEdit.Password)
+        self.StaffText_CPass.setFont(font)
+        self.StaffText_CPass.setObjectName(_fromUtf8("StaffText_CPass"))
+
+        self.StaffLabel_CPassword = QtGui.QLabel(MainWindow)
+        self.StaffLabel_CPassword.setGeometry(QtCore.QRect(550, 340, 81, 31))
+        self.StaffLabel_CPassword.setFont(font)
+        self.StaffLabel_CPassword.setObjectName(_fromUtf8("StaffLabel_CPassword"))
+
+        self.StaffButton_Promote = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Promote.setGeometry(QtCore.QRect(520, 780, 101, 23))
+        self.StaffButton_Promote.setObjectName(_fromUtf8("StaffButton_Promote"))
+        self.StaffButton_Promote.clicked.connect(self.PromoteFunction)
+
+        self.StaffLabel_Email = QtGui.QLabel(MainWindow)
+        self.StaffLabel_Email.setGeometry(QtCore.QRect(550, 200, 121, 31))
+        self.StaffLabel_Email.setFont(font)
+        self.StaffLabel_Email.setObjectName(_fromUtf8("StaffLabel_Email"))
+
+        self.StaffButton_Add = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Add.setGeometry(QtCore.QRect(120, 780, 91, 23))
+        self.StaffButton_Add.setObjectName(_fromUtf8("StaffButton_Add"))
+        self.StaffButton_Add.clicked.connect(self.AddStaffFunc)
+
+        self.StaffSearch_Name = QtGui.QLineEdit(MainWindow)
+        self.StaffSearch_Name.setGeometry(QtCore.QRect(10, 700, 281, 31))
+        self.StaffSearch_Name.setObjectName(_fromUtf8("StaffSearch_Name"))
+        regex = QtCore.QRegExp("[a-z-A-Z_]+")
+        validator = QtGui.QRegExpValidator(regex)
+        self.StaffSearch_Name.setValidator(validator)
+
+        self.StaffLabel_SearchID = QtGui.QLabel(MainWindow)
+        self.StaffLabel_SearchID.setGeometry(QtCore.QRect(310, 680, 91, 16))
+        self.StaffLabel_SearchID.setObjectName(_fromUtf8("StaffLabel_SearchID"))
+        self.StaffLabel_SearchID.setText(_translate("MainWindow", "Search ID", None))
+
+        self.StaffSearch_ID = QtGui.QLineEdit(MainWindow)
+        self.StaffSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
+        self.StaffSearch_ID.setObjectName(_fromUtf8("StaffSearch_ID"))
+        validator = QtGui.QIntValidator()
+        self.StaffSearch_ID.setValidator(validator)
+        self.StaffButton_SearchID = QtGui.QPushButton(MainWindow)
+        self.StaffButton_SearchID.setGeometry(QtCore.QRect(310, 740, 121, 27))
+        self.StaffButton_SearchID.setObjectName(_fromUtf8("StaffButton_SearchID"))
+        self.StaffButton_SearchID.setText(_translate("MainWindow", "Search by ID", None))
+
+
+        self.StaffButton_SearchName = QtGui.QPushButton(MainWindow)
+        self.StaffButton_SearchName.setGeometry(QtCore.QRect(10, 740, 121, 27))
+        self.StaffButton_SearchName.setObjectName(_fromUtf8("StaffButton_SearchName"))
+        self.StaffButton_SearchName.setText(_translate("MainWindow", "Search Name", None))
+
+        self.StaffButton_Save2 = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Save2.setGeometry(QtCore.QRect(1000, 130, 75, 23))
+        self.StaffButton_Save2.setObjectName(_fromUtf8("StaffButton_Save2"))
+        self.StaffButton_Save2.setText(_translate("MainWindow", "Save", None))
+        self.StaffButton_Save2.clicked.connect(self.confirmsavestaff)
+
+        self.StaffButton_Save = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Save.setGeometry(QtCore.QRect(1000, 130, 75, 23))
+        self.StaffButton_Save.setObjectName(_fromUtf8("StaffButton_Save"))
+        self.StaffButton_Save.setText(_translate("MainWindow", "Save", None))
+        self.StaffButton_Save.clicked.connect(self.handleAddStaffSave)
+
+        self.StaffButton_Cancel = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Cancel.setGeometry(QtCore.QRect(1000, 200, 75, 23))
+        self.StaffButton_Cancel.setObjectName(_fromUtf8("StaffButton_Cancel"))
+        self.StaffButton_Cancel.setText(_translate("MainWindow", "Cancel", None))
+        self.StaffButton_Cancel.clicked.connect(self.handleStaffCancel)
+
         self.StaffButton_Remove = QtGui.QPushButton(MainWindow)
         self.StaffButton_Remove.setGeometry(QtCore.QRect(380, 780, 101, 23))
         self.StaffButton_Remove.setObjectName(_fromUtf8("StaffButton_Remove"))
-        self.StaffButton_Remove.clicked.connect(self.RemoveStudentfunc)
+        self.StaffButton_Remove.clicked.connect(self.RemoveStafffunc)
 
-        self.StaffText_GName = QtGui.QLineEdit(MainWindow)
-        self.StaffText_GName.setGeometry(QtCore.QRect(670, 270, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffText_GName.setFont(font)
-        self.StaffText_GName.setObjectName(_fromUtf8("StaffText_GName"))
-
-        self.StaffView = QtGui.QListView(MainWindow)
+        self.StaffView = QtGui.QListWidget(MainWindow)
         self.StaffView.setGeometry(QtCore.QRect(10, 60, 450, 550))
         self.StaffView.setObjectName(_fromUtf8("StaffView"))
-        self.StudentLabel_SearchName = QtGui.QLabel(MainWindow)
-        self.StudentLabel_SearchName.setGeometry(QtCore.QRect(10, 680, 91, 16))
-        self.StudentLabel_SearchName.setObjectName(_fromUtf8("StudentLabel_SearchName"))
+        self.StaffView.itemClicked.connect(self.handleViewDetailStaff)
+
+        self.StaffLabel_SearchName = QtGui.QLabel(MainWindow)
+        self.StaffLabel_SearchName.setGeometry(QtCore.QRect(10, 680, 91, 16))
+        self.StaffLabel_SearchName.setObjectName(_fromUtf8("StaffLabel_SearchName"))
+        self.StaffLabel_SearchName.setText(_translate("MainWindow", "Search Name", None))
+
+
         self.LogOffAdmin_Staff = QtGui.QCommandLinkButton(MainWindow)
         self.LogOffAdmin_Staff.setGeometry(QtCore.QRect(1100, 10, 187, 41))
         self.LogOffAdmin_Staff.setObjectName(_fromUtf8("LogOffAdmin_Staff"))
@@ -714,35 +847,28 @@ class Ui_MainWindow(object):
 
         self.StaffLabel_Name = QtGui.QLabel(MainWindow)
         self.StaffLabel_Name.setGeometry(QtCore.QRect(550, 60, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.StaffLabel_Name.setFont(font)
         self.StaffLabel_Name.setObjectName(_fromUtf8("StaffLabel_Name"))
         self.StaffButton_Exit = QtGui.QPushButton(MainWindow)
         self.StaffButton_Exit.setGeometry(QtCore.QRect(790, 780, 75, 23))
         self.StaffButton_Exit.setObjectName(_fromUtf8("StaffButton_Exit"))
-        self.StaffButton_Exit.clicked.connect(self.CancleRegfunc)
+        self.StaffButton_Exit.clicked.connect(self.CancelRegfunc)
 
         self.StaffButton_Edit = QtGui.QPushButton(MainWindow)
         self.StaffButton_Edit.setGeometry(QtCore.QRect(250, 780, 91, 23))
         self.StaffButton_Edit.setObjectName(_fromUtf8("StaffButton_Edit"))
-        self.StaffButton_Edit.clicked.connect(self.AddStaffFunc)
+        self.StaffButton_Edit.clicked.connect(self.EditstaffFunc)
 
         self.StaffLabel_Password = QtGui.QLabel(MainWindow)
         self.StaffLabel_Password.setGeometry(QtCore.QRect(550, 270, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.StaffLabel_Password.setFont(font)
         self.StaffLabel_Password.setObjectName(_fromUtf8("StaffLabel_Password"))
+
         self.StaffLabel_ID = QtGui.QLabel(MainWindow)
         self.StaffLabel_ID.setGeometry(QtCore.QRect(550, 130, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.StaffLabel_ID.setFont(font)
         self.StaffLabel_ID.setObjectName(_fromUtf8("StaffLabel_ID"))
-        self.StaffSearch_Name = QtGui.QLineEdit(MainWindow)
-        self.StaffSearch_Name.setGeometry(QtCore.QRect(10, 660, 451, 31))
-        self.StaffSearch_Name.setObjectName(_fromUtf8("StaffSearch_Name"))
+
 
         # =================================================
         self.workerThread = WorkerThread()
@@ -750,11 +876,51 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.workerThread.start()
+
+    def confirmsavestudent(self):
+        if (self.popupMessage(MainWindow,"Do your really want to edit this student? ")):
+            self.handleEditSaveStudent(MainWindow)
+
     def newOnKeyPressEvent(self,event):
         if event.key() == QtCore.Qt.Key_Enter :
-            print("emter ")
+            print("enter ")
             self.MainAdminfunc(MainWindow)
 
+    def confirmsavestaff(self):
+        if (self.popupMessage(MainWindow,"Do your really want to edit this staff? ")):
+            self.handleEditSaveStaff(MainWindow)
+            self.enableLeftStaff()
+
+    def newOnKeyPressEvent(self,event):
+        if event.key() == QtCore.Qt.Key_Enter :
+            print("enter ")
+            self.MainAdminfunc(MainWindow)
+
+    def handleBrowse(self):
+        global filename
+        filename = QtGui.QFileDialog.getOpenFileName()
+        pixmap = QtGui.QPixmap(filename)
+        pixmap = pixmap.scaled(510, 440, QtCore.Qt.KeepAspectRatio)
+        self.StudentLabel_Picture_2.setPixmap(pixmap)
+
+    def handleViewDetailStaff(self):
+        print("Bullshit")
+        name = self.StaffSearch_Name.text()
+        num = self.StaffView.currentRow()
+        print(num)
+        if name == "":
+            staff = Sys.staffList[num]
+        else:
+            result = Sys.searchByNameStaff(name)
+            print(len(result))
+            staff = result[num]
+
+        self.StaffText_Email.setText(str(staff.email))
+        self.StaffText_ID.setText(str(staff.staffId))
+        self.StaffText_Name.setText(staff.Name)
+        # QtCoreApplication::processEvents()
+        print("Do nothing")
+        print(os.getcwd())
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
@@ -772,14 +938,14 @@ class Ui_MainWindow(object):
         self.Password.setText(_translate("MainWindow", "Password", None))
         self.Login_login_btn.setText(_translate("MainWindow", "Login", None))
         self.Login_registration_btn.setText(_translate("MainWindow", "Admin Login", None))
-        self.textEdit.setHtml(_translate("MainWindow",
-                                         "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-                                         "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-                                         "p, li { white-space: pre-wrap; }\n"
-                                         "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:18pt; font-weight:400; font-style:normal;\">\n"
-                                         "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:24pt; font-weight:600; font-style:italic; color:#ff0000;\">Login</span></p></body></html>",
-                                         None))
-
+        # self.textEdit.setHtml(_translate("MainWindow",
+        #                                  "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        #                                  "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+        #                                  "p, li { white-space: pre-wrap; }\n"
+        #                                  "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:18pt; font-weight:400; font-style:normal;\">\n"
+        #                                  "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:24pt; font-weight:600; font-style:italic; color:#ff0000;\">Login</span></p></body></html>",
+        #                                  None))
+        #self.textEdit.setText(_translate("MainWindow"),"LOGIN",None)
         self.label_reg.setText(_translate("MainWindow", "Email ID", None))
         self.Reg_reg_btn.setText(_translate("MainWindow", "Register", None))
         self.Usernamereg.setText(_translate("MainWindow", "Username", None))
@@ -848,7 +1014,7 @@ class Ui_MainWindow(object):
         self.StudentLabel_RFID.setText(_translate("MainWindow", "Tag ID:", None))
         self.StudentButton_Add.setText(_translate("MainWindow", "Add Student", None))
         self.StudentLabel_GName.setText(_translate("MainWindow", "Guardian:", None))
-        self.StudentButton_ViewDetails.setText(_translate("MainWindow", "View Details", None))
+        #self.StudentButton_ViewDetails.setText(_translate("MainWindow", "View Details", None))
         self.StudentButton_SearchName.setText(_translate("MainWindow", "Search By Name", None))
         self.StudentButton_SearchName.clicked.connect(self.searchByName)
         self.StudentButton_SearchID.setText(_translate("MainWindow", "Search By ID", None))
@@ -866,7 +1032,10 @@ class Ui_MainWindow(object):
         self.StaffButton_Exit.setText(_translate("MainWindow", "Exit", None))
         self.StaffButton_Edit.setText(_translate("MainWindow", "Edit Staff", None))
         self.StaffLabel_Password.setText(_translate("MainWindow", "Password:", None))
+        self.StaffLabel_CPassword.setText(_translate("MainWindow", "Re-Enter:", None))
         self.StaffLabel_ID.setText(_translate("MainWindow", "Staff ID:", None))
+        self.StaffButton_SearchName.clicked.connect(self.searchByNameStaff)
+        self.StaffButton_SearchID.clicked.connect(self.searchByIdStaff)
         self.hideall()
         self.showLogin()
 
@@ -875,9 +1044,50 @@ class Ui_MainWindow(object):
         result = Sys.searchByName(name)
         ui.StudentView.clear()
         for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].fName + " " + result[i].lName)
+            item = QtGui.QListWidgetItem(result[i].Name)
             ui.StudentView.addItem(item)
         self.StudentView.show()
+
+    def searchByNameStaff(self):
+        name = self.StaffSearch_Name.text()
+        result = Sys.searchByNameStaff(name)
+        ui.StaffView.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.StaffView.addItem(item)
+        self.StaffView.show()
+
+    def searchByIdStaff(self):
+        id = self.StaffSearch_ID.text()
+        if id == "":
+            result = Sys.staffList
+        else:
+            result = Sys.searchByIdStaff(id)
+        ui.StaffView.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.StaffView.addItem(item)
+        self.enableLeftStaff()
+        self.StaffView.show()
+
+    def enableStaff(self):
+        self.StaffButton_Add.setEnabled(False)
+        self.StaffButton_Edit.setEnabled(False)
+        self.StaffButton_Exit.setEnabled(False)
+        self.StaffButton_Promote.setEnabled(False)
+        self.StaffButton_Remove.setEnabled(False)
+        self.StaffSearch_Name.setEnabled(False)
+        self.StaffText_Pass.setEnabled(False)
+        self.StaffText_CPass.setEnabled(False)
+        self.StaffText_Email.setEnabled(False)
+        self.StaffText_ID.setEnabled(False)
+        self.StaffText_Name.setEnabled(False)
+        self.StaffView.setEnabled(False)
+        self.LogOffAdmin_Staff.setEnabled(False)
+        self.StaffButton_SearchID.setEnabled(False)
+        self.StaffButton_SearchName.setEnabled(False)
+        self.StaffSearch_ID.setEnabled(False)
+        self.StaffSearch_Name.setEnabled(False)
 
     def enable(self):
         self.StudentText_ID.setEnabled(False)
@@ -888,8 +1098,10 @@ class Ui_MainWindow(object):
         self.StudentView.setEnabled(False)
         self.StudentButton_Exit.setEnabled(False)
         self.StudentText_Picture.setEnabled(False)
+
+        self.StudentButton_Picture.setEnabled(False)
         self.StudentButton_SearchName.setEnabled(False)
-        self.StudentButton_ViewDetails.setEnabled(False)
+        #self.StudentButton_ViewDetails.setEnabled(False)
         self.StudentButton_Add.setEnabled(False)
         self.StudentButton_Edit.setEnabled(False)
         self.StudentButton_Remove.setEnabled(False)
@@ -904,26 +1116,18 @@ class Ui_MainWindow(object):
     def searchByID(self):
         id = self.StudentSearch_ID.text()
 
-        try:
-            if(int(id)>0 and int(id)<1000):
-                result = Sys.searchByID(id)
-                ui.StudentView.clear()
-                for i in range(0, len(result)):
-                    item = QtGui.QListWidgetItem(result[i].fName + " " + result[i].lName)
-                    ui.StudentView.addItem(item)
-                self.StudentView.show()
-        except Exception:
-            print("enter only number")
-            pass
+        if id == "":
+            result = Sys.studentList
+        else:
+            result = Sys.searchByID(id)
+        ui.StudentView.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.StudentView.addItem(item)
+        self.StudentView.show()
 
-
-    '''def addstudentfun(self):
-        self.homewindow = QtGui.QDialog()
-        self.ui = Ui_DialogAdd()
-        self.ui.setupUi(self.homewindow)
-        self.homewindow.exec_()
-'''
     def showStaffWindow(self):
+        self.enableLeftStaff()
         self.StaffButton_Add.show()
         self.StaffButton_Edit.show()
         self.StaffButton_Exit.show()
@@ -933,14 +1137,25 @@ class Ui_MainWindow(object):
         self.StaffLabel_ID.show()
         self.StaffLabel_Name.show()
         self.StaffLabel_Password.show()
+        self.StaffLabel_CPassword.show()
         self.StaffSearch_Name.show()
-        self.StaffText_GName.show()
-        self.StaffText_Grade.show()
+        self.StaffText_Pass.show()
+        self.StaffText_CPass.show()
+        self.StaffText_Email.show()
         self.StaffText_ID.show()
         self.StaffText_Name.show()
+        result = Sys.getStaffNames()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i])
+            ui.StaffView.addItem(item)
         self.StaffView.show()
         self.LogOffAdmin_Staff.show()
-
+        self.StaffLabel_SearchName.show()
+        self.StaffLabel_SearchID.show()
+        self.StaffButton_SearchID.show()
+        self.StaffButton_SearchName.show()
+        self.StaffSearch_ID.show()
+        self.StaffSearch_Name.show()
 
     def showStudentWindow(self):
         self.StudentButton_SearchName.show()
@@ -964,11 +1179,12 @@ class Ui_MainWindow(object):
         self.StudentButton_SearchID.show()
         self.StudentView.show()
         self.StudentSearch_Name.show()
-        self.StudentButton_ViewDetails.show()
+        #self.StudentButton_ViewDetails.show()
 
         self.StudentButton_Exit.show()
         self.StudentText_Name.show()
-        self.StudentText_Picture.show()
+        self.StudentText_Picture.hide()
+        self.StudentButton_Picture.show()
         self.StudentText_RFID.show()
 
         result = Sys.getStudentNames()
@@ -991,11 +1207,6 @@ class Ui_MainWindow(object):
     def keyPressEvent(self,event):
         if event.key() == QtCore.Qt.Key_0 :
             self.close()
-
-
-
-
-
 
     def showLog(self):
         self.GenericReport_AppendText.show()
@@ -1022,11 +1233,22 @@ class Ui_MainWindow(object):
         self.dateEdit.show()
         self.DismissWidget.show()
 
-	#MainWindow.update()
-
-
-
     def hideall(self):
+        #staff hide
+        self.StaffLabel_SearchName.hide()
+        self.StaffLabel_SearchID.hide()
+        self.StaffButton_SearchID.hide()
+        self.StaffButton_SearchName.hide()
+        self.StaffButton_Save.hide()
+        self.StaffButton_Save2.hide()
+        self.StaffButton_Cancel.hide()
+        #self.StaffButton_ViewDetails.hide()
+        self.StaffSearch_ID.hide()
+        self.StaffSearch_Name.hide()
+
+
+
+
         self.label.hide()
         self.label_2.hide()
         self.pushButton.hide()
@@ -1090,11 +1312,6 @@ class Ui_MainWindow(object):
         self.StudentCheckout.hide()
         #for log
         self.LogButton_Exit.hide()
-
-
-
-
-
         #self.LogOffAdmin.hide()
         self.Log_label.hide()
         self.Log_label1.hide()
@@ -1119,6 +1336,7 @@ class Ui_MainWindow(object):
         self.LogOffAdminStudent.hide()
 
         #hide all student window
+        self.StudentButton_Picture.hide()
         self.StudentLabel_Grade.hide()
         self.StudentLabel_ID.hide()
         self.StudentLabel_Picture_2.hide()
@@ -1141,7 +1359,7 @@ class Ui_MainWindow(object):
         self.StudentText_RFID.hide()
         self.StudentSearch_ID.hide()
         self.StudentSearch_Name.hide()
-        self.StudentButton_ViewDetails.hide()
+        #self.StudentButton_ViewDetails.hide()
         self.StudentButton_SearchID.hide()
         self.StudentSearch_Name.hide()
         self.StudentView.hide()
@@ -1157,9 +1375,11 @@ class Ui_MainWindow(object):
         self.StaffLabel_ID.hide()
         self.StaffLabel_Name.hide()
         self.StaffLabel_Password.hide()
+        self.StaffLabel_CPassword.hide()
         self.StaffSearch_Name.hide()
-        self.StaffText_GName.hide()
-        self.StaffText_Grade.hide()
+        self.StaffText_Pass.hide()
+        self.StaffText_CPass.hide()
+        self.StaffText_Email.hide()
         self.StaffText_ID.hide()
         self.StaffText_Name.hide()
         self.StaffView.hide()
@@ -1168,9 +1388,6 @@ class Ui_MainWindow(object):
         self.StudentButton_Save.hide()
         self.StudentButton_Cancel.hide()
         self.StudentButton_Save2.hide()
-
-
-
 
     def showMain(self):
         #show for main
@@ -1199,7 +1416,6 @@ class Ui_MainWindow(object):
         self.adminlabel_5.show()
         self.StudentCheckout.show()
 
-
     def showRegistration(self):
         #show registration page
         self.Reg_reg_btn.show()
@@ -1212,7 +1428,6 @@ class Ui_MainWindow(object):
         self.Usernamereg.show()
         self.label_reg.show()
         self.CancleReg.show()
-       
 
     def showLogin(self):
         self.Username.show()
@@ -1241,6 +1456,7 @@ class Ui_MainWindow(object):
                 break
 
     def handleViewDetail(self):
+        picpath = "../pictures/"
         # item = self.StudentView.currentItem().text()
         # print(item)
         name = self.StudentSearch_Name.text()
@@ -1253,18 +1469,30 @@ class Ui_MainWindow(object):
             print(len(result))
             student = result[num]
 
-
+        print(student.image)
         self.StudentText_GName.setText(student.guardian)
         self.StudentText_Grade.setText(str(student.grade))
         self.StudentText_ID.setText(str(student.studentId))
-        self.StudentText_Name.setText(student.fName + " " + student.lName)
-        #self.StudentText_Picture.show()
+        self.StudentText_Name.setText(student.Name)
+        pixmap = QtGui.QPixmap(student.image)
+        pixmap = pixmap.scaled(510,440,QtCore.Qt.KeepAspectRatio)
+        #self.StudentLabel_Picture_2.setPixmap(QtGui.QPixmap(os.getcwd() + picpath + "student1.jpg"))
+        self.StudentLabel_Picture_2.setPixmap(pixmap)
+        #self.StudentLabel_Picture_2.setText("aaa")
+        #QtCoreApplication::processEvents()
         self.StudentText_RFID.setText(student.tagId)
         print("Do nothing")
-
-
+        print(os.getcwd())
 
     def handleAddSave(self, MainWindow):
+        global filename
+        print(filename,"this this")
+        temp = filename.split("/")
+        temp = temp[-1]
+        print(temp)
+        destination = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/"
+        pic = destination +"/"+ temp
+        print("pp"+pic)
 
 
         id = self.StudentText_ID.text()
@@ -1272,16 +1500,43 @@ class Ui_MainWindow(object):
         rfid = self.StudentText_RFID.text()
         name = self.StudentText_Name.text()
         gname = self.StudentText_GName.text()
-        pic = self.StudentText_Picture.text()
+
 
         if(id == "" or grade == "" or rfid == "" or name == "" or gname == ""):
             print("One of the inputs is blank")
             self.popupMessage2(MainWindow, "Please fill in all the fields. ")
 
         else:
-            self.popupMessage(MainWindow, "Are you sure the information is correct? ")
-            print("Input validated")
-        print("Save1 Clicked")
+            result = Sys.checkDuplicateID(id)
+            if result:
+                self.popupMessage(MainWindow,"This student id already exist.")
+            if not result:
+                if (self.popupMessage(MainWindow, "Are you sure the information is correct? ")):
+                        shutil.copy(filename, destination)
+                        Sys.studentList.append(Student(name,int(id),rfid,gname,pic,int(grade)))
+                        Sys.addnewStudent(name,int(id),rfid,gname,pic,int(grade))
+                        self.searchByName()
+                        print("Input validated")
+                        print("Save1 Clicked")
+                        self.enable()
+                        self.StudentView.setEnabled(True)
+                        self.StudentButton_Exit.setEnabled(True)
+
+                        self.StudentButton_SearchName.setEnabled(True)
+                        #self.StudentButton_ViewDetails.setEnabled(True)
+                        self.StudentButton_Add.setEnabled(True)
+                        self.StudentButton_Edit.setEnabled(True)
+                        self.StudentButton_Remove.setEnabled(True)
+                        self.StudentButton_Save2.setEnabled(True)
+                        self.StudentButton_Save.setEnabled(True)
+                        self.StudentButton_SearchID.setEnabled(True)
+                        self.StudentButton_SearchName.setEnabled(True)
+                        self.LogOffAdmin.setEnabled(True)
+                        self.StudentSearch_Name.setEnabled(True)
+                        self.StudentSearch_ID.setEnabled(True)
+
+                        self.clearallfunction(MainWindow)
+                        self.StudentView.repaint()
 
         # confirmation=QMessage()
         # confirmation.exec()
@@ -1294,11 +1549,12 @@ class Ui_MainWindow(object):
         self.clearallfunction(MainWindow)
         self.enable()
 
+
         self.StudentView.setEnabled(True)
         self.StudentButton_Exit.setEnabled(True)
 
         self.StudentButton_SearchName.setEnabled(True)
-        self.StudentButton_ViewDetails.setEnabled(True)
+        #self.StudentButton_ViewDetails.setEnabled(True)
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)
@@ -1332,12 +1588,98 @@ class Ui_MainWindow(object):
             result = PopupMessage2.exec()
             print(result)
 
+    def handleAddStaffSave(self, MainWindow):
+        id = self.StaffText_ID.text()
+        email = self.StaffText_Email.text()
+        name = self.StaffText_Name.text()
+        password = self.StaffText_Pass.text()
+        cpassword = self.StaffText_CPass.text()
 
+        if (id == "" or email == "" or name == "" or password == "" or cpassword == ""):
+            print("One or more of the inputs is blank")
+            self.popupMessage2(MainWindow, "Please fill in all the fields. ")
+        else:
+            if (password != cpassword):
+                print(password + " " + cpassword)
+                self.popupMessage2(MainWindow, "The passwords do not match, please try again. ")
+                self.StaffText_CPass.setText("")
+                self.StaffText_Pass.setText("")
+            else:
+                result = Sys.checkDuplicateIDStaff(id)
+                if result:
+                    self.popupMessage(MainWindow, "This staff id already exist.")
+                if not result:
+                    if (self.popupMessage(MainWindow, "Are you sure the information is correct? ")):
+                        Sys.staffList.append(Staff(id, name, email, password, 0))
+                        Sys.addnewStaff(name, int(id), email, password, 0)
+                        self.searchByNameStaff()
+                        print("Input validated")
+                        print("Save1 Clicked")
+                        self.enableLeftStaff()
+                        self.clearallfunction(MainWindow)
+                        self.StudentView.repaint()
 
-    def handleEditSave(self, MainWindow):
+    def handleEditSaveStudent(self, MainWindow):
+        id = self.StudentText_ID.text()
+        grade = self.StudentText_Grade.text()
+        rfid = self.StudentText_RFID.text()
+        name = self.StudentText_Name.text()
+        gname = self.StudentText_GName.text()
+        pic = filename
+        Sys.editStudent(id,grade,rfid,name,gname,pic)
+        Ui_MainWindow.searchByName(self)
+
+        self.enable()
+
+        self.StudentView.setEnabled(True)
+        self.StudentButton_Exit.setEnabled(True)
+
+        self.StudentButton_SearchName.setEnabled(True)
+        #self.StudentButton_ViewDetails.setEnabled(True)
+        self.StudentButton_Add.setEnabled(True)
+        self.StudentButton_Edit.setEnabled(True)
+        self.StudentButton_Remove.setEnabled(True)
+        self.StudentButton_Save2.setEnabled(True)
+        self.StudentButton_Save.setEnabled(True)
+        self.StudentButton_SearchID.setEnabled(True)
+        self.StudentButton_SearchName.setEnabled(True)
+        self.LogOffAdmin.setEnabled(True)
+        self.StudentSearch_Name.setEnabled(True)
+        self.StudentSearch_ID.setEnabled(True)
+        self.StudentButton_Save2.hide()
+        self.StudentButton_Cancel.hide()
         print("Save2 Clicked")
 
+    def handleEditSaveStaff(self, MainWindow):
+        name = self.StaffText_Name.text()
+        email = self.StaffText_Email.text()
+        id = self.StaffText_ID.text()
+        password = self.StaffText_Pass.text()
+        Sys.editStaff(name, email, password, id)
+        Ui_MainWindow.searchByName(self)
 
+        self.enable()
+
+        self.StudentView.setEnabled(True)
+        self.StudentButton_Exit.setEnabled(True)
+
+        self.StudentButton_SearchName.setEnabled(True)
+        #self.StudentButton_ViewDetails.setEnabled(True)
+        self.StudentButton_Add.setEnabled(True)
+        self.StudentButton_Edit.setEnabled(True)
+        self.StudentButton_Remove.setEnabled(True)
+        self.StudentButton_Save2.setEnabled(True)
+        self.StudentButton_Save.setEnabled(True)
+        self.StudentButton_SearchID.setEnabled(True)
+        self.StudentButton_SearchName.setEnabled(True)
+        self.LogOffAdmin.setEnabled(True)
+        self.StudentSearch_Name.setEnabled(True)
+        self.StudentSearch_ID.setEnabled(True)
+        self.StudentButton_Save2.hide()
+        self.StudentButton_Cancel.hide()
+
+
+        print("Save2 Clicked")
 
     def Registrationfunc(self, MainWindow):
         #when Registration is clicked
@@ -1347,19 +1689,20 @@ class Ui_MainWindow(object):
 
     def MainAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
-
+        global currentUser
         try:
             conn = connectDB()
             cur = conn.cursor()
             userpassword = str(self.Login_password.text())
             username = self.Login_uname.text()
+            currentUser = username
             temp = cur.execute("Select * FROM staff WHERE Email = %s", username)
             if temp == 0:
                 print("Invalid Username")
             else:
                 check = cur.fetchone()
-                password = check[3]
-                isAdmin = check[5]
+                password = check[2]
+                isAdmin = check[4]
                 if (password == userpassword):
                     if (isAdmin == 1):
                         self.hideall()
@@ -1386,14 +1729,12 @@ class Ui_MainWindow(object):
                 self.showMain()
                 print("Show staff Page")
 
-
-
-
     def LogOffAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
         self.hideall()
         self.showLogin()
         ##print("Registration clicked")
+
     def LogAdminfunc(self, MainWindow):
         self.hideall()
         self.showLog()
@@ -1402,17 +1743,23 @@ class Ui_MainWindow(object):
         #when Admin Login is clicked is clicked
         self.hideall()
         self.showLogin()
-    def CancleRegfunc(self, MainWindow):
+
+    def CancelRegfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
         self.hideall()
         self.showMainAdmin()
+        ui.StudentView.clear()
+        ui.StaffView.clear()
+
     def ShowAdminFunc(self, MainWindow):
         self.hideall()
         self.showStudentWindow()
+        self.StudentButton_Picture.setEnabled(False)
 
     def ShowStaffWindonFunc(self,MainWindow):
         self.hideall()
         self.showStaffWindow()
+        self.enableLeftStaff()
 
     def addStudentfunc(self,MainWindow):
         self.hideall()
@@ -1429,6 +1776,10 @@ class Ui_MainWindow(object):
         self.StudentText_GName.setEnabled(True)
         self.StudentText_ID.setEnabled(True)
         self.StudentText_Picture.setEnabled(True)
+        self.StudentButton_Picture.setEnabled(True)
+        self.StaffText_Pass.setEnabled(True)
+        self.StaffText_CPass.setEnabled(True)
+        self.StaffText_Email.setEnabled(True)
 
     def clearallfunction(self,MainWindow):
         self.StudentText_Name.clear()
@@ -1437,6 +1788,7 @@ class Ui_MainWindow(object):
         self.StudentText_GName.clear()
         self.StudentText_ID.clear()
         self.StudentText_Picture.clear()
+        self.StudentLabel_Picture_2.clear()
 
     def editStudentfunc(self, MainWindow):
         self.hideall()
@@ -1452,313 +1804,136 @@ class Ui_MainWindow(object):
         self.StudentText_GName.setEnabled(True)
         self.StudentText_ID.setEnabled(True)
         self.StudentText_Picture.setEnabled(True)
+        self.StudentButton_Picture.setEnabled(True)
 
-    # def addStudentfunc(self,MainWindow):
-    #     self.homewindow = QtGui.QDialog()
-    #     self.ui = Ui_DialogAdd()
-    #     self.ui.setupUi(self.homewindow)
-    #     self.homewindow.exec_()
-    #     print("addign")
-    #     self.hideall()
-    #     self.showStudentWindow()
-    #     self.StudentButton_Save.show()
-    #     self.StudentButton_Cancel.show()
-
-
-
-    #def addstudent(self):
+    def RemoveStudentfunc(self, name):
+        name =  self.StudentText_Name.text()
+        id = self.StudentText_ID.text()
+        print(name)
+        if(self.popupMessage(MainWindow,"Do you really want to delete " + name + " from the database ?")):
+            Sys.removeStudent(id)
+            query = "DELETE FROM student WHERE StudentID= %s;"
+            query2 = (id)
+            conn = connectDB()
+            cur = conn.cursor()
+            addq = cur.execute(query, query2)
 
 
-    def RemoveStudentfunc(self):
-        self.homewindow = QtGui.QDialog()
-        self.ui = Ui_ConfirmRemove()
-        self.ui.setupUi(self.homewindow)
-        self.homewindow.exec_()
+
+            self.clearallfunction(MainWindow)
+            conn.commit()
+            conn.close()
+            self.searchByName()
+
+    def RemoveStafffunc(self, name):
+        name =  self.StaffText_Name.text()
+        id = self.StaffText_ID.text()
+        print(name)
+        if(self.popupMessage(MainWindow,"Do you really want to delete " + name + " from the database ?")):
+            if(Sys.removeStaff(id, currentUser)):
+                query = "DELETE FROM staff WHERE StaffID= %s;"
+                query2 = (id)
+                conn = connectDB()
+                cur = conn.cursor()
+                addq = cur.execute(query, query2)
+                self.clearallfunction(MainWindow)
+                conn.commit()
+                conn.close()
+                self.searchByNameStaff()
+            else:
+                self.popupMessage2(MainWindow,"Admins are not allowed to remove themselves. Please get another admin to remove you. ")
+
+    def EditstaffFunc(self):
+        self.enableRightStaff()
+        self.StaffButton_Save2.show()
+        self.StaffButton_Cancel.show()
+
+    def clearStaff(self):
+        self.StaffText_Name.clear()
+        self.StaffText_ID.clear()
+        self.StaffText_Pass.clear()
+        self.StaffText_CPass.clear()
+        self.StaffText_Email.clear()
+
+    def enableLeftStaff(self):
+        self.enableStaff()
+        self.StaffButton_Add.setEnabled(True)
+        self.StaffButton_Edit.setEnabled(True)
+        self.StaffButton_Exit.setEnabled(True)
+        self.StaffButton_Promote.setEnabled(True)
+        self.StaffButton_Remove.setEnabled(True)
+        self.StaffLabel_Email.setEnabled(True)
+        self.StaffLabel_ID.setEnabled(True)
+        self.StaffLabel_Name.setEnabled(True)
+        self.StaffLabel_Password.setEnabled(True)
+        self.StaffLabel_CPassword.setEnabled(True)
+        self.StaffSearch_Name.setEnabled(True)
+        self.StaffText_Pass.setEnabled(False)
+        self.StaffText_Pass.setEnabled(False)
+        self.StaffText_Email.setEnabled(False)
+        self.StaffText_ID.setEnabled(False)
+        self.StaffText_Name.setEnabled(False)
+        self.StaffView.setEnabled(True)
+        self.LogOffAdmin_Staff.setEnabled(True)
+        self.StaffLabel_SearchName.setEnabled(True)
+        self.StaffLabel_SearchID.setEnabled(True)
+        self.StaffButton_SearchID.setEnabled(True)
+        self.StaffButton_SearchName.setEnabled(True)
+        self.StaffSearch_ID.setEnabled(True)
+        self.StaffSearch_Name.setEnabled(True)
+        self.StaffButton_Save2.hide()
+        self.StaffButton_Save.hide()
+        self.StaffButton_Cancel.hide()
+        self.StaffLabel_CPassword.hide()
+        self.StaffLabel_Password.hide()
+        self.StaffText_CPass.hide()
+        self.StaffText_Pass.hide()
+
+    def enableRightStaff(self):
+        self.enableStaff()
+        self.StaffButton_Save2.show()
+        self.StaffButton_Cancel.show()
+        self.StaffLabel_Password.show()
+        self.StaffLabel_CPassword.show()
+        self.StaffText_Name.setEnabled(True)
+        self.StaffText_Email.setEnabled(True)
+        self.StaffText_ID.setEnabled(True)
+        self.StaffText_Pass.setEnabled(True)
+        self.StaffText_CPass.setEnabled(True)
+        self.StaffButton_Save2.setEnabled(True)
+        self.StaffButton_Cancel.setEnabled(True)
+        self.StaffText_Pass.show()
+        self.StaffText_CPass.show()
+
+    def handleStaffCancel(self):
+        self.clearStaff()
+
+        self.enableLeftStaff()
 
     def AddStaffFunc(self):
-        self.homewindow = QtGui.QDialog()
-        self.ui = Ui_StaffDialog()
-        self.ui.setupUi(self.homewindow)
-        self.homewindow.exec_()
+        self.enableStaff()
+        self.clearStaff()
+        self.enableRightStaff()
+        self.StaffButton_Save2.hide()
+        self.StaffButton_Save.show()
 
     def PromoteFunction (self):
-        self.homewindow = QtGui.QDialog()
-        self.ui = Ui_ConfirmPromote()
-        self.ui.setupUi(self.homewindow)
-        self.homewindow.exec_()
-
-
-
-
-
-
-
-
-
-#classs for add and edit student
-
-'''class Ui_DialogAdd(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(480, 640)
-        self.label = QtGui.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(10, 30, 91, 31))
-        self.label.setObjectName(_fromUtf8("label"))
-        self.lineEdit = QtGui.QLineEdit(Dialog)
-        self.lineEdit.setGeometry(QtCore.QRect(140, 30, 161, 27))
-        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
-        self.label_2 = QtGui.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(10, 140, 81, 17))
-        self.label_2.setObjectName(_fromUtf8("label_2"))
-        self.lineEdit_2 = QtGui.QLineEdit(Dialog)
-        self.lineEdit_2.setGeometry(QtCore.QRect(140, 130, 161, 27))
-        self.lineEdit_2.setObjectName(_fromUtf8("lineEdit_2"))
-        self.label_3 = QtGui.QLabel(Dialog)
-        self.label_3.setGeometry(QtCore.QRect(10, 200, 68, 17))
-        self.label_3.setObjectName(_fromUtf8("label_3"))
-        self.label_4 = QtGui.QLabel(Dialog)
-        self.label_4.setGeometry(QtCore.QRect(10, 260, 121, 20))
-        self.label_4.setObjectName(_fromUtf8("label_4"))
-        self.label_5 = QtGui.QLabel(Dialog)
-        self.label_5.setGeometry(QtCore.QRect(10, 320, 91, 20))
-        self.label_5.setObjectName(_fromUtf8("label_5"))
-        self.lineEdit_3 = QtGui.QLineEdit(Dialog)
-        self.lineEdit_3.setGeometry(QtCore.QRect(140, 190, 161, 27))
-        self.lineEdit_3.setObjectName(_fromUtf8("lineEdit_3"))
-        self.lineEdit_4 = QtGui.QLineEdit(Dialog)
-        self.lineEdit_4.setGeometry(QtCore.QRect(140, 250, 161, 27))
-        self.lineEdit_4.setObjectName(_fromUtf8("lineEdit_4"))
-        self.lineEdit_5 = QtGui.QLineEdit(Dialog)
-        self.lineEdit_5.setGeometry(QtCore.QRect(140, 310, 161, 27))
-        self.lineEdit_5.setObjectName(_fromUtf8("lineEdit_5"))
-        self.label_6 = QtGui.QLabel(Dialog)
-        self.label_6.setGeometry(QtCore.QRect(10, 380, 111, 17))
-        self.label_6.setObjectName(_fromUtf8("label_6"))
-        self.pushButton = QtGui.QPushButton(Dialog)
-        self.pushButton.setGeometry(QtCore.QRect(140, 380, 99, 27))
-        self.pushButton.setObjectName(_fromUtf8("pushButton"))
-        self.pushButton_2 = QtGui.QPushButton(Dialog)
-        self.pushButton_2.setGeometry(QtCore.QRect(140, 530, 61, 27))
-        self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
-        self.pushButton_2.clicked.connect(self.cancelClicked)
-
-        self.pushButton_3 = QtGui.QPushButton(Dialog)
-        self.pushButton_3.setGeometry(QtCore.QRect(230, 530, 71, 27))
-        self.pushButton_3.setObjectName(_fromUtf8("pushButton_3"))
-        self.label_7 = QtGui.QLabel(Dialog)
-        self.label_7.setGeometry(QtCore.QRect(10, 90, 81, 17))
-        self.label_7.setObjectName(_fromUtf8("label_7"))
-        self.lineEdit_6 = QtGui.QLineEdit(Dialog)
-        self.lineEdit_6.setGeometry(QtCore.QRect(140, 80, 161, 27))
-        self.lineEdit_6.setObjectName(_fromUtf8("lineEdit_6"))
-
-
-
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
-
-    def cancelClicked(self):
-        print("close is manually bitch")
-        self.close()
-
-    def addstudentclicked(self):
-	    username = self.Login_uname.text()
-	    password = self.Login_password.text()
-        #print(username)
-
-    def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
-        self.label.setText(_translate("Dialog", "First Name : ", None))
-        self.label_2.setText(_translate("Dialog", "Student Id :", None))
-        self.label_3.setText(_translate("Dialog", "Grade :", None))
-        self.label_4.setText(_translate("Dialog", "Guardian Name :", None))
-        self.label_5.setText(_translate("Dialog", "RFID Tag ID :", None))
-        self.label_6.setText(_translate("Dialog", "Upload Photo :", None))
-        self.pushButton.setText(_translate("Dialog", "Browse", None))
-        self.pushButton_2.setText(_translate("Dialog", "Cancel", None))
-        self.pushButton_3.setText(_translate("Dialog", "Add", None))
-        self.label_7.setText(_translate("Dialog", "Last Name : ", None))
-
-###class for remove student
-'''
-class Ui_ConfirmRemove(object):
-    def setupUi(self, ConfirmRemove):
-        ConfirmRemove.setObjectName(_fromUtf8("ConfirmRemove"))
-        ConfirmRemove.resize(400, 150)
-        ConfirmRemove.setMaximumSize(QtCore.QSize(400, 150))
-        ConfirmRemove.setBaseSize(QtCore.QSize(400, 300))
-        self.RemoveText = QtGui.QLabel(ConfirmRemove)
-        self.RemoveText.setGeometry(QtCore.QRect(20, -30, 371, 141))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.RemoveText.setFont(font)
-        self.RemoveText.setAlignment(QtCore.Qt.AlignCenter)
-        self.RemoveText.setObjectName(_fromUtf8("RemoveText"))
-        self.RemoveConfirm = QtGui.QPushButton(ConfirmRemove)
-        self.RemoveConfirm.setGeometry(QtCore.QRect(60, 100, 75, 23))
-        self.RemoveConfirm.setObjectName(_fromUtf8("RemoveConfirm"))
-
-        self.RemoveCancel = QtGui.QPushButton(ConfirmRemove)
-        self.RemoveCancel.setGeometry(QtCore.QRect(260, 100, 75, 23))
-        self.RemoveCancel.setObjectName(_fromUtf8("RemoveCancel"))
-        #self.RemoveCancel.clicked.connect(self.closeIt)
-
-        self.retranslateUi(ConfirmRemove)
-        QtCore.QMetaObject.connectSlotsByName(ConfirmRemove)
-
-
-
-    def retranslateUi(self, ConfirmRemove):
-        ConfirmRemove.setWindowTitle(_translate("ConfirmRemove", "Confirm", None))
-        self.RemoveText.setText(_translate("ConfirmRemove", "Are you sure you want to \n"
-"remove $student_staff? ", None))
-        self.RemoveConfirm.setText(_translate("ConfirmRemove", "Confirm", None))
-        self.RemoveCancel.setText(_translate("ConfirmRemove", "Cancel", None))
-
-
-
-
-#class for promoting staff to admin
-class Ui_ConfirmPromote(object):
-    def setupUi(self, ConfirmPromote):
-        ConfirmPromote.setObjectName(_fromUtf8("ConfirmPromote"))
-        ConfirmPromote.resize(400, 150)
-        ConfirmPromote.setMaximumSize(QtCore.QSize(400, 150))
-        ConfirmPromote.setBaseSize(QtCore.QSize(400, 300))
-        self.PromoteText = QtGui.QLabel(ConfirmPromote)
-        self.PromoteText.setGeometry(QtCore.QRect(20, -30, 371, 141))
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.PromoteText.setFont(font)
-        self.PromoteText.setAlignment(QtCore.Qt.AlignCenter)
-        self.PromoteText.setObjectName(_fromUtf8("PromoteText"))
-        self.PromoteConfirm = QtGui.QPushButton(ConfirmPromote)
-        self.PromoteConfirm.setGeometry(QtCore.QRect(60, 100, 75, 23))
-        self.PromoteConfirm.setObjectName(_fromUtf8("PromoteConfirm"))
-        self.PromoteCancel = QtGui.QPushButton(ConfirmPromote)
-        self.PromoteCancel.setGeometry(QtCore.QRect(260, 100, 75, 23))
-        self.PromoteCancel.setObjectName(_fromUtf8("PromoteCancel"))
-        #self.PromoteCancel.clicked.connect(self.closeIt)
-
-        self.retranslateUi(ConfirmPromote)
-        QtCore.QMetaObject.connectSlotsByName(ConfirmPromote)
-
-
-
-    def retranslateUi(self, ConfirmPromote):
-        ConfirmPromote.setWindowTitle(_translate("ConfirmPromote", "Confirm", None))
-        self.PromoteText.setText(_translate("ConfirmPromote", "Are you sure you want to promote \n"
-"$staff_user to an admin? ", None))
-        self.PromoteConfirm.setText(_translate("ConfirmPromote", "Confirm", None))
-        self.PromoteCancel.setText(_translate("ConfirmPromote", "Cancel", None))
-
-
-
-
-
-
-#Class for add and edit staff
-class Ui_StaffDialog(object):
-    def setupUi(self, StaffDialog):
-        StaffDialog.setObjectName(_fromUtf8("StaffDialog"))
-        StaffDialog.resize(400, 220)
-        StaffDialog.setMaximumSize(QtCore.QSize(400, 220))
-        palette = QtGui.QPalette()
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(252, 254, 227))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(252, 254, 227))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(252, 254, 227))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(252, 254, 227))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
-        StaffDialog.setPalette(palette)
-        self.StaffLabel_Name = QtGui.QLabel(StaffDialog)
-        self.StaffLabel_Name.setGeometry(QtCore.QRect(20, 20, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffLabel_Name.setFont(font)
-        self.StaffLabel_Name.setObjectName(_fromUtf8("StaffLabel_Name"))
-        self.StaffLabel_ID = QtGui.QLabel(StaffDialog)
-        self.StaffLabel_ID.setGeometry(QtCore.QRect(20, 60, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffLabel_ID.setFont(font)
-        self.StaffLabel_ID.setObjectName(_fromUtf8("StaffLabel_ID"))
-        self.StaffLabel_Email = QtGui.QLabel(StaffDialog)
-        self.StaffLabel_Email.setGeometry(QtCore.QRect(20, 100, 121, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffLabel_Email.setFont(font)
-        self.StaffLabel_Email.setObjectName(_fromUtf8("StaffLabel_Email"))
-        self.StaffLabel_Password = QtGui.QLabel(StaffDialog)
-        self.StaffLabel_Password.setGeometry(QtCore.QRect(20, 140, 81, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffLabel_Password.setFont(font)
-        self.StaffLabel_Password.setObjectName(_fromUtf8("StaffLabel_Password"))
-        self.StaffText_Name = QtGui.QLineEdit(StaffDialog)
-        self.StaffText_Name.setGeometry(QtCore.QRect(140, 20, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffText_Name.setFont(font)
-        self.StaffText_Name.setObjectName(_fromUtf8("StaffText_Name"))
-        self.StaffText_ID = QtGui.QLineEdit(StaffDialog)
-        self.StaffText_ID.setGeometry(QtCore.QRect(140, 60, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffText_ID.setFont(font)
-        self.StaffText_ID.setObjectName(_fromUtf8("StaffText_ID"))
-        self.StaffText_Grade = QtGui.QLineEdit(StaffDialog)
-        self.StaffText_Grade.setGeometry(QtCore.QRect(140, 100, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffText_Grade.setFont(font)
-        self.StaffText_Grade.setObjectName(_fromUtf8("StaffText_Grade"))
-        self.StaffText_GName = QtGui.QLineEdit(StaffDialog)
-        self.StaffText_GName.setGeometry(QtCore.QRect(140, 140, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.StaffText_GName.setFont(font)
-        self.StaffText_GName.setObjectName(_fromUtf8("StaffText_GName"))
-        self.StaffConfirm = QtGui.QPushButton(StaffDialog)
-        self.StaffConfirm.setGeometry(QtCore.QRect(70, 190, 75, 23))
-        self.StaffConfirm.setObjectName(_fromUtf8("StaffConfirm"))
-        self.StaffCancel = QtGui.QPushButton(StaffDialog)
-        self.StaffCancel.setGeometry(QtCore.QRect(270, 190, 75, 23))
-        self.StaffCancel.setObjectName(_fromUtf8("StaffCancel"))
-        #self.StaffCancel.clicked.connect(self.closeIt)
-
-
-        self.retranslateUi(StaffDialog)
-        QtCore.QMetaObject.connectSlotsByName(StaffDialog)
-
-
-
-    def retranslateUi(self, StaffDialog):
-        StaffDialog.setWindowTitle(_translate("StaffDialog", "Staff Information", None))
-        self.StaffLabel_Name.setText(_translate("StaffDialog", "Full Name:", None))
-        self.StaffLabel_ID.setText(_translate("StaffDialog", "Staff ID:", None))
-        self.StaffLabel_Email.setText(_translate("StaffDialog", "Email:", None))
-        self.StaffLabel_Password.setText(_translate("StaffDialog", "Password:", None))
-        self.StaffConfirm.setText(_translate("StaffDialog", "Confirm", None))
-        self.StaffCancel.setText(_translate("StaffDialog", "Cancel", None))
-
-
-
-
-
-
+        print('this')
+        id = self.StaffText_ID.text()
+        if(Sys.promoteStaff(id)):
+            self.popupMessage2(MainWindow, self.StaffText_Name.text() + " is already an admin.")
+        else:
+            if(self.popupMessage(MainWindow, "Are you sure you want to promote " + self.StaffText_Name.text() + " to an admin?")):
+                query = "UPDATE staff  SET isAdmin=1  WHERE StaffID=%s;"
+                query2 = (id)
+                conn = connectDB()
+                cur = conn.cursor()
+                addq = cur.execute(query, query2)
+                conn.commit()
+                conn.close()
+                print("admin updated")
+            else:
+                print("admin canceled")
 
 class WorkerThread(QThread):
     def __init__(self, parent = None):
@@ -1794,9 +1969,6 @@ def client_thread(clientsocket):
         item = QtGui.QListWidgetItem(temp)
         ui.listWidget_2.addItem(item)
     MainWindow.update()
-    # MainWindow.show()
-    # sys.exit(app.exec_())
-    print(temp)
     clientsocket.close()
 
 placeHolder = [["E2000017571001991550787E", "Kashif Iqbal"], ["E20051860607016213308EA2" ,"Joe Smith"], ["E2000016551401070900BF7D", "Nupur Pandey"], ["E20000175710020015507886", "Bibek"], ["E2005186060701621260955C", "Austin Hasting"], ["E2000016551400980900BF95", "Albaro Tinoco"]]
@@ -1806,7 +1978,6 @@ def search_query(rfid):
         if rfid == placeHolder[i][0]:
             return placeHolder[i][1]
     return "Not Found!"
-
 
 app = QtGui.QApplication(sys.argv)
 MainWindow = QtGui.QMainWindow()
@@ -1820,5 +1991,3 @@ if __name__ == "__main__":
 
 
     sys.exit(app.exec_())
-
-
