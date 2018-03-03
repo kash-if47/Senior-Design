@@ -261,8 +261,6 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(1200, 900)
-        #MessageBox for Statuses
-        self.PopupMessage = QtGui.QMessageBox()
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
@@ -314,13 +312,6 @@ class Ui_MainWindow(object):
         self.pushButton_4.setObjectName(_fromUtf8("pushButton_4"))
         self.gridLayout.addWidget(self.pushButton_4, 2, 6, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName(_fromUtf8("menubar"))
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName(_fromUtf8("statusbar"))
-        MainWindow.setStatusBar(self.statusbar)
         self.pushButton.clicked.connect(self.handleClear1)
         self.pushButton_2.clicked.connect(self.handleClear2)
         MainWindow.keyPressEvent = self.newOnKeyPressEvent
@@ -334,231 +325,134 @@ class Ui_MainWindow(object):
         font.setPointSize(20)
         self.Username.setFont(font)
         self.Username.setObjectName(_fromUtf8("Username"))
+
         self.Password = QtGui.QLabel(MainWindow)
         self.Password.setGeometry(QtCore.QRect(220, 260, 191, 101))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.Password.setFont(font)
         self.Password.setObjectName(_fromUtf8("Password"))
+
         self.Login_uname = QtGui.QLineEdit(MainWindow)
         self.Login_uname.setGeometry(QtCore.QRect(430, 210, 271, 41))
         font = QtGui.QFont()
         font.setPointSize(22)
         self.Login_uname.setFont(font)
         self.Login_uname.setObjectName(_fromUtf8("Login_uname"))
+
         self.Login_password = QtGui.QLineEdit(MainWindow)
         self.Login_password.setEchoMode(QtGui.QLineEdit.Password)
         self.Login_password.setGeometry(QtCore.QRect(430, 290, 271, 41))
         self.Login_password.setObjectName(_fromUtf8("Login_password"))
         ########################################
 
-        self.Login_login_btn = QtGui.QPushButton(MainWindow)
-        self.Login_login_btn.setGeometry(QtCore.QRect(270, 450, 211, 61))
-        self.Login_login_btn.setObjectName(_fromUtf8("Login_login_btn"))
-        #when login is clicked
-        # self.Login_login_btn.clicked.connect(self.loginfunc)
+        self.LoginButton = QtGui.QPushButton(MainWindow)
+        self.LoginButton.setGeometry(QtCore.QRect(520, 450, 211, 61))
+        self.LoginButton.setObjectName(_fromUtf8("LoginButton"))
+        self.LoginButton.clicked.connect(self.MainAdminfunc)
 
-        self.Login_registration_btn = QtGui.QPushButton(MainWindow)
-        self.Login_registration_btn.setGeometry(QtCore.QRect(520, 450, 211, 61))
-        self.Login_registration_btn.setObjectName(_fromUtf8("Login_registration_btn"))
-        #when Login Admin is clicked
-        self.Login_registration_btn.clicked.connect(self.MainAdminfunc)
+        self.LoginTitle = QtGui.QLabel(MainWindow)
+        self.LoginTitle.setGeometry(QtCore.QRect(450, 90, 421, 80))
+        self.LoginTitle.setObjectName(_fromUtf8("LoginTitle"))
+        self.LoginTitle.setText("Login")
+        BigRedFont = QtGui.QFont()
+        BigRedFont.setPointSize(50)
+        self.LoginTitle.setFont(BigRedFont)
+        self.LoginTitle.setStyleSheet('color: red')
 
-        # self.Login_registration_btn.keyPressEvent(QtCore.Qt.Key_Enter).connect(self.MainAdminfunc)
-
-        self.textEdit = QtGui.QLabel(MainWindow)
-        self.textEdit.setGeometry(QtCore.QRect(450, 90, 421, 80))
-        self.textEdit.setObjectName(_fromUtf8("textEdit"))
-        self.textEdit.setText("Login")
-        font = QtGui.QFont()
-        font.setPointSize(50)
-        self.textEdit.setFont(font)
-        self.textEdit.setStyleSheet('color: red')
         self.LogOffstaff = QtGui.QCommandLinkButton(MainWindow)
         self.LogOffstaff.setGeometry(QtCore.QRect(790, 780, 187, 41))
         self.LogOffstaff.setObjectName(_fromUtf8("LogOffstaff"))
-        #when Registration is clicked
         self.LogOffstaff.clicked.connect(self.LogOffStafffunc)
-        #=======================================================
-        #Registration Page
-
-        self.label_reg = QtGui.QLabel(MainWindow)
-        self.label_reg.setGeometry(QtCore.QRect(290, 230, 191, 101))
-        font = QtGui.QFont()
-        font.setPointSize(20)
-        self.label_reg.setFont(font)
-        self.label_reg.setObjectName(_fromUtf8("label_reg"))
-        self.Reg_email = QtGui.QLineEdit(MainWindow)
-        self.Reg_email.setGeometry(QtCore.QRect(500, 260, 271, 41))
-        self.Reg_email.setObjectName(_fromUtf8("Reg_email"))
-        self.Reg_reg_btn = QtGui.QPushButton(MainWindow)
-        self.Reg_reg_btn.setGeometry(QtCore.QRect(420, 490, 211, 61))
-        self.Reg_reg_btn.setObjectName(_fromUtf8("Reg_reg_btn"))
-        self.Usernamereg = QtGui.QLabel(MainWindow)
-        self.Usernamereg.setGeometry(QtCore.QRect(290, 150, 191, 101))
-        font = QtGui.QFont()
-        font.setPointSize(20)
-        self.Usernamereg.setFont(font)
-        self.Usernamereg.setObjectName(_fromUtf8("Usernamereg"))
-        self.Reg_username = QtGui.QLineEdit(MainWindow)
-        self.Reg_username.setGeometry(QtCore.QRect(500, 180, 271, 41))
-        self.Reg_username.setObjectName(_fromUtf8("Reg_username"))
-        self.label_3reg = QtGui.QLabel(MainWindow)
-        self.label_3reg.setGeometry(QtCore.QRect(290, 310, 191, 101))
-        font = QtGui.QFont()
-        font.setPointSize(20)
-        self.label_3reg.setFont(font)
-        self.label_3reg.setObjectName(_fromUtf8("label_3reg"))
-        self.Reg_password = QtGui.QLineEdit(MainWindow)
-        self.Reg_password.setGeometry(QtCore.QRect(500, 340, 271, 41))
-        self.Reg_password.setObjectName(_fromUtf8("Reg_password"))
-        self.textEditreg = QtGui.QTextEdit(MainWindow)
-        self.textEditreg.setGeometry(QtCore.QRect(380, 60, 421, 61))
-        self.textEditreg.setObjectName(_fromUtf8("textEditreg"))
-        self.CancleReg = QtGui.QCommandLinkButton(MainWindow)
-        self.CancleReg.setGeometry(QtCore.QRect(790, 780, 187, 41))
-        self.CancleReg.setObjectName(_fromUtf8("CancleReg"))
-        #when Registration is clicked
-        self.CancleReg.clicked.connect(self.MainAdminfunc)
 
         #=======================================================
-        # main admin page
-
+        # main admin page need to fix by adding log and pushing buttons to menu
         self.LogOffAdmin1 = QtGui.QCommandLinkButton(MainWindow)
         self.LogOffAdmin1.setGeometry(QtCore.QRect(990, 10, 187, 41))
         self.LogOffAdmin1.setObjectName(_fromUtf8("LogOffAdmin1"))
-        #when Registration is clicked
         self.LogOffAdmin1.clicked.connect(self.LogOffAdminfunc)
+
         self.verticalLayoutWidget = QtGui.QWidget(MainWindow)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 169, 1071, 271))
         self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+
         self.EditStudent = QtGui.QPushButton(self.verticalLayoutWidget)
         self.EditStudent.setObjectName(_fromUtf8("EditStudent"))
         self.EditStudent.clicked.connect(self.ShowAdminFunc)
         self.horizontalLayout.addWidget(self.EditStudent)
-        self.RegisterStaff = QtGui.QPushButton(self.verticalLayoutWidget)
-        self.RegisterStaff.setObjectName(_fromUtf8("RegisterStaff"))
-        self.RegisterStaff.clicked.connect(self.ShowStaffWindonFunc)
-        self.horizontalLayout.addWidget(self.RegisterStaff)
+
+        self.EditStaff = QtGui.QPushButton(self.verticalLayoutWidget)
+        self.EditStaff.setObjectName(_fromUtf8("EditStaff"))
+        self.EditStaff.clicked.connect(self.ShowStaffWindonFunc)
+        self.horizontalLayout.addWidget(self.EditStaff)
+
         self.StudentLog = QtGui.QPushButton(self.verticalLayoutWidget)
         self.StudentLog.setObjectName(_fromUtf8("StudentLog"))
+
+        #removing log components so no ui file can be integrated
+        #self.StudentLog.clicked.connect(self.LogAdminfunc)
+
         self.horizontalLayout.addWidget(self.StudentLog)
+
         self.verticalLayout.addLayout(self.horizontalLayout)
+
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
+
         self.StudentCheckout = QtGui.QPushButton(self.verticalLayoutWidget)
         self.StudentCheckout.setObjectName(_fromUtf8("StudentCheckout"))
-        self.StudentLog.clicked.connect(self.LogAdminfunc)
         self.horizontalLayout_2.addWidget(self.StudentCheckout)
+
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem1)
+
         self.verticalLayout.addLayout(self.horizontalLayout_2)
-        self.adminlabel = QtGui.QLabel(MainWindow)
-        self.adminlabel.setGeometry(QtCore.QRect(30, 10, 981, 31))
+
+        self.adminlabel_welcome = QtGui.QLabel(MainWindow)
+        self.adminlabel_welcome.setGeometry(QtCore.QRect(30, 10, 981, 31))
         font = QtGui.QFont()
         font.setPointSize(16)
-        self.adminlabel.setFont(font)
-        self.adminlabel.setObjectName(_fromUtf8("adminlabel"))
-        self.adminlabel_2 = QtGui.QLabel(MainWindow)
-        self.adminlabel_2.setGeometry(QtCore.QRect(120, 270, 141, 20))
-        self.adminlabel_2.setObjectName(_fromUtf8("adminlabel_2"))
-        self.adminlabel_3 = QtGui.QLabel(MainWindow)
-        self.adminlabel_3.setGeometry(QtCore.QRect(490, 250, 201, 61))
-        self.adminlabel_3.setObjectName(_fromUtf8("adminlabel_3"))
-        self.adminlabel_4 = QtGui.QLabel(MainWindow)
-        self.adminlabel_4.setGeometry(QtCore.QRect(850, 270, 171, 16))
-        self.adminlabel_4.setObjectName(_fromUtf8("adminlabel_4"))
-        self.adminlabel_5 = QtGui.QLabel(MainWindow)
-        self.adminlabel_5.setGeometry(QtCore.QRect(480, 410, 191, 16))
-        self.adminlabel_5.setObjectName(_fromUtf8("adminlabel_5"))
+        self.adminlabel_welcome.setFont(font)
+        self.adminlabel_welcome.setObjectName(_fromUtf8("adminlabel_welcome"))
+
+        self.adminlabel_student = QtGui.QLabel(MainWindow)
+        self.adminlabel_student.setGeometry(QtCore.QRect(120, 270, 141, 20))
+        self.adminlabel_student.setObjectName(_fromUtf8("adminlabel_student"))
+
+        self.adminlabel_staff = QtGui.QLabel(MainWindow)
+        self.adminlabel_staff.setGeometry(QtCore.QRect(490, 250, 201, 61))
+        self.adminlabel_staff.setObjectName(_fromUtf8("adminlabel_staff"))
+
+        self.adminlabel_log = QtGui.QLabel(MainWindow)
+        self.adminlabel_log.setGeometry(QtCore.QRect(850, 270, 171, 16))
+        self.adminlabel_log.setObjectName(_fromUtf8("adminlabel_log"))
+
+        self.adminlabel_checkout = QtGui.QLabel(MainWindow)
+        self.adminlabel_checkout.setGeometry(QtCore.QRect(480, 410, 191, 16))
+        self.adminlabel_checkout.setObjectName(_fromUtf8("adminlabel_checkout"))
 
         #=======================================================
         #Log page
-
-        self.LogButton_Generate = QtGui.QPushButton(MainWindow)
-        self.LogButton_Generate.setGeometry(QtCore.QRect(370, 550, 75, 23))
-        self.LogButton_Generate.setMaximumSize(QtCore.QSize(1200, 900))
-        self.LogButton_Generate.setObjectName(_fromUtf8("LogButton_Generate"))
-        self.dateEdit_2 = QtGui.QDateEdit(MainWindow)
-        self.dateEdit_2.setGeometry(QtCore.QRect(190, 550, 110, 22))
-        self.dateEdit_2.setMaximumSize(QtCore.QSize(1200, 900))
-        self.dateEdit_2.setObjectName(_fromUtf8("dateEdit_2"))
         self.LogButton_Exit = QtGui.QPushButton(MainWindow)
         self.LogButton_Exit.setGeometry(QtCore.QRect(720, 550, 75, 23))
         self.LogButton_Exit.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogButton_Exit.setObjectName(_fromUtf8("LogButton_Exit"))
-        self.LogButton_Exit.clicked.connect(self.CancelRegfunc)
-        self.dateEdit = QtGui.QDateEdit(MainWindow)
-        self.dateEdit.setGeometry(QtCore.QRect(20, 550, 110, 22))
-        self.dateEdit.setMaximumSize(QtCore.QSize(1200, 900))
-        self.dateEdit.setObjectName(_fromUtf8("dateEdit"))
-        self.Log_label = QtGui.QLabel(MainWindow)
-        self.Log_label.setGeometry(QtCore.QRect(310, 20, 251, 51))
-        self.Log_label.setMaximumSize(QtCore.QSize(1200, 900))
-        font = QtGui.QFont()
-        font.setPointSize(24)
-        self.Log_label.setFont(font)
-        self.Log_label.setObjectName(_fromUtf8("Log_label"))
-        self.Log_label1 = QtGui.QLabel(MainWindow)
-        self.Log_label1.setGeometry(QtCore.QRect(30, 530, 61, 21))
-        self.Log_label1.setMaximumSize(QtCore.QSize(1200, 900))
-        self.Log_label1.setObjectName(_fromUtf8("Log_label1"))
-        self.Log_label2 = QtGui.QLabel(MainWindow)
-        self.Log_label2.setGeometry(QtCore.QRect(200, 530, 61, 21))
-        self.Log_label2.setMaximumSize(QtCore.QSize(1200, 900))
-        self.Log_label2.setObjectName(_fromUtf8("Log_label2"))
+        self.LogButton_Exit.clicked.connect(self.CancelActionfunc)
+
         self.LogOffAdminStudent = QtGui.QCommandLinkButton(MainWindow)
         self.LogOffAdminStudent.setGeometry(QtCore.QRect(700, 10, 187, 41))
         self.LogOffAdminStudent.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogOffAdminStudent.setObjectName(_fromUtf8("LogOffAdmin"))
         self.LogOffAdminStudent.clicked.connect(self.LogOffAdminfunc)
-        self.DismissWidget = QtGui.QTabWidget(MainWindow)
-        self.DismissWidget.setGeometry(QtCore.QRect(10, 70, 781, 441))
-        self.DismissWidget.setMaximumSize(QtCore.QSize(1200, 900))
-        self.DismissWidget.setObjectName(_fromUtf8("DismissWidget"))
-        self.tab = QtGui.QWidget()
-        self.tab.setObjectName(_fromUtf8("tab"))
-        self.GenericReport_AppendText = QtGui.QTextEdit(self.tab)
-        self.GenericReport_AppendText.setGeometry(QtCore.QRect(0, 10, 771, 401))
-        self.GenericReport_AppendText.setObjectName(_fromUtf8("GenericReport_AppendText"))
-        self.DismissWidget.addTab(self.tab, _fromUtf8(""))
-        self.tab_2 = QtGui.QWidget()
-        self.tab_2.setObjectName(_fromUtf8("tab_2"))
-        self.horizontalLayoutWidget = QtGui.QWidget(self.tab_2)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(-1, -1, 781, 421))
-        self.horizontalLayoutWidget.setObjectName(_fromUtf8("horizontalLayoutWidget"))
-        self.horizontalLayout = QtGui.QHBoxLayout(self.horizontalLayoutWidget)
-        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.LogListView_Student1 = QtGui.QListView(self.horizontalLayoutWidget)
-        self.LogListView_Student1.setObjectName(_fromUtf8("LogListView_Student1"))
-        self.horizontalLayout.addWidget(self.LogListView_Student1)
-        self.LogListView_Student2 = QtGui.QListView(self.horizontalLayoutWidget)
-        self.LogListView_Student2.setObjectName(_fromUtf8("LogListView_Student2"))
-        self.horizontalLayout.addWidget(self.LogListView_Student2)
-        self.DismissWidget.addTab(self.tab_2, _fromUtf8(""))
-        self.tab_3 = QtGui.QWidget()
-        self.tab_3.setObjectName(_fromUtf8("tab_3"))
-        self.horizontalLayoutWidget_2 = QtGui.QWidget(self.tab_3)
-        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(-1, -1, 781, 421))
-        self.horizontalLayoutWidget_2.setObjectName(_fromUtf8("horizontalLayoutWidget_2"))
-        self.horizontalLayout_2 = QtGui.QHBoxLayout(self.horizontalLayoutWidget_2)
-        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        self.LogListView_Staff1 = QtGui.QListView(self.horizontalLayoutWidget_2)
-        self.LogListView_Staff1.setObjectName(_fromUtf8("LogListView_Staff1"))
-        self.horizontalLayout_2.addWidget(self.LogListView_Staff1)
-        self.LogListView_Staff2 = QtGui.QListView(self.horizontalLayoutWidget_2)
-        self.LogListView_Staff2.setObjectName(_fromUtf8("LogListView_Staff2"))
-        self.horizontalLayout_2.addWidget(self.LogListView_Staff2)
-        self.DismissWidget.addTab(self.tab_3, _fromUtf8(""))
-
         #=======================================================
-
         #student window
         #generic font
         font = QtGui.QFont()
@@ -661,23 +555,23 @@ class Ui_MainWindow(object):
         self.StudentButton_Exit = QtGui.QPushButton(MainWindow)
         self.StudentButton_Exit.setGeometry(QtCore.QRect(790, 780, 75, 23))
         self.StudentButton_Exit.setObjectName(_fromUtf8("StudentButton_Exit"))
-        self.StudentButton_Exit.clicked.connect(self.CancelRegfunc)
+        self.StudentButton_Exit.clicked.connect(self.CancelActionfunc)
 
-        self.StudentButton_Save = QtGui.QPushButton(MainWindow)
-        self.StudentButton_Save.setGeometry(QtCore.QRect(1000, 130, 75, 23))
-        self.StudentButton_Save.setObjectName(_fromUtf8("StudentButton_Save"))
-        self.StudentButton_Save.clicked.connect(self.handleAddSave)
+        self.StudentButton_SaveAdd = QtGui.QPushButton(MainWindow)
+        self.StudentButton_SaveAdd.setGeometry(QtCore.QRect(1000, 130, 75, 23))
+        self.StudentButton_SaveAdd.setObjectName(_fromUtf8("StudentButton_SaveAdd"))
+        self.StudentButton_SaveAdd.clicked.connect(self.handleAddSave)
 
         self.StudentButton_Picture = QtGui.QPushButton(MainWindow)
         self.StudentButton_Picture.setGeometry(QtCore.QRect(700, 410, 81, 31))
-        self.StudentButton_Picture.setObjectName(_fromUtf8("StudentButton_Save"))
+        self.StudentButton_Picture.setObjectName(_fromUtf8("StudentButton_Picture"))
         self.StudentButton_Picture.setText(_translate("MainWindow", "Browse", None))
         self.StudentButton_Picture.clicked.connect(self.handleBrowse)
 
-        self.StudentButton_Save2 = QtGui.QPushButton(MainWindow)
-        self.StudentButton_Save2.setGeometry(QtCore.QRect(1000, 130, 75, 23))
-        self.StudentButton_Save2.setObjectName(_fromUtf8("StudentButton_Save2"))
-        self.StudentButton_Save2.clicked.connect(self.confirmsavestudent)
+        self.StudentButton_SaveEdit = QtGui.QPushButton(MainWindow)
+        self.StudentButton_SaveEdit.setGeometry(QtCore.QRect(1000, 130, 75, 23))
+        self.StudentButton_SaveEdit.setObjectName(_fromUtf8("StudentButton_SaveEdit"))
+        self.StudentButton_SaveEdit.clicked.connect(self.confirmsavestudent)
 
         self.StudentButton_Cancel = QtGui.QPushButton(MainWindow)
         self.StudentButton_Cancel.setGeometry(QtCore.QRect(1000, 200, 75, 23))
@@ -729,10 +623,45 @@ class Ui_MainWindow(object):
         #Staff Window
         # StaffSearch_Name ,
 
+        #Labels
+        self.StaffLabel_Name = QtGui.QLabel(MainWindow)
+        self.StaffLabel_Name.setGeometry(QtCore.QRect(550, 60, 81, 31))
+        self.StaffLabel_Name.setFont(font)
+        self.StaffLabel_Name.setObjectName(_fromUtf8("StaffLabel_Name"))
+
+        self.StaffLabel_ID = QtGui.QLabel(MainWindow)
+        self.StaffLabel_ID.setGeometry(QtCore.QRect(550, 130, 81, 31))
+        self.StaffLabel_ID.setFont(font)
+        self.StaffLabel_ID.setObjectName(_fromUtf8("StaffLabel_ID"))
+
+        self.StaffLabel_Email = QtGui.QLabel(MainWindow)
+        self.StaffLabel_Email.setGeometry(QtCore.QRect(550, 200, 121, 31))
+        self.StaffLabel_Email.setFont(font)
+        self.StaffLabel_Email.setObjectName(_fromUtf8("StaffLabel_Email"))
+
+        self.StaffLabel_Password = QtGui.QLabel(MainWindow)
+        self.StaffLabel_Password.setGeometry(QtCore.QRect(550, 270, 81, 31))
+        self.StaffLabel_Password.setFont(font)
+        self.StaffLabel_Password.setObjectName(_fromUtf8("StaffLabel_Password"))
+
+        self.StaffLabel_CPassword = QtGui.QLabel(MainWindow)
+        self.StaffLabel_CPassword.setGeometry(QtCore.QRect(550, 340, 81, 31))
+        self.StaffLabel_CPassword.setFont(font)
+        self.StaffLabel_CPassword.setObjectName(_fromUtf8("StaffLabel_CPassword"))
+
+        self.StaffLabel_SearchName = QtGui.QLabel(MainWindow)
+        self.StaffLabel_SearchName.setGeometry(QtCore.QRect(10, 680, 91, 16))
+        self.StaffLabel_SearchName.setObjectName(_fromUtf8("StaffLabel_SearchName"))
+        self.StaffLabel_SearchName.setText(_translate("MainWindow", "Search Name", None))
+
+        self.StaffLabel_SearchID = QtGui.QLabel(MainWindow)
+        self.StaffLabel_SearchID.setGeometry(QtCore.QRect(310, 680, 91, 16))
+        self.StaffLabel_SearchID.setObjectName(_fromUtf8("StaffLabel_SearchID"))
+        self.StaffLabel_SearchID.setText(_translate("MainWindow", "Search ID", None))
+
+        #Textfields
         self.StaffText_Name = QtGui.QLineEdit(MainWindow)
         self.StaffText_Name.setGeometry(QtCore.QRect(670, 60, 241, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.StaffText_Name.setFont(font)
         self.StaffText_Name.setObjectName(_fromUtf8("StaffText_Name"))
 
@@ -758,65 +687,43 @@ class Ui_MainWindow(object):
         self.StaffText_CPass.setFont(font)
         self.StaffText_CPass.setObjectName(_fromUtf8("StaffText_CPass"))
 
-        self.StaffLabel_CPassword = QtGui.QLabel(MainWindow)
-        self.StaffLabel_CPassword.setGeometry(QtCore.QRect(550, 340, 81, 31))
-        self.StaffLabel_CPassword.setFont(font)
-        self.StaffLabel_CPassword.setObjectName(_fromUtf8("StaffLabel_CPassword"))
+        #Buttons
+        self.StaffButton_Add = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Add.setGeometry(QtCore.QRect(120, 780, 91, 23))
+        self.StaffButton_Add.setObjectName(_fromUtf8("StaffButton_Add"))
+        self.StaffButton_Add.clicked.connect(self.AddStaffFunc)
+
+        self.StaffButton_Edit = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Edit.setGeometry(QtCore.QRect(250, 780, 91, 23))
+        self.StaffButton_Edit.setObjectName(_fromUtf8("StaffButton_Edit"))
+        self.StaffButton_Edit.clicked.connect(self.EditstaffFunc)
+
+        self.StaffButton_Remove = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Remove.setGeometry(QtCore.QRect(380, 780, 101, 23))
+        self.StaffButton_Remove.setObjectName(_fromUtf8("StaffButton_Remove"))
+        self.StaffButton_Remove.clicked.connect(self.RemoveStafffunc)
 
         self.StaffButton_Promote = QtGui.QPushButton(MainWindow)
         self.StaffButton_Promote.setGeometry(QtCore.QRect(520, 780, 101, 23))
         self.StaffButton_Promote.setObjectName(_fromUtf8("StaffButton_Promote"))
         self.StaffButton_Promote.clicked.connect(self.PromoteFunction)
 
-        self.StaffLabel_Email = QtGui.QLabel(MainWindow)
-        self.StaffLabel_Email.setGeometry(QtCore.QRect(550, 200, 121, 31))
-        self.StaffLabel_Email.setFont(font)
-        self.StaffLabel_Email.setObjectName(_fromUtf8("StaffLabel_Email"))
+        self.StaffButton_Exit = QtGui.QPushButton(MainWindow)
+        self.StaffButton_Exit.setGeometry(QtCore.QRect(790, 780, 75, 23))
+        self.StaffButton_Exit.setObjectName(_fromUtf8("StaffButton_Exit"))
+        self.StaffButton_Exit.clicked.connect(self.CancelActionfunc)
 
-        self.StaffButton_Add = QtGui.QPushButton(MainWindow)
-        self.StaffButton_Add.setGeometry(QtCore.QRect(120, 780, 91, 23))
-        self.StaffButton_Add.setObjectName(_fromUtf8("StaffButton_Add"))
-        self.StaffButton_Add.clicked.connect(self.AddStaffFunc)
+        self.StaffButton_SaveAdd = QtGui.QPushButton(MainWindow)
+        self.StaffButton_SaveAdd.setGeometry(QtCore.QRect(1000, 130, 75, 23))
+        self.StaffButton_SaveAdd.setObjectName(_fromUtf8("StaffButton_SaveAdd"))
+        self.StaffButton_SaveAdd.setText(_translate("MainWindow", "Save", None))
+        self.StaffButton_SaveAdd.clicked.connect(self.handleAddStaffSave)
 
-        self.StaffSearch_Name = QtGui.QLineEdit(MainWindow)
-        self.StaffSearch_Name.setGeometry(QtCore.QRect(10, 700, 281, 31))
-        self.StaffSearch_Name.setObjectName(_fromUtf8("StaffSearch_Name"))
-        regex = QtCore.QRegExp("[a-z-A-Z_]+")
-        validator = QtGui.QRegExpValidator(regex)
-        self.StaffSearch_Name.setValidator(validator)
-
-        self.StaffLabel_SearchID = QtGui.QLabel(MainWindow)
-        self.StaffLabel_SearchID.setGeometry(QtCore.QRect(310, 680, 91, 16))
-        self.StaffLabel_SearchID.setObjectName(_fromUtf8("StaffLabel_SearchID"))
-        self.StaffLabel_SearchID.setText(_translate("MainWindow", "Search ID", None))
-
-        self.StaffSearch_ID = QtGui.QLineEdit(MainWindow)
-        self.StaffSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
-        self.StaffSearch_ID.setObjectName(_fromUtf8("StaffSearch_ID"))
-        validator = QtGui.QIntValidator()
-        self.StaffSearch_ID.setValidator(validator)
-        self.StaffButton_SearchID = QtGui.QPushButton(MainWindow)
-        self.StaffButton_SearchID.setGeometry(QtCore.QRect(310, 740, 121, 27))
-        self.StaffButton_SearchID.setObjectName(_fromUtf8("StaffButton_SearchID"))
-        self.StaffButton_SearchID.setText(_translate("MainWindow", "Search by ID", None))
-
-
-        self.StaffButton_SearchName = QtGui.QPushButton(MainWindow)
-        self.StaffButton_SearchName.setGeometry(QtCore.QRect(10, 740, 121, 27))
-        self.StaffButton_SearchName.setObjectName(_fromUtf8("StaffButton_SearchName"))
-        self.StaffButton_SearchName.setText(_translate("MainWindow", "Search Name", None))
-
-        self.StaffButton_Save2 = QtGui.QPushButton(MainWindow)
-        self.StaffButton_Save2.setGeometry(QtCore.QRect(1000, 130, 75, 23))
-        self.StaffButton_Save2.setObjectName(_fromUtf8("StaffButton_Save2"))
-        self.StaffButton_Save2.setText(_translate("MainWindow", "Save", None))
-        self.StaffButton_Save2.clicked.connect(self.confirmsavestaff)
-
-        self.StaffButton_Save = QtGui.QPushButton(MainWindow)
-        self.StaffButton_Save.setGeometry(QtCore.QRect(1000, 130, 75, 23))
-        self.StaffButton_Save.setObjectName(_fromUtf8("StaffButton_Save"))
-        self.StaffButton_Save.setText(_translate("MainWindow", "Save", None))
-        self.StaffButton_Save.clicked.connect(self.handleAddStaffSave)
+        self.StaffButton_SaveEdit = QtGui.QPushButton(MainWindow)
+        self.StaffButton_SaveEdit.setGeometry(QtCore.QRect(1000, 130, 75, 23))
+        self.StaffButton_SaveEdit.setObjectName(_fromUtf8("StaffButton_SaveEdit"))
+        self.StaffButton_SaveEdit.setText(_translate("MainWindow", "Save", None))
+        self.StaffButton_SaveEdit.clicked.connect(self.confirmsavestaff)
 
         self.StaffButton_Cancel = QtGui.QPushButton(MainWindow)
         self.StaffButton_Cancel.setGeometry(QtCore.QRect(1000, 200, 75, 23))
@@ -824,51 +731,38 @@ class Ui_MainWindow(object):
         self.StaffButton_Cancel.setText(_translate("MainWindow", "Cancel", None))
         self.StaffButton_Cancel.clicked.connect(self.handleStaffCancel)
 
-        self.StaffButton_Remove = QtGui.QPushButton(MainWindow)
-        self.StaffButton_Remove.setGeometry(QtCore.QRect(380, 780, 101, 23))
-        self.StaffButton_Remove.setObjectName(_fromUtf8("StaffButton_Remove"))
-        self.StaffButton_Remove.clicked.connect(self.RemoveStafffunc)
+        #Searchfields
+        self.StaffSearch_Name = QtGui.QLineEdit(MainWindow)
+        self.StaffSearch_Name.setGeometry(QtCore.QRect(10, 700, 281, 31))
+        self.StaffSearch_Name.setObjectName(_fromUtf8("StaffSearch_Name"))
+        self.StaffSearch_Name.setValidator(azvalidator)
 
+        self.StaffSearch_ID = QtGui.QLineEdit(MainWindow)
+        self.StaffSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
+        self.StaffSearch_ID.setObjectName(_fromUtf8("StaffSearch_ID"))
+        self.StaffSearch_ID.setValidator(validator)
+
+        self.StaffButton_SearchName = QtGui.QPushButton(MainWindow)
+        self.StaffButton_SearchName.setGeometry(QtCore.QRect(10, 740, 121, 27))
+        self.StaffButton_SearchName.setObjectName(_fromUtf8("StaffButton_SearchName"))
+        self.StaffButton_SearchName.setText(_translate("MainWindow", "Search Name", None))
+
+        self.StaffButton_SearchID = QtGui.QPushButton(MainWindow)
+        self.StaffButton_SearchID.setGeometry(QtCore.QRect(310, 740, 121, 27))
+        self.StaffButton_SearchID.setObjectName(_fromUtf8("StaffButton_SearchID"))
+        self.StaffButton_SearchID.setText(_translate("MainWindow", "Search by ID", None))
+
+        #stafflist
         self.StaffView = QtGui.QListWidget(MainWindow)
         self.StaffView.setGeometry(QtCore.QRect(10, 60, 450, 550))
         self.StaffView.setObjectName(_fromUtf8("StaffView"))
         self.StaffView.itemClicked.connect(self.handleViewDetailStaff)
 
-        self.StaffLabel_SearchName = QtGui.QLabel(MainWindow)
-        self.StaffLabel_SearchName.setGeometry(QtCore.QRect(10, 680, 91, 16))
-        self.StaffLabel_SearchName.setObjectName(_fromUtf8("StaffLabel_SearchName"))
-        self.StaffLabel_SearchName.setText(_translate("MainWindow", "Search Name", None))
-
-
+        #logoffbutton
         self.LogOffAdmin_Staff = QtGui.QCommandLinkButton(MainWindow)
         self.LogOffAdmin_Staff.setGeometry(QtCore.QRect(1100, 10, 187, 41))
         self.LogOffAdmin_Staff.setObjectName(_fromUtf8("LogOffAdmin_Staff"))
         self.LogOffAdmin_Staff.clicked.connect(self.LogOffAdminfunc)
-
-        self.StaffLabel_Name = QtGui.QLabel(MainWindow)
-        self.StaffLabel_Name.setGeometry(QtCore.QRect(550, 60, 81, 31))
-        self.StaffLabel_Name.setFont(font)
-        self.StaffLabel_Name.setObjectName(_fromUtf8("StaffLabel_Name"))
-        self.StaffButton_Exit = QtGui.QPushButton(MainWindow)
-        self.StaffButton_Exit.setGeometry(QtCore.QRect(790, 780, 75, 23))
-        self.StaffButton_Exit.setObjectName(_fromUtf8("StaffButton_Exit"))
-        self.StaffButton_Exit.clicked.connect(self.CancelRegfunc)
-
-        self.StaffButton_Edit = QtGui.QPushButton(MainWindow)
-        self.StaffButton_Edit.setGeometry(QtCore.QRect(250, 780, 91, 23))
-        self.StaffButton_Edit.setObjectName(_fromUtf8("StaffButton_Edit"))
-        self.StaffButton_Edit.clicked.connect(self.EditstaffFunc)
-
-        self.StaffLabel_Password = QtGui.QLabel(MainWindow)
-        self.StaffLabel_Password.setGeometry(QtCore.QRect(550, 270, 81, 31))
-        self.StaffLabel_Password.setFont(font)
-        self.StaffLabel_Password.setObjectName(_fromUtf8("StaffLabel_Password"))
-
-        self.StaffLabel_ID = QtGui.QLabel(MainWindow)
-        self.StaffLabel_ID.setGeometry(QtCore.QRect(550, 130, 81, 31))
-        self.StaffLabel_ID.setFont(font)
-        self.StaffLabel_ID.setObjectName(_fromUtf8("StaffLabel_ID"))
-
 
         # =================================================
         self.workerThread = WorkerThread()
@@ -931,74 +825,29 @@ class Ui_MainWindow(object):
         self.pushButton_2.setText(_translate("MainWindow", "Clear", None))
         self.pushButton_4.setText(_translate("MainWindow", "Undo", None))
         self.StudentButton_Cancel.setText(_translate("Mainwindow","Cancel",None))
-        self.StudentButton_Save.setText(_translate("Mainwindow", "Save", None))
-        self.StudentButton_Save2.setText(_translate("Mainwindow", "Save2", None))
+        self.StudentButton_SaveAdd.setText(_translate("Mainwindow", "Save", None))
+        self.StudentButton_SaveEdit.setText(_translate("Mainwindow", "Save", None))
 
         self.Username.setText(_translate("MainWindow", "Username", None))
         self.Password.setText(_translate("MainWindow", "Password", None))
-        self.Login_login_btn.setText(_translate("MainWindow", "Login", None))
-        self.Login_registration_btn.setText(_translate("MainWindow", "Admin Login", None))
-        # self.textEdit.setHtml(_translate("MainWindow",
-        #                                  "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-        #                                  "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-        #                                  "p, li { white-space: pre-wrap; }\n"
-        #                                  "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:18pt; font-weight:400; font-style:normal;\">\n"
-        #                                  "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:24pt; font-weight:600; font-style:italic; color:#ff0000;\">Login</span></p></body></html>",
-        #                                  None))
-        #self.textEdit.setText(_translate("MainWindow"),"LOGIN",None)
-        self.label_reg.setText(_translate("MainWindow", "Email ID", None))
-        self.Reg_reg_btn.setText(_translate("MainWindow", "Register", None))
-        self.Usernamereg.setText(_translate("MainWindow", "Username", None))
+        self.LoginButton.setText(_translate("MainWindow", "Login", None))
         self.LogOffAdmin1.setText(_translate("MainWindow", "Log Off", None))
         self.LogOffstaff.setText(_translate("MainWindow", "Log Off", None))
-        self.CancleReg.setText(_translate("MainWindow", "Cancel", None))
-        self.label_3reg.setText(_translate("MainWindow", "Password", None))
-        self.textEditreg.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:24pt; font-weight:600; font-style:italic; color:#ff0000;\">Registration</span></p></body></html>", None))
-
-        # Registration
-        self.RegisterStaff.setText(_translate("MainWindow", "Register Staff", None))
-        self.EditStudent.setText(_translate("MainWindow", "Edit Student", None))
-        #self.AddStudent.setText(_translate("MainWindow", "Add Student", None))
-        #self.RemoveStudent.setText(_translate("MainWindow", "Remove Student", None))
-        #self.RemoveStaff.setText(_translate("MainWindow", "Remove Staff", None))
-        #self.EditStaff.setText(_translate("MainWindow", "Edit Staff", None))
-        self.StudentLog.setText(_translate("MainWindow", "Student Log", None))
-        #self.LogOffAdmin.setText(_translate("MainWindow", "Log Offff", None))
 
         #Log
-        self.LogButton_Generate.setText(_translate("MainWindow", "Generate", None))
         self.LogButton_Exit.setText(_translate("MainWindow", "Exit", None))
-        self.Log_label.setText(_translate("MainWindow", "Dismissal Log", None))
-        self.Log_label1.setText(_translate("MainWindow", "Start Date", None))
-        self.Log_label2.setText(_translate("MainWindow", "End Date", None))
-        #self.LogOffAdmin.setText(_translate("MainWindow", "Log Off", None))
         self.LogOffAdminStudent.setText(_translate("MainWindow", "Log Off", None))
-        self.GenericReport_AppendText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.5pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Write in this location to insert into the report.</span></p></body></html>", None))
-        self.DismissWidget.setTabText(self.DismissWidget.indexOf(self.tab), _translate("MainWindow", "Generic Report", None))
-        self.DismissWidget.setTabText(self.DismissWidget.indexOf(self.tab_2), _translate("MainWindow", "Student Report", None))
-        self.DismissWidget.setTabText(self.DismissWidget.indexOf(self.tab_3), _translate("MainWindow", "Staff Report", None))
-
-        
 
         #mainadmin
-        #self.LogOffAdmin2.setText(_translate("MainWindow", "Log Off", None))
         self.EditStudent.setText(_translate("MainWindow", "Edit Student", None))
-        self.RegisterStaff.setText(_translate("MainWindow", "Edit Staff", None))
+        self.EditStaff.setText(_translate("MainWindow", "Edit Staff", None))
         self.StudentLog.setText(_translate("MainWindow", "Student Log", None))
         self.StudentCheckout.setText(_translate("MainWindow", "Student Checkout", None))
-        self.adminlabel.setText(_translate("MainWindow", "Welcome to the Admin menu", None))
-        self.adminlabel_2.setText(_translate("MainWindow", "Add/Remove/Delete Student", None))
-        self.adminlabel_3.setText(_translate("MainWindow", "Add/Remove/Delete Staff", None))
-        self.adminlabel_4.setText(_translate("MainWindow", "Student log generator", None))
-        self.adminlabel_5.setText(_translate("MainWindow", "Ordinary Checkout staff", None))
+        self.adminlabel_welcome.setText(_translate("MainWindow", "Welcome to the Admin menu", None))
+        self.adminlabel_student.setText(_translate("MainWindow", "Add/Remove/Delete Student", None))
+        self.adminlabel_staff.setText(_translate("MainWindow", "Add/Remove/Delete Staff", None))
+        self.adminlabel_log.setText(_translate("MainWindow", "Student log generator", None))
+        self.adminlabel_checkout.setText(_translate("MainWindow", "Ordinary Checkout staff", None))
         # Student window
         self.StudentLabel_Grade.setText(_translate("MainWindow", "Grade Number:", None))
         self.StudentLabel_ID.setText(_translate("MainWindow", "Student ID:", None))
@@ -1105,8 +954,8 @@ class Ui_MainWindow(object):
         self.StudentButton_Add.setEnabled(False)
         self.StudentButton_Edit.setEnabled(False)
         self.StudentButton_Remove.setEnabled(False)
-        self.StudentButton_Save2.setEnabled(False)
-        self.StudentButton_Save.setEnabled(False)
+        self.StudentButton_SaveEdit.setEnabled(False)
+        self.StudentButton_SaveAdd.setEnabled(False)
         self.StudentButton_SearchID.setEnabled(False)
         self.StudentButton_SearchName.setEnabled(False)
         self.LogOffAdmin.setEnabled(False)
@@ -1179,8 +1028,6 @@ class Ui_MainWindow(object):
         self.StudentButton_SearchID.show()
         self.StudentView.show()
         self.StudentSearch_Name.show()
-        #self.StudentButton_ViewDetails.show()
-
         self.StudentButton_Exit.show()
         self.StudentText_Name.show()
         self.StudentText_Picture.hide()
@@ -1209,29 +1056,8 @@ class Ui_MainWindow(object):
             self.close()
 
     def showLog(self):
-        self.GenericReport_AppendText.show()
-        #self.centralwidgetlog.show()
         self.LogButton_Exit.show()
-        #self.LogOffAdmin2.show()
-        self.GenericReport_AppendText.show()
-        self.Log_label.show()
-        self.Log_label1.show()
-        self.Log_label2.show()
-        self.LogButton_Generate.show()
-        self.LogListView_Student1.show()
-        self.LogListView_Student2.show()
-        self.LogListView_Staff2.show()
-        self.LogListView_Staff1.show()
         self.LogOffAdminStudent.show()
-        self.tab.show()
-        #self.tabWidget.show()
-        self.tab_3.show()
-        self.tab_2.show()
-        self.dateEdit_2.show()
-        self.menubar.show()
-        self.statusbar.show()
-        self.dateEdit.show()
-        self.DismissWidget.show()
 
     def hideall(self):
         #staff hide
@@ -1239,16 +1065,14 @@ class Ui_MainWindow(object):
         self.StaffLabel_SearchID.hide()
         self.StaffButton_SearchID.hide()
         self.StaffButton_SearchName.hide()
-        self.StaffButton_Save.hide()
-        self.StaffButton_Save2.hide()
+        self.StaffButton_SaveAdd.hide()
+        self.StaffButton_SaveEdit.hide()
         self.StaffButton_Cancel.hide()
-        #self.StaffButton_ViewDetails.hide()
         self.StaffSearch_ID.hide()
         self.StaffSearch_Name.hide()
+        self.LogOffstaff.hide()
 
-
-
-
+        #listview hide
         self.label.hide()
         self.label_2.hide()
         self.pushButton.hide()
@@ -1256,83 +1080,34 @@ class Ui_MainWindow(object):
         self.pushButton_2.hide()
         self.pushButton_4.hide()
         self.listWidget.hide()
+        self.listWidget_2.hide()
 
-
+        #login hide
         self.Username.hide()
         self.Password.hide()
-        self.Login_login_btn.hide()
-        self.Login_registration_btn.hide()
-        self.textEdit.hide()
-
+        self.LoginButton.hide()
+        self.LoginTitle.hide()
         self.Login_uname.hide()
         self.Login_uname.clear()
-
         self.Login_password.hide()
         self.Login_password.clear()
 
-        self.Reg_reg_btn.hide()
-        self.Reg_email.hide()
-        self.Reg_username.hide()
-        self.Reg_password.hide()
-        self.Usernamereg.hide()
-        self.label_3reg.hide()
         #hiding main admin page
-        self.RegisterStaff.hide()
         self.EditStudent.hide()
-        #self.AddStudent.hide()
-        #self.RemoveStudent.hide()
-        #self.RemoveStaff.hide()
-        #self.EditStaff.hide()
+        self.EditStaff.hide()
         self.StudentLog.hide()
-        #self.LogOffAdmin.hide()  
-        #hiding registration
-        #show registration page
-        self.textEditreg.hide()
-        self.label_reg.hide()      
-        #self.LogStudendid.hide()
-        #self.LogDate.hide()
-        #self.LogCancel.hide()
-        #self.LogOk.hide()
-        self.listWidget_2.hide()
-        #self.LogStudentIdText.hide()
-        #self.LogDateText.hide()
-        self.LogOffstaff.hide()
-        self.CancleReg.hide()
-        self.RegisterStaff.hide()
         self.EditStudent.hide()
         self.StudentLog.hide()
         self.LogOffAdmin1.hide()
-        #self.LogOffAdmin2.hide()
-        #self.LogOffAdmin3.hide()
-        self.adminlabel.hide()
-        self.adminlabel_2.hide()
-        self.adminlabel_3.hide()
-        self.adminlabel_4.hide()
-        self.adminlabel_5.hide()
+        self.adminlabel_welcome.hide()
+        self.adminlabel_student.hide()
+        self.adminlabel_staff.hide()
+        self.adminlabel_log.hide()
+        self.adminlabel_checkout.hide()
         self.StudentCheckout.hide()
+
         #for log
         self.LogButton_Exit.hide()
-        #self.LogOffAdmin.hide()
-        self.Log_label.hide()
-        self.Log_label1.hide()
-        self.Log_label2.hide()
-        self.LogButton_Generate.hide()
-        #self.tabWidget.hide()
-        self.LogListView_Student1.hide()
-        self.LogListView_Student2.hide()
-        self.LogListView_Staff2.hide()
-        self.LogListView_Staff1.hide()
-        #self.centralwidgetlog.hide()
-        self.tab.hide()
-        #self.tabWidget.hide()
-        self.tab_3.hide()
-        self.tab_2.hide()
-        self.dateEdit.hide()
-        self.dateEdit_2.hide()
-        self.menubar.hide()
-        self.statusbar.hide()
-        #self.LogOffAdmin2.hide()
-        self.DismissWidget.hide()
         self.LogOffAdminStudent.hide()
 
         #hide all student window
@@ -1359,7 +1134,6 @@ class Ui_MainWindow(object):
         self.StudentText_RFID.hide()
         self.StudentSearch_ID.hide()
         self.StudentSearch_Name.hide()
-        #self.StudentButton_ViewDetails.hide()
         self.StudentButton_SearchID.hide()
         self.StudentSearch_Name.hide()
         self.StudentView.hide()
@@ -1385,9 +1159,9 @@ class Ui_MainWindow(object):
         self.StaffView.hide()
         self.LogOffAdmin_Staff.hide()
         self.StudentButton_SearchName.hide()
-        self.StudentButton_Save.hide()
+        self.StudentButton_SaveAdd.hide()
         self.StudentButton_Cancel.hide()
-        self.StudentButton_Save2.hide()
+        self.StudentButton_SaveEdit.hide()
 
     def showMain(self):
         #show for main
@@ -1403,38 +1177,22 @@ class Ui_MainWindow(object):
 
     def showMainAdmin(self):
         #show admin page
-        self.RegisterStaff.show()
         self.EditStudent.show()
+        self.EditStaff.show()
         self.StudentLog.show()
         self.LogOffAdmin1.show()
-        #self.verticalLayoutWidget.show()
-        #self.horizontalLayout.show()
-        self.adminlabel.show()
-        self.adminlabel_2.show()
-        self.adminlabel_3.show()
-        self.adminlabel_4.show()
-        self.adminlabel_5.show()
+        self.adminlabel_welcome.show()
+        self.adminlabel_student.show()
+        self.adminlabel_staff.show()
+        self.adminlabel_log.show()
+        self.adminlabel_checkout.show()
         self.StudentCheckout.show()
-
-    def showRegistration(self):
-        #show registration page
-        self.Reg_reg_btn.show()
-        self.Reg_email.show()
-        self.Reg_username.show()
-        self.Reg_password.show()
-        #self.Username.show()
-        self.textEditreg.show()
-        self.label_3reg.show()
-        self.Usernamereg.show()
-        self.label_reg.show()
-        self.CancleReg.show()
 
     def showLogin(self):
         self.Username.show()
         self.Password.show()
-        self.Login_login_btn.show()
-        self.Login_registration_btn.show()
-        self.textEdit.show()
+        self.LoginButton.show()
+        self.LoginTitle.show()
         self.Login_uname.show()
         self.Login_password.show()        
 
@@ -1527,8 +1285,8 @@ class Ui_MainWindow(object):
                         self.StudentButton_Add.setEnabled(True)
                         self.StudentButton_Edit.setEnabled(True)
                         self.StudentButton_Remove.setEnabled(True)
-                        self.StudentButton_Save2.setEnabled(True)
-                        self.StudentButton_Save.setEnabled(True)
+                        self.StudentButton_SaveEdit.setEnabled(True)
+                        self.StudentButton_SaveAdd.setEnabled(True)
                         self.StudentButton_SearchID.setEnabled(True)
                         self.StudentButton_SearchName.setEnabled(True)
                         self.LogOffAdmin.setEnabled(True)
@@ -1543,9 +1301,9 @@ class Ui_MainWindow(object):
         #
 
     def handleAddCancel(self, MainWindow):
-        self.StudentButton_Save.hide()
+        self.StudentButton_SaveAdd.hide()
         self.StudentButton_Cancel.hide()
-        self.StudentButton_Save2.hide()
+        self.StudentButton_SaveEdit.hide()
         self.clearallfunction(MainWindow)
         self.enable()
 
@@ -1558,8 +1316,8 @@ class Ui_MainWindow(object):
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)
-        self.StudentButton_Save2.setEnabled(True)
-        self.StudentButton_Save.setEnabled(True)
+        self.StudentButton_SaveEtit.setEnabled(True)
+        self.StudentButton_SaveAdd.setEnabled(True)
         self.StudentButton_SearchID.setEnabled(True)
         self.StudentButton_SearchName.setEnabled(True)
         self.LogOffAdmin.setEnabled(True)
@@ -1639,16 +1397,15 @@ class Ui_MainWindow(object):
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)
-        self.StudentButton_Save2.setEnabled(True)
-        self.StudentButton_Save.setEnabled(True)
+        self.StudentButton_SaveEdit.setEnabled(True)
+        self.StudentButton_SaveAdd.setEnabled(True)
         self.StudentButton_SearchID.setEnabled(True)
         self.StudentButton_SearchName.setEnabled(True)
         self.LogOffAdmin.setEnabled(True)
         self.StudentSearch_Name.setEnabled(True)
         self.StudentSearch_ID.setEnabled(True)
-        self.StudentButton_Save2.hide()
+        self.StudentButton_SaveEdit.hide()
         self.StudentButton_Cancel.hide()
-        print("Save2 Clicked")
 
     def handleEditSaveStaff(self, MainWindow):
         name = self.StaffText_Name.text()
@@ -1668,24 +1425,18 @@ class Ui_MainWindow(object):
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)
-        self.StudentButton_Save2.setEnabled(True)
-        self.StudentButton_Save.setEnabled(True)
+        self.StudentButton_SaveEdit.setEnabled(True)
+        self.StudentButton_SaveAdd.setEnabled(True)
         self.StudentButton_SearchID.setEnabled(True)
         self.StudentButton_SearchName.setEnabled(True)
         self.LogOffAdmin.setEnabled(True)
         self.StudentSearch_Name.setEnabled(True)
         self.StudentSearch_ID.setEnabled(True)
-        self.StudentButton_Save2.hide()
+        self.StudentButton_SaveEdit.hide()
         self.StudentButton_Cancel.hide()
 
 
         print("Save2 Clicked")
-
-    def Registrationfunc(self, MainWindow):
-        #when Registration is clicked
-        self.hideall()
-        self.showRegistration()
-        ##print("Registration clicked")
 
     def MainAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
@@ -1733,7 +1484,6 @@ class Ui_MainWindow(object):
         #when Admin Login is clicked is clicked
         self.hideall()
         self.showLogin()
-        ##print("Registration clicked")
 
     def LogAdminfunc(self, MainWindow):
         self.hideall()
@@ -1744,8 +1494,7 @@ class Ui_MainWindow(object):
         self.hideall()
         self.showLogin()
 
-    def CancelRegfunc(self, MainWindow):
-        #when Admin Login is clicked is clicked
+    def CancelActionfunc(self, MainWindow):
         self.hideall()
         self.showMainAdmin()
         ui.StudentView.clear()
@@ -1765,11 +1514,11 @@ class Ui_MainWindow(object):
         self.hideall()
         self.showStudentWindow()
         self.StudentButton_Cancel.show()
-        self.StudentButton_Save.show()
+        self.StudentButton_SaveAdd.show()
         self.clearallfunction(MainWindow)
         self.enable()
         self.StudentButton_Cancel.setEnabled(True)
-        self.StudentButton_Save.setEnabled(True)
+        self.StudentButton_SaveAdd.setEnabled(True)
         self.StudentText_Name.setEnabled(True)
         self.StudentText_RFID.setEnabled(True)
         self.StudentText_Grade.setEnabled(True)
@@ -1794,10 +1543,10 @@ class Ui_MainWindow(object):
         self.hideall()
         self.showStudentWindow()
         self.StudentButton_Cancel.show()
-        self.StudentButton_Save2.show()
+        self.StudentButton_SaveEdit.show()
         self.enable()
         self.StudentButton_Cancel.setEnabled(True)
-        self.StudentButton_Save2.setEnabled(True)
+        self.StudentButton_SaveEdit.setEnabled(True)
         self.StudentText_Name.setEnabled(True)
         self.StudentText_RFID.setEnabled(True)
         self.StudentText_Grade.setEnabled(True)
@@ -1845,7 +1594,7 @@ class Ui_MainWindow(object):
 
     def EditstaffFunc(self):
         self.enableRightStaff()
-        self.StaffButton_Save2.show()
+        self.StaffButton_SaveEdit.show()
         self.StaffButton_Cancel.show()
 
     def clearStaff(self):
@@ -1881,8 +1630,8 @@ class Ui_MainWindow(object):
         self.StaffButton_SearchName.setEnabled(True)
         self.StaffSearch_ID.setEnabled(True)
         self.StaffSearch_Name.setEnabled(True)
-        self.StaffButton_Save2.hide()
-        self.StaffButton_Save.hide()
+        self.StaffButton_SaveEdit.hide()
+        self.StaffButton_SaveAdd.hide()
         self.StaffButton_Cancel.hide()
         self.StaffLabel_CPassword.hide()
         self.StaffLabel_Password.hide()
@@ -1891,7 +1640,7 @@ class Ui_MainWindow(object):
 
     def enableRightStaff(self):
         self.enableStaff()
-        self.StaffButton_Save2.show()
+        self.StaffButton_SaveEdit.show()
         self.StaffButton_Cancel.show()
         self.StaffLabel_Password.show()
         self.StaffLabel_CPassword.show()
@@ -1900,7 +1649,7 @@ class Ui_MainWindow(object):
         self.StaffText_ID.setEnabled(True)
         self.StaffText_Pass.setEnabled(True)
         self.StaffText_CPass.setEnabled(True)
-        self.StaffButton_Save2.setEnabled(True)
+        self.StaffButton_SaveEdit.setEnabled(True)
         self.StaffButton_Cancel.setEnabled(True)
         self.StaffText_Pass.show()
         self.StaffText_CPass.show()
@@ -1914,8 +1663,8 @@ class Ui_MainWindow(object):
         self.enableStaff()
         self.clearStaff()
         self.enableRightStaff()
-        self.StaffButton_Save2.hide()
-        self.StaffButton_Save.show()
+        self.StaffButton_SaveEdit.hide()
+        self.StaffButton_SaveAdd.show()
 
     def PromoteFunction (self):
         print('this')
