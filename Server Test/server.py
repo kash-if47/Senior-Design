@@ -169,10 +169,12 @@ class System(object):
             print(idval)
             if int(id) == int(idval):
                 print("found " + id)
-                if(user == self.staffList[i].Name):
+                if(user == self.staffList[i].Email):
+                    print("Removal Denied")
                     return 0
                 else:
                     del self.staffList[i]
+                    print("Staff Removed")
                     return 1
 
     def promoteStaff(self,id):
@@ -458,7 +460,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(12)
         #validators
-        validator = QtGui.QIntValidator()
+        intvalidator = QtGui.QIntValidator()
         regex = QtCore.QRegExp("[a-z-A-Z _]+")
         azvalidator = QtGui.QRegExpValidator(regex)
         #Labels
@@ -516,7 +518,7 @@ class Ui_MainWindow(object):
         self.StudentText_ID = QtGui.QLineEdit(MainWindow)
         self.StudentText_ID.setGeometry(QtCore.QRect(650, 130, 241, 31))
         self.StudentText_ID.setEnabled(False)
-        self.StudentText_ID.setValidator(validator)
+        self.StudentText_ID.setValidator(intvalidator)
         self.StudentText_ID.setFont(font)
         self.StudentText_ID.setObjectName(_fromUtf8("StudentText_ID"))
 
@@ -525,7 +527,7 @@ class Ui_MainWindow(object):
         self.StudentText_Grade.setGeometry(QtCore.QRect(650, 200, 241, 31))
         self.StudentText_Grade.setFont(font)
         self.StudentText_Grade.setObjectName(_fromUtf8("StudentText_Grade"))
-        self.StudentText_Grade.setValidator(validator)
+        self.StudentText_Grade.setValidator(intvalidator)
 
         self.StudentText_GName = QtGui.QLineEdit(MainWindow)
         self.StudentText_GName.setGeometry(QtCore.QRect(650, 270, 241, 31))
@@ -600,7 +602,7 @@ class Ui_MainWindow(object):
         self.StudentSearch_ID = QtGui.QLineEdit(MainWindow)
         self.StudentSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
         self.StudentSearch_ID.setObjectName(_fromUtf8("StudentSearch_ID"))
-        self.StudentSearch_ID.setValidator(validator)
+        self.StudentSearch_ID.setValidator(intvalidator)
 
         self.StudentSearch_Name = QtGui.QLineEdit(MainWindow)
         self.StudentSearch_Name.setGeometry(QtCore.QRect(10, 700, 281, 31))
@@ -740,7 +742,7 @@ class Ui_MainWindow(object):
         self.StaffSearch_ID = QtGui.QLineEdit(MainWindow)
         self.StaffSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
         self.StaffSearch_ID.setObjectName(_fromUtf8("StaffSearch_ID"))
-        self.StaffSearch_ID.setValidator(validator)
+        self.StaffSearch_ID.setValidator(intvalidator)
 
         self.StaffButton_SearchName = QtGui.QPushButton(MainWindow)
         self.StaffButton_SearchName.setGeometry(QtCore.QRect(10, 740, 121, 27))
@@ -1577,20 +1579,24 @@ class Ui_MainWindow(object):
     def RemoveStafffunc(self, name):
         name =  self.StaffText_Name.text()
         id = self.StaffText_ID.text()
-        print(name)
-        if(self.popupMessage(MainWindow,"Do you really want to delete " + name + " from the database ?")):
-            if(Sys.removeStaff(id, currentUser)):
-                query = "DELETE FROM staff WHERE StaffID= %s;"
-                query2 = (id)
-                conn = connectDB()
-                cur = conn.cursor()
-                addq = cur.execute(query, query2)
-                self.clearallfunction(MainWindow)
-                conn.commit()
-                conn.close()
-                self.searchByNameStaff()
-            else:
-                self.popupMessage2(MainWindow,"Admins are not allowed to remove themselves. Please get another admin to remove you. ")
+        email = self.StaffText_Email.text()
+        if(email == currentUser):
+            self.popupMessage2(MainWindow, "Admins are not allowed to remove themselves. \nPlease get another admin to remove you. ")
+        else:
+            if(self.popupMessage(MainWindow,"Do you really want to delete " + name + " from the database ?")):
+                print(str(id) + name + str(currentUser))
+                if(Sys.removeStaff(id, currentUser)):
+                    query = "DELETE FROM staff WHERE StaffID= %s;"
+                    query2 = (id)
+                    conn = connectDB()
+                    cur = conn.cursor()
+                    addq = cur.execute(query, query2)
+                    self.clearallfunction(MainWindow)
+                    conn.commit()
+                    conn.close()
+                    self.searchByNameStaff()
+                else:
+                    self.popupMessage2(MainWindow,"Admins are not allowed to remove themselves. Please get another admin to remove you. ")
 
     def EditstaffFunc(self):
         self.enableRightStaff()
@@ -1735,7 +1741,6 @@ ui.setupUi(MainWindow)
 
 if __name__ == "__main__":
     MainWindow.show()
-    print("Hello Austin")
     Sys = System()
 
 
