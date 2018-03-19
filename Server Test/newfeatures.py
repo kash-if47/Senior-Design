@@ -1068,6 +1068,8 @@ class Ui_MainWindow(object):
         self.pushButton_3.setText(_translate("MainWindow", "Undo", None))
         self.pushButton_2.setText(_translate("MainWindow", "Clear", None))
         self.pushButton_4.setText(_translate("MainWindow", "Undo", None))
+		
+		
         self.StudentButton_Cancel.setText(_translate("Mainwindow","Cancel",None))
         self.StudentButton_SaveAdd.setText(_translate("Mainwindow", "Save", None))
         self.StudentButton_SaveEdit.setText(_translate("Mainwindow", "Save", None))
@@ -1163,8 +1165,6 @@ class Ui_MainWindow(object):
     def tabControl(self):
         print(self.DismissWidget.currentIndex)
         print(self.DismissWidget.indexOf)
-
-
 
     def searchIDStudentLog(self):
         result = []
@@ -1736,7 +1736,7 @@ class Ui_MainWindow(object):
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)
-        self.StudentButton_SaveEtit.setEnabled(True)
+        self.StudentButton_SaveEdit.setEnabled(True)
         self.StudentButton_SaveAdd.setEnabled(True)
         self.StudentButton_SearchID.setEnabled(True)
         self.StudentButton_SearchName.setEnabled(True)
@@ -1809,7 +1809,6 @@ class Ui_MainWindow(object):
             student = result[num]
         print(student.Name)
 
-
     def handleEditSaveStudent(self, MainWindow):
         id = self.StudentText_ID.text()
         grade = self.StudentText_Grade.text()
@@ -1826,7 +1825,6 @@ class Ui_MainWindow(object):
         self.StudentButton_Exit.setEnabled(True)
 
         self.StudentButton_SearchName.setEnabled(True)
-        #self.StudentButton_ViewDetails.setEnabled(True)
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)

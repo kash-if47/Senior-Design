@@ -9,6 +9,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtCore import QThread
 import pymysql
+import datetime
 
 filename = ""
 
@@ -91,6 +92,7 @@ class System(object):
         return result
 
     def searchByName(self, name):
+        print(str(len(self.studentList)))
         result = []
         for i in range(0, len(self.studentList)):
             fullName = self.studentList[i].Name
@@ -245,24 +247,40 @@ class System(object):
         cur = conn.cursor()
         cur.execute("SELECT * FROM LOG")
         dataMain = cur.fetchall()
+        ui.LogListWidget_Staff.clear()
+        ui.LogListWidget_Student.clear()
+
+        sDate = ui.StartDateEdit.date()
+        eDate = ui.EndDateEdit.date()
+
+        sDate = sDate.toPyDate()
+        eDate = eDate.toPyDate()
 
         data = {'Student ID': [], 'Staff ID': [], 'Date': [], 'Time': []}
+        count = 0
         for i in range(0, len(dataMain)):
-            data['Student ID'].append(str(dataMain[i][0]))
-            data['Staff ID'].append(str(dataMain[i][1]))
-            data['Date'].append(str(dataMain[i][2]))
-            data['Time'].append(str(dataMain[i][3]))
-            ui.LogTreeView_Generic.setColumnCount(4)
-            ui.LogTreeView_Generic.setRowCount(len(dataMain))
-        # LogTreeView_Generic = QTableWidget(len(dataMain), 4)
+            logDate = str(dataMain[i][2]).split(" ")[0]
+            logDate = datetime.datetime.strptime(logDate, '%Y-%m-%d').date()
+            difference = eDate - sDate
+            print(difference)
+            logdiff = logDate - sDate
+            if ((logdiff <= difference) and (logdiff >= datetime.timedelta(days=0))):
+                count = count + 1
+                data['Student ID'].append(str(dataMain[i][0]))
+                data['Staff ID'].append(str(dataMain[i][1]))
+                data['Date'].append(str(dataMain[i][2]).split(" ")[0])
+                data['Time'].append(str(dataMain[i][2]).split(" ")[1])
+            ui.LogTableView_Generic.setColumnCount(4)
+            ui.LogTableView_Generic.setRowCount(count)
+        # LogTableView_Generic = QTableWidget(len(dataMain), 4)
         horHeaders = []
         for n, key in enumerate(sorted(data.keys())):
             horHeaders.append(key)
             for m, item in enumerate(data[key]):
                 newitem = QTableWidgetItem(item)
-                ui.LogTreeView_Generic.setItem(m, n, newitem)
-            ui.LogTreeView_Generic.setHorizontalHeaderLabels(horHeaders)
-            ui.LogTreeView_Generic.show()
+                ui.LogTableView_Generic.setItem(m, n, newitem)
+            ui.LogTableView_Generic.setHorizontalHeaderLabels(horHeaders)
+            ui.LogTableView_Generic.show()
 
         result = Sys.getStudentNames()
         for i in range(0, len(result)):
@@ -343,61 +361,68 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(1200, 900)
-        self.centralwidget = QtGui.QWidget(MainWindow)
-        self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.gridLayout = QtGui.QGridLayout(self.centralwidget)
-        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.label = QtGui.QLabel(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label.setFont(font)
-        self.label.setObjectName(_fromUtf8("label"))
-        self.gridLayout.addWidget(self.label, 0, 1, 1, 1)
-        spacerItem = QtGui.QSpacerItem(13, 538, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem, 0, 3, 3, 1)
-        self.label_2 = QtGui.QLabel(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_2.setFont(font)
-        self.label_2.setObjectName(_fromUtf8("label_2"))
-        self.gridLayout.addWidget(self.label_2, 0, 5, 1, 1)
-        self.listWidget = QtGui.QListWidget(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.listWidget.setFont(font)
-        self.listWidget.setObjectName(_fromUtf8("listWidget"))
-        self.gridLayout.addWidget(self.listWidget, 1, 0, 1, 3)
-        self.listWidget_2 = QtGui.QListWidget(self.centralwidget)
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.listWidget_2.setFont(font)
-        self.listWidget_2.setObjectName(_fromUtf8("listWidget_2"))
-        self.gridLayout.addWidget(self.listWidget_2, 1, 4, 1, 3)
-        self.pushButton = QtGui.QPushButton(self.centralwidget)
-        self.pushButton.setObjectName(_fromUtf8("pushButton"))
-        self.gridLayout.addWidget(self.pushButton, 2, 0, 1, 1)
-        self.pushButton_3 = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_3.setObjectName(_fromUtf8("pushButton_3"))
-        self.gridLayout.addWidget(self.pushButton_3, 2, 2, 1, 1)
-        self.pushButton_2 = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
-        self.gridLayout.addWidget(self.pushButton_2, 2, 4, 1, 1)
-        self.pushButton_4 = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_4.setObjectName(_fromUtf8("pushButton_4"))
-        self.gridLayout.addWidget(self.pushButton_4, 2, 6, 1, 1)
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.pushButton.clicked.connect(self.handleClear1)
-        self.pushButton_2.clicked.connect(self.handleClear2)
-        MainWindow.keyPressEvent = self.newOnKeyPressEvent
 
+        #Double list page
+        ThickFont = QtGui.QFont()
+        ThickFont.setPointSize(11)
+        ThickFont.setBold(True)
+        ThickFont.setWeight(75)
+        TitleFont = ThickFont
+        TitleFont.setPointSize(12)
+
+        self.LeftList = QtGui.QListWidget(MainWindow)
+        self.LeftList.setGeometry(QtCore.QRect(20, 240, 310, 380))
+        self.LeftList.setFont(ThickFont)
+        self.LeftList.setObjectName(_fromUtf8("LeftList"))
+        self.LeftList.itemClicked.connect(self.updateLeftPicture)
+
+        self.RightList = QtGui.QListWidget(MainWindow)
+        self.RightList.setGeometry(QtCore.QRect(480, 240, 310, 380))
+        self.RightList.setFont(ThickFont)
+        self.RightList.setObjectName(_fromUtf8("RightList"))
+        self.RightList.itemClicked.connect(self.updateRightPicture)
+
+        self.LeftListTitle = QtGui.QLabel(MainWindow)
+        self.LeftListTitle.setGeometry(QtCore.QRect(160, 10, 100, 40))
+        self.LeftListTitle.setFont(TitleFont)
+        self.LeftListTitle.setObjectName(_fromUtf8("LeftListTitle"))
+
+        self.RightListTitle = QtGui.QLabel(MainWindow)
+        self.RightListTitle.setGeometry(QtCore.QRect(620, 10, 100, 40))
+        self.RightListTitle.setFont(TitleFont)
+        self.RightListTitle.setObjectName(_fromUtf8("RightListTitle"))
+
+        self.LeftClear = QtGui.QPushButton(MainWindow)
+        self.LeftClear.setGeometry(QtCore.QRect(350, 360, 70, 25))
+        self.LeftClear.setObjectName(_fromUtf8("LeftClear"))
+        self.LeftClear.clicked.connect(self.handleClearLeft)
+
+        self.RightClear = QtGui.QPushButton(MainWindow)
+        self.RightClear.setGeometry(QtCore.QRect(820, 360, 70, 25))
+        self.RightClear.setObjectName(_fromUtf8("RightClear"))
+        self.RightClear.clicked.connect(self.handleClearRight)
+
+        self.LeftStudentPicture = QtGui.QLabel(MainWindow)
+        self.LeftStudentPicture.setGeometry(QtCore.QRect(150, 50, 180, 170))
+        self.LeftStudentPicture.setObjectName(_fromUtf8("LeftStudentPicture"))
+
+        self.RightStudentPicture = QtGui.QLabel(MainWindow)
+        self.RightStudentPicture.setGeometry(QtCore.QRect(610, 50, 180, 170))
+        self.RightStudentPicture.setObjectName(_fromUtf8("RightStudentPicture"))
+
+        self.SplittingLine = QtGui.QFrame(MainWindow)
+        self.SplittingLine.setGeometry(QtCore.QRect(450, 0, 20, 650))
+        self.SplittingLine.setFrameShape(QtGui.QFrame.VLine)
+        self.SplittingLine.setFrameShadow(QtGui.QFrame.Sunken)
+        self.SplittingLine.setObjectName(_fromUtf8("SplittingLine"))
+
+        # self.centralwidget = QtGui.QWidget(MainWindow)
+        # self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
+        # self.gridLayout = QtGui.QGridLayout(self.centralwidget)
+        # self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        #
+        # MainWindow.setCentralWidget(self.centralwidget)
+        MainWindow.keyPressEvent = self.newOnKeyPressEvent
 
         #=======================================================
         #login Page
@@ -426,7 +451,6 @@ class Ui_MainWindow(object):
         self.Login_password.setEchoMode(QtGui.QLineEdit.Password)
         self.Login_password.setGeometry(QtCore.QRect(430, 290, 271, 41))
         self.Login_password.setObjectName(_fromUtf8("Login_password"))
-        ########################################
 
         self.LoginButton = QtGui.QPushButton(MainWindow)
         self.LoginButton.setGeometry(QtCore.QRect(520, 450, 211, 61))
@@ -442,10 +466,10 @@ class Ui_MainWindow(object):
         self.LoginTitle.setFont(BigRedFont)
         self.LoginTitle.setStyleSheet('color: red')
 
-        self.LogOffstaff = QtGui.QCommandLinkButton(MainWindow)
-        self.LogOffstaff.setGeometry(QtCore.QRect(790, 780, 187, 41))
-        self.LogOffstaff.setObjectName(_fromUtf8("LogOffstaff"))
-        self.LogOffstaff.clicked.connect(self.LogOffStafffunc)
+        self.LogOffStaff = QtGui.QCommandLinkButton(MainWindow)
+        self.LogOffStaff.setGeometry(QtCore.QRect(790, 780, 187, 41))
+        self.LogOffStaff.setObjectName(_fromUtf8("LogOffStaff"))
+        self.LogOffStaff.clicked.connect(self.LogOffStafffunc)
 
         #=======================================================
         # main admin page need to fix by adding log and pushing buttons to menu
@@ -477,10 +501,6 @@ class Ui_MainWindow(object):
         self.StudentLog.setObjectName(_fromUtf8("StudentLog"))
         self.StudentLog.clicked.connect(self.ShowStudentLogFunc)
 
-
-        #removing log components so no ui file can be integrated
-        #self.StudentLog.clicked.connect(self.LogAdminfunc)
-
         self.horizontalLayout.addWidget(self.StudentLog)
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -494,6 +514,7 @@ class Ui_MainWindow(object):
         self.StudentCheckout = QtGui.QPushButton(self.verticalLayoutWidget)
         self.StudentCheckout.setObjectName(_fromUtf8("StudentCheckout"))
         self.horizontalLayout_2.addWidget(self.StudentCheckout)
+        self.StudentCheckout.clicked.connect(self.showMain)
 
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem1)
@@ -525,171 +546,159 @@ class Ui_MainWindow(object):
 
         #=======================================================
         #Log page
-        self.LogButton_Generate = QtGui.QPushButton(MainWindow)
-        self.LogButton_Generate.setGeometry(QtCore.QRect(360, 560, 75, 23))
-        self.LogButton_Generate.setMaximumSize(QtCore.QSize(1200, 900))
-        self.LogButton_Generate.setObjectName(_fromUtf8("LogButton_Generate"))
+        today = QtCore.QDate.currentDate()
+        mindate = today.addMonths(-1)
 
+        self.DismissWidget = QtGui.QTabWidget(MainWindow)
+        self.DismissWidget.setGeometry(QtCore.QRect(10, 90, 900, 440))
+        self.DismissWidget.setMaximumSize(QtCore.QSize(1200, 900))
+        self.DismissWidget.setObjectName(_fromUtf8("DismissWidget"))
 
-        self.EndDateEdit = QtGui.QDateEdit(MainWindow)
-        self.EndDateEdit.setGeometry(QtCore.QRect(180, 560, 110, 22))
-        self.EndDateEdit.setMaximumSize(QtCore.QSize(1200, 900))
-        self.EndDateEdit.setObjectName(_fromUtf8("EndDateEdit"))
+        self.GenericTab = QtGui.QWidget()
+        self.GenericTab.setObjectName(_fromUtf8("GenericTab"))
+        self.DismissWidget.addTab(self.GenericTab, _fromUtf8(""))
 
+        self.StudentTab = QtGui.QWidget()
+        self.StudentTab.setObjectName(_fromUtf8("StudentTab"))
+        self.DismissWidget.addTab(self.StudentTab, _fromUtf8(""))
 
-        self.LogButton_Exit = QtGui.QPushButton(MainWindow)
-        self.LogButton_Exit.setGeometry(QtCore.QRect(710, 560, 75, 23))
-        self.LogButton_Exit.setMaximumSize(QtCore.QSize(1200, 900))
-        self.LogButton_Exit.setObjectName(_fromUtf8("LogButton_Exit"))
+        self.StaffTab = QtGui.QWidget()
+        self.StaffTab.setObjectName(_fromUtf8("StaffTab"))
+        self.DismissWidget.addTab(self.StaffTab, _fromUtf8(""))
 
-
-        self.StartDateEdit = QtGui.QDateEdit(MainWindow)
-        self.StartDateEdit.setGeometry(QtCore.QRect(10, 560, 110, 22))
-        self.StartDateEdit.setMaximumSize(QtCore.QSize(1200, 900))
-        self.StartDateEdit.setObjectName(_fromUtf8("StartDateEdit"))
-
+        #Log Labels
+        logFont = QtGui.QFont()
+        logFont.setPointSize(24)
 
         self.LogLabel_Title = QtGui.QLabel(MainWindow)
         self.LogLabel_Title.setGeometry(QtCore.QRect(310, 20, 251, 51))
         self.LogLabel_Title.setMaximumSize(QtCore.QSize(1200, 900))
-        font = QtGui.QFont()
-        font.setPointSize(24)
-        self.LogLabel_Title.setFont(font)
+        self.LogLabel_Title.setFont(logFont)
         self.LogLabel_Title.setObjectName(_fromUtf8("LogLabel_Title"))
-
 
         self.LogLabel_Start = QtGui.QLabel(MainWindow)
         self.LogLabel_Start.setGeometry(QtCore.QRect(20, 540, 61, 21))
         self.LogLabel_Start.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogLabel_Start.setObjectName(_fromUtf8("LogLabel_Start"))
 
-
         self.LogLabel_End = QtGui.QLabel(MainWindow)
         self.LogLabel_End.setGeometry(QtCore.QRect(190, 540, 61, 21))
         self.LogLabel_End.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogLabel_End.setObjectName(_fromUtf8("LogLabel_End"))
 
-
-        self.LogOffAdmin2 = QtGui.QCommandLinkButton(MainWindow)
-        self.LogOffAdmin2.setGeometry(QtCore.QRect(700, 10, 187, 41))
-        self.LogOffAdmin2.setMaximumSize(QtCore.QSize(1200, 900))
-        self.LogOffAdmin2.setObjectName(_fromUtf8("LogOffAdmin2"))
-
-
-        self.DismissWidget = QtGui.QTabWidget(MainWindow)
-        self.DismissWidget.setGeometry(QtCore.QRect(10, 90, 781, 441))
-        self.DismissWidget.setMaximumSize(QtCore.QSize(1200, 900))
-        self.DismissWidget.setObjectName(_fromUtf8("DismissWidget"))
-
-
-        self.GenericTab = QtGui.QWidget()
-        self.GenericTab.setObjectName(_fromUtf8("GenericTab"))
-        self.LogTreeView_Generic = QtGui.QTableWidget(self.GenericTab)
-        self.LogTreeView_Generic.setGeometry(QtCore.QRect(0, 1, 781, 421))
-        self.LogTreeView_Generic.setObjectName(_fromUtf8("LogTreeView_Generic"))
-
-
-        self.DismissWidget.addTab(self.GenericTab, _fromUtf8(""))
-        self.StudentTab = QtGui.QWidget()
-        self.StudentTab.setObjectName(_fromUtf8("StudentTab"))
-        #self.StudentTab.mouseReleaseEvent=sys.showStudentReport(self)
-        #self.StudentTab.mouseReleaseEvent = lambda event, my_variable: sys.showStudentReport(event)
-
-
-        self.LogStudentText_SearchName = QtGui.QLineEdit(self.StudentTab)
-        self.LogStudentText_SearchName.setGeometry(QtCore.QRect(0, 390, 211, 31))
-        self.LogStudentText_SearchName.setObjectName(_fromUtf8("LogStudentText_SearchName"))
-
-
-        self.LogStudentText_SearchID = QtGui.QLineEdit(self.StudentTab)
-        self.LogStudentText_SearchID.setGeometry(QtCore.QRect(220, 390, 181, 31))
-        self.LogStudentText_SearchID.setObjectName(_fromUtf8("LogStudentText_SearchID"))
-
-
-        self.LogTreeView_Student = QtGui.QTreeView(self.StudentTab)
-        self.LogTreeView_Student.setGeometry(QtCore.QRect(398, 0, 381, 421))
-        self.LogTreeView_Student.setObjectName(_fromUtf8("LogTreeView_Student"))
-
-
-        self.LogListWidget_Student = QtGui.QListWidget(self.StudentTab)
-        self.LogListWidget_Student.setGeometry(QtCore.QRect(0, 0, 400, 361))
-        self.LogListWidget_Student.setObjectName(_fromUtf8("LogListWidget_Student"))
-        self.LogListWidget_Student.itemClicked.connect(self.handleviewLogStudent)
-
-
-
         self.LogStudentLabel_SearchName = QtGui.QLabel(self.StudentTab)
         self.LogStudentLabel_SearchName.setGeometry(QtCore.QRect(0, 360, 101, 16))
         self.LogStudentLabel_SearchName.setObjectName(_fromUtf8("LogStudentLabel_SearchName"))
-
 
         self.LogStudentLogLabel_SearchID = QtGui.QLabel(self.StudentTab)
         self.LogStudentLogLabel_SearchID.setGeometry(QtCore.QRect(220, 360, 61, 16))
         self.LogStudentLogLabel_SearchID.setObjectName(_fromUtf8("LogStudentLogLabel_SearchID"))
 
-
-        self.LogStudentButton_SearchName = QtGui.QPushButton(self.StudentTab)
-        self.LogStudentButton_SearchName.setGeometry(QtCore.QRect(130, 360, 75, 23))
-        self.LogStudentButton_SearchName.setObjectName(_fromUtf8("LogStudentButton_SearchName"))
-
-
-        self.LogStudentButton_SearchID = QtGui.QPushButton(self.StudentTab)
-        self.LogStudentButton_SearchID.setGeometry(QtCore.QRect(320, 360, 75, 23))
-        self.LogStudentButton_SearchID.setObjectName(_fromUtf8("LogStudentButton_SearchID"))
-
-
-
-        self.DismissWidget.addTab(self.StudentTab, _fromUtf8(""))
-        self.StaffTab = QtGui.QWidget()
-        self.StaffTab.setObjectName(_fromUtf8("StaffTab"))
-
-
-        self.LogTableView_Staff = QtGui.QTableView(self.StaffTab)
-        self.LogTableView_Staff.setGeometry(QtCore.QRect(398, 0, 381, 421))
-        self.LogTableView_Staff.setObjectName(_fromUtf8("LogTableView_Staff"))
-
-
-        self.LogListWidget_Staff = QtGui.QListWidget(self.StaffTab)
-        self.LogListWidget_Staff.setGeometry(QtCore.QRect(0, 0, 400, 361))
-        self.LogListWidget_Staff.setObjectName(_fromUtf8("LogListWidget_Staff"))
-
-
-        self.LogStaffText_SearchID = QtGui.QLineEdit(self.StaffTab)
-        self.LogStaffText_SearchID.setGeometry(QtCore.QRect(220, 390, 181, 31))
-        self.LogStaffText_SearchID.setObjectName(_fromUtf8("LogStaffText_SearchID"))
-
-
-        self.LogStaffText_SearchName = QtGui.QLineEdit(self.StaffTab)
-        self.LogStaffText_SearchName.setGeometry(QtCore.QRect(0, 390, 211, 31))
-        self.LogStaffText_SearchName.setObjectName(_fromUtf8("LogStaffText_SearchName"))
-
-
         self.LogStaffLabel_SearchName = QtGui.QLabel(self.StaffTab)
         self.LogStaffLabel_SearchName.setGeometry(QtCore.QRect(0, 360, 101, 16))
         self.LogStaffLabel_SearchName.setObjectName(_fromUtf8("LogStaffLabel_SearchName"))
-
 
         self.LogStaffLabel_SearchID = QtGui.QLabel(self.StaffTab)
         self.LogStaffLabel_SearchID.setGeometry(QtCore.QRect(220, 360, 61, 16))
         self.LogStaffLabel_SearchID.setObjectName(_fromUtf8("LogStaffLabel_SearchID"))
 
+        #Log Textfields
+        self.LogStudentText_SearchName = QtGui.QLineEdit(self.StudentTab)
+        self.LogStudentText_SearchName.setGeometry(QtCore.QRect(0, 390, 211, 31))
+        self.LogStudentText_SearchName.setObjectName(_fromUtf8("LogStudentText_SearchName"))
+
+        self.LogStudentText_SearchID = QtGui.QLineEdit(self.StudentTab)
+        self.LogStudentText_SearchID.setGeometry(QtCore.QRect(220, 390, 181, 31))
+        self.LogStudentText_SearchID.setObjectName(_fromUtf8("LogStudentText_SearchID"))
+
+        self.LogStaffText_SearchName = QtGui.QLineEdit(self.StaffTab)
+        self.LogStaffText_SearchName.setGeometry(QtCore.QRect(0, 390, 211, 31))
+        self.LogStaffText_SearchName.setObjectName(_fromUtf8("LogStaffText_SearchName"))
+
+        self.LogStaffText_SearchID = QtGui.QLineEdit(self.StaffTab)
+        self.LogStaffText_SearchID.setGeometry(QtCore.QRect(220, 390, 181, 31))
+        self.LogStaffText_SearchID.setObjectName(_fromUtf8("LogStaffText_SearchID"))
+
+        #Log DateEdits
+        self.StartDateEdit = QtGui.QDateEdit(MainWindow)
+        self.StartDateEdit.setGeometry(QtCore.QRect(10, 560, 110, 22))
+        self.StartDateEdit.setMaximumSize(QtCore.QSize(1200, 900))
+        self.StartDateEdit.setObjectName(_fromUtf8("StartDateEdit"))
+        self.StartDateEdit.setDate(mindate)
+
+        self.EndDateEdit = QtGui.QDateEdit(MainWindow)
+        self.EndDateEdit.setGeometry(QtCore.QRect(180, 560, 110, 22))
+        self.EndDateEdit.setMaximumSize(QtCore.QSize(1200, 900))
+        self.EndDateEdit.setObjectName(_fromUtf8("EndDateEdit"))
+        self.EndDateEdit.setDate(today)
+
+        #Log Buttons
+        self.LogOffAdmin2 = QtGui.QCommandLinkButton(MainWindow)
+        self.LogOffAdmin2.setGeometry(QtCore.QRect(700, 10, 187, 41))
+        self.LogOffAdmin2.setMaximumSize(QtCore.QSize(1200, 900))
+        self.LogOffAdmin2.setObjectName(_fromUtf8("LogOffAdmin2"))
+
+        self.LogButton_Generate = QtGui.QPushButton(MainWindow)
+        self.LogButton_Generate.setGeometry(QtCore.QRect(360, 560, 75, 23))
+        self.LogButton_Generate.setMaximumSize(QtCore.QSize(1200, 900))
+        self.LogButton_Generate.setObjectName(_fromUtf8("LogButton_Generate"))
+        self.LogButton_Generate.clicked.connect(self.redrawTables)
+
+        self.LogButton_Exit = QtGui.QPushButton(MainWindow)
+        self.LogButton_Exit.setGeometry(QtCore.QRect(710, 560, 75, 23))
+        self.LogButton_Exit.setMaximumSize(QtCore.QSize(1200, 900))
+        self.LogButton_Exit.setObjectName(_fromUtf8("LogButton_Exit"))
+        self.LogButton_Exit.clicked.connect(self.CancelActionfunc)
+
+        self.LogStudentButton_SearchName = QtGui.QPushButton(self.StudentTab)
+        self.LogStudentButton_SearchName.setGeometry(QtCore.QRect(130, 360, 75, 23))
+        self.LogStudentButton_SearchName.setObjectName(_fromUtf8("LogStudentButton_SearchName"))
+        self.LogStudentButton_SearchName.clicked.connect(self.searchNameStudentLog)
+
+        self.LogStudentButton_SearchID = QtGui.QPushButton(self.StudentTab)
+        self.LogStudentButton_SearchID.setGeometry(QtCore.QRect(320, 360, 75, 23))
+        self.LogStudentButton_SearchID.setObjectName(_fromUtf8("LogStudentButton_SearchID"))
+        self.LogStudentButton_SearchID.clicked.connect(self.searchIDStudentLog)
 
         self.LogStaffButton_SearchName = QtGui.QPushButton(self.StaffTab)
         self.LogStaffButton_SearchName.setGeometry(QtCore.QRect(130, 360, 75, 23))
         self.LogStaffButton_SearchName.setObjectName(_fromUtf8("LogStaffButton_SearchName"))
+        self.LogStaffButton_SearchName.clicked.connect(self.searchNameStaffLog)
 
+        self.LogStaffButton_SearchID = QtGui.QPushButton(self.StaffTab)
+        self.LogStaffButton_SearchID.setGeometry(QtCore.QRect(320, 360, 75, 23))
+        self.LogStaffButton_SearchID.setObjectName(_fromUtf8("LogStaffButton_SearchId"))
+        self.LogStaffButton_SearchID.clicked.connect(self.searchIDStaffLog)
 
+        #Log Lists
+        self.LogListWidget_Student = QtGui.QListWidget(self.StudentTab)
+        self.LogListWidget_Student.setGeometry(QtCore.QRect(0, 0, 400, 361))
+        self.LogListWidget_Student.setObjectName(_fromUtf8("LogListWidget_Student"))
+        self.LogListWidget_Student.itemClicked.connect(self.handleviewLogStudent)
 
-        self.LogStaffButton_SearchId = QtGui.QPushButton(self.StaffTab)
-        self.LogStaffButton_SearchId.setGeometry(QtCore.QRect(320, 360, 75, 23))
-        self.LogStaffButton_SearchId.setObjectName(_fromUtf8("LogStaffButton_SearchId"))
-        self.DismissWidget.addTab(self.StaffTab, _fromUtf8(""))
+        self.LogListWidget_Staff = QtGui.QListWidget(self.StaffTab)
+        self.LogListWidget_Staff.setGeometry(QtCore.QRect(0, 0, 400, 361))
+        self.LogListWidget_Staff.setObjectName(_fromUtf8("LogListWidget_Staff"))
+        self.LogListWidget_Staff.itemClicked.connect(self.handleviewLogStaff)
+
+        #Log Tables
+        self.LogTableView_Generic = QtGui.QTableWidget(self.GenericTab)
+        self.LogTableView_Generic.setGeometry(QtCore.QRect(0, 0, 900, 520))
+        self.LogTableView_Generic.setObjectName(_fromUtf8("LogTableView_Generic"))
+        #self.LogTableView_Generic.setEnabled(False)
+
+        self.LogTableView_Student = QtGui.QTableWidget(self.StudentTab)
+        self.LogTableView_Student.setGeometry(QtCore.QRect(398, 0, 500, 421))
+        self.LogTableView_Student.setObjectName(_fromUtf8("LogTableView_Student"))
+        #self.LogTableView_Student.setEnabled(False)
+
+        self.LogTableView_Staff = QtGui.QTableWidget(self.StaffTab)
+        self.LogTableView_Staff.setGeometry(QtCore.QRect(398, 0, 500, 420))
+        self.LogTableView_Staff.setObjectName(_fromUtf8("LogTableView_Staff"))
+        #self.LogTableView_Staff.setEnabled(False)
+
+        #function added at end of log being created to prevent errors
         self.DismissWidget.currentChanged.connect(self.tabControl)
-
-
-
-
-
         #=======================================================
         #student window
         #generic font
@@ -699,7 +708,7 @@ class Ui_MainWindow(object):
         intvalidator = QtGui.QIntValidator()
         regex = QtCore.QRegExp("[a-z-A-Z _]+")
         azvalidator = QtGui.QRegExpValidator(regex)
-        #Labels
+        #Student Labels
         self.StudentLabel_Name = QtGui.QLabel(MainWindow)
         self.StudentLabel_Name.setGeometry(QtCore.QRect(530, 60, 81, 31))
         self.StudentLabel_Name.setFont(font)
@@ -743,7 +752,7 @@ class Ui_MainWindow(object):
         self.StudentLabel_SearchID.setGeometry(QtCore.QRect(310, 680, 91, 16))
         self.StudentLabel_SearchID.setObjectName(_fromUtf8("StudentLabel_SearchID"))
 
-        #textfields
+        #Student Textfields
         self.StudentText_Name = QtGui.QLineEdit(MainWindow)
         self.StudentText_Name.setEnabled(False)
         self.StudentText_Name.setGeometry(QtCore.QRect(650, 60, 241, 31))
@@ -778,13 +787,12 @@ class Ui_MainWindow(object):
         self.StudentText_RFID.setFont(font)
         self.StudentText_RFID.setObjectName(_fromUtf8("StudentText_RFID"))
 
-        #this text is depreciated and needs to be removed everywhere
         self.StudentText_Picture = QtGui.QLineEdit(MainWindow)
         self.StudentText_Picture.setGeometry(QtCore.QRect(650, 410, 241, 31))
         self.StudentText_Picture.setFont(font)
         self.StudentText_Picture.setObjectName(_fromUtf8("StudentText_Picture"))
 
-        #Buttons
+        #Student Buttons
         self.StudentButton_Remove = QtGui.QPushButton(MainWindow)
         self.StudentButton_Remove.setGeometry(QtCore.QRect(330, 830, 111, 23))
         self.StudentButton_Remove.setObjectName(_fromUtf8("StudentButton_Remove"))
@@ -834,7 +842,7 @@ class Ui_MainWindow(object):
         self.StudentButton_SearchID.setGeometry(QtCore.QRect(310, 740, 121, 27))
         self.StudentButton_SearchID.setObjectName(_fromUtf8("StudentButton_SearchID"))
 
-        #Searchfield
+        #Student Searchfield
         self.StudentSearch_ID = QtGui.QLineEdit(MainWindow)
         self.StudentSearch_ID.setGeometry(QtCore.QRect(310, 700, 161, 31))
         self.StudentSearch_ID.setObjectName(_fromUtf8("StudentSearch_ID"))
@@ -859,9 +867,7 @@ class Ui_MainWindow(object):
 
         #=================================================
         #Staff Window
-        # StaffSearch_Name ,
-
-        #Labels
+        #Staff Labels
         self.StaffLabel_Name = QtGui.QLabel(MainWindow)
         self.StaffLabel_Name.setGeometry(QtCore.QRect(550, 60, 81, 31))
         self.StaffLabel_Name.setFont(font)
@@ -994,7 +1000,6 @@ class Ui_MainWindow(object):
         self.StaffView = QtGui.QListWidget(MainWindow)
         self.StaffView.setGeometry(QtCore.QRect(10, 60, 450, 550))
         self.StaffView.setObjectName(_fromUtf8("StaffView"))
-        self.StaffView.itemClicked.connect(self.handleViewDetailStaff)
 
         #logoffbutton
         self.LogOffAdmin_Staff = QtGui.QCommandLinkButton(MainWindow)
@@ -1009,16 +1014,9 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.workerThread.start()
 
-
-
     def confirmsavestudent(self):
         if (self.popupMessage(MainWindow,"Do your really want to edit this student? ")):
             self.handleEditSaveStudent(MainWindow)
-
-    def newOnKeyPressEvent(self,event):
-        if event.key() == QtCore.Qt.Key_Enter :
-            print("enter ")
-            self.MainAdminfunc(MainWindow)
 
     def confirmsavestaff(self):
         if (self.popupMessage(MainWindow,"Do your really want to edit this staff? ")):
@@ -1026,9 +1024,19 @@ class Ui_MainWindow(object):
             self.enableLeftStaff()
 
     def newOnKeyPressEvent(self,event):
-        if event.key() == QtCore.Qt.Key_Enter :
+        if ((event.key() == QtCore.Qt.Key_Enter) and (self.LoginButton.isEnabled())):
             print("enter ")
             self.MainAdminfunc(MainWindow)
+        if (event.key() == QtCore.Qt.Key_1):
+            print("Pressed 1 Idiot :)")
+        if (event.key() == QtCore.Qt.Key_E):
+            print("IM NOT LISTENING")
+        if ((event.key() == QtCore.Qt.Key_1) and (self.LeftClear.isEnabled())):
+            print("Clearing Left Side")
+            self.handleClearLeft()
+        if ((event.key() == QtCore.Qt.Key_2) and (self.RightClear.isEnabled())):
+            print("Clearing Right Side")
+            self.handleClearRight()
 
     def handleBrowse(self):
         global filename
@@ -1038,7 +1046,7 @@ class Ui_MainWindow(object):
         self.StudentLabel_Picture_2.setPixmap(pixmap)
 
     def handleViewDetailStaff(self):
-        print("Bullshit")
+        # print("Bullshit")
         name = self.StaffSearch_Name.text()
         num = self.StaffView.currentRow()
         print(num)
@@ -1057,40 +1065,31 @@ class Ui_MainWindow(object):
         print(os.getcwd())
 
     def retranslateUi(self, MainWindow):
-
-
-
-
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
-        self.label.setText(_translate("MainWindow", "Lane 1", None))
-        self.label_2.setText(_translate("MainWindow", "Lane 2", None))
-        self.pushButton.setText(_translate("MainWindow", "Clear", None))
-        self.pushButton_3.setText(_translate("MainWindow", "Undo", None))
-        self.pushButton_2.setText(_translate("MainWindow", "Clear", None))
-        self.pushButton_4.setText(_translate("MainWindow", "Undo", None))
-        self.StudentButton_Cancel.setText(_translate("Mainwindow","Cancel",None))
-        self.StudentButton_SaveAdd.setText(_translate("Mainwindow", "Save", None))
-        self.StudentButton_SaveEdit.setText(_translate("Mainwindow", "Save", None))
 
+        #Double List View
+        self.LeftListTitle.setText(_translate("MainWindow", "Lane 1", None))
+        self.RightListTitle.setText(_translate("MainWindow", "Lane 2", None))
+        self.LeftClear.setText(_translate("MainWindow", "Clear", None))
+        self.RightClear.setText(_translate("MainWindow", "Clear", None))
+        self.LeftStudentPicture.setText(_translate("MainWindow", "Picture Here", None))
+        self.RightStudentPicture.setText(_translate("MainWindow", "Picture Here", None))
 
-
-
-
+        #Login
         self.Username.setText(_translate("MainWindow", "Username", None))
         self.Password.setText(_translate("MainWindow", "Password", None))
         self.LoginButton.setText(_translate("MainWindow", "Login", None))
-        self.LogOffAdmin1.setText(_translate("MainWindow", "Log Off", None))
-        self.LogOffstaff.setText(_translate("MainWindow", "Log Off", None))
+        self.LogOffAdmin1.setText(_translate("MainWindow", "Log Off Admin 1", None))
+        self.LogOffStaff.setText(_translate("MainWindow", "Log Off Staff", None))
 
         #Log
         self.LogButton_Exit.setText(_translate("MainWindow", "Exit", None))
-
         self.LogButton_Generate.setText(_translate("Dismissal", "Generate", None))
         self.LogButton_Exit.setText(_translate("Dismissal", "Exit", None))
         self.LogLabel_Title.setText(_translate("Dismissal", "Dismissal Log", None))
         self.LogLabel_Start.setText(_translate("Dismissal", "Start Date", None))
         self.LogLabel_End.setText(_translate("Dismissal", "End Date", None))
-        self.LogOffAdmin2.setText(_translate("Dismissal", "Log Off2", None))
+        self.LogOffAdmin2.setText(_translate("Dismissal", "Log Off Admin 2", None))
         self.DismissWidget.setTabText(self.DismissWidget.indexOf(self.GenericTab), _translate("Dismissal", "Generic Report", None))
         self.LogStudentLabel_SearchName.setText(_translate("Dismissal", "Search Name:", None))
         self.LogStudentLogLabel_SearchID.setText(_translate("Dismissal", "Search ID:", None))
@@ -1100,14 +1099,8 @@ class Ui_MainWindow(object):
         self.LogStaffLabel_SearchName.setText(_translate("Dismissal", "Search Name:", None))
         self.LogStaffLabel_SearchID.setText(_translate("Dismissal", "Search ID:", None))
         self.LogStaffButton_SearchName.setText(_translate("Dismissal", "Search", None))
-        self.LogStaffButton_SearchId.setText(_translate("Dismissal", "Search", None))
+        self.LogStaffButton_SearchID.setText(_translate("Dismissal", "Search", None))
         self.DismissWidget.setTabText(self.DismissWidget.indexOf(self.StaffTab), _translate("Dismissal", "Staff Report", None))
-        self.LogStaffButton_SearchId.clicked.connect(self.searchIDStaffLog)
-        self.LogStaffButton_SearchName.clicked.connect(self.searchNameStaffLog)
-        self.LogStudentButton_SearchID.clicked.connect(self.searchIDStudentLog)
-        self.LogStudentButton_SearchName.clicked.connect(self.searchNameStudentLog)
-
-        #self.LogOffAdminStudent.setText(_translate("MainWindow", "Log Off", None))
 
         #mainadmin
         self.EditStudent.setText(_translate("MainWindow", "Edit Student", None))
@@ -1119,6 +1112,7 @@ class Ui_MainWindow(object):
         self.adminlabel_staff.setText(_translate("MainWindow", "Add/Remove/Delete Staff", None))
         self.adminlabel_log.setText(_translate("MainWindow", "Student log generator", None))
         self.adminlabel_checkout.setText(_translate("MainWindow", "Ordinary Checkout staff", None))
+
         # Student window
         self.StudentLabel_Grade.setText(_translate("MainWindow", "Grade Number:", None))
         self.StudentLabel_ID.setText(_translate("MainWindow", "Student ID:", None))
@@ -1127,18 +1121,20 @@ class Ui_MainWindow(object):
         self.StudentButton_Remove.setText(_translate("MainWindow", "Remove Student", None))
         self.StudentButton_Exit.setText(_translate("MainWindow", "Exit", None))
         self.StudentButton_Edit.setText(_translate("MainWindow", "Edit Student", None))
-        self.LogOffAdmin.setText(_translate("MainWindow", "Log Off", None))
+        self.LogOffAdmin.setText(_translate("MainWindow", "Log Off Admin", None))
         self.StudentLabel_Name.setText(_translate("MainWindow", "Full Name:", None))
         self.StudentLabel_Picture.setText(_translate("MainWindow", "Picture:", None))
         self.StudentLabel_SearchName.setText(_translate("MainWindow", "Search Name:", None))
         self.StudentLabel_RFID.setText(_translate("MainWindow", "Tag ID:", None))
         self.StudentButton_Add.setText(_translate("MainWindow", "Add Student", None))
         self.StudentLabel_GName.setText(_translate("MainWindow", "Guardian:", None))
-        #self.StudentButton_ViewDetails.setText(_translate("MainWindow", "View Details", None))
         self.StudentButton_SearchName.setText(_translate("MainWindow", "Search By Name", None))
         self.StudentButton_SearchName.clicked.connect(self.searchByName)
         self.StudentButton_SearchID.setText(_translate("MainWindow", "Search By ID", None))
         self.StudentButton_SearchID.clicked.connect(self.searchByID)
+        self.StudentButton_Cancel.setText(_translate("Mainwindow", "Cancel", None))
+        self.StudentButton_SaveAdd.setText(_translate("Mainwindow", "Save", None))
+        self.StudentButton_SaveEdit.setText(_translate("Mainwindow", "Save", None))
 
 
         #staff Window
@@ -1147,7 +1143,7 @@ class Ui_MainWindow(object):
         self.StaffButton_Add.setText(_translate("MainWindow", "Add Staff", None))
         self.StaffButton_Remove.setText(_translate("MainWindow", "Remove Staff", None))
         self.StudentLabel_SearchName.setText(_translate("MainWindow", "Search Name:", None))
-        self.LogOffAdmin_Staff.setText(_translate("MainWindow", "Log Off", None))
+        self.LogOffAdmin_Staff.setText(_translate("MainWindow", "Log Off Admin Staff", None))
         self.StaffLabel_Name.setText(_translate("MainWindow", "Full Name:", None))
         self.StaffButton_Exit.setText(_translate("MainWindow", "Exit", None))
         self.StaffButton_Edit.setText(_translate("MainWindow", "Edit Staff", None))
@@ -1160,11 +1156,20 @@ class Ui_MainWindow(object):
         self.hideall()
         self.showLogin()
 
+    def updateLeftPicture(self):
+        self.LeftStudentPicture.setPixmap(self.listItemToPicture(self.LeftList.currentItem().text()))
+
+    def updateRightPicture(self):
+        self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.currentItem().text()))
+
     def tabControl(self):
-        print(self.DismissWidget.currentIndex)
-        print(self.DismissWidget.indexOf)
+        self.redrawTables()
 
-
+    def redrawTables(self):
+        print("Generate Clicked")
+        self.handleviewLogStudent()
+        self.handleviewLogStaff()
+        Sys.showLogData()
 
     def searchIDStudentLog(self):
         result = []
@@ -1179,17 +1184,26 @@ class Ui_MainWindow(object):
     def searchNameStaffLog(self):
         result = []
         name = self.LogStaffText_SearchName.text()
+
         result = Sys.searchByNameStaff(name)
+        ui.LogListWidget_Staff.clear()
+        if len(result) == 0:
+            result = Sys.staffList
         for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i])
+            item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Staff.addItem(item)
 
     def searchIDStaffLog(self):
         result = []
         id = self.LogStaffText_SearchID.text()
-        result = Sys.searchByIdStaff(id)
+        if id == "":
+            result = Sys.staffList
+        else:
+            result = Sys.searchByIdStaff(id)
+        ui.LogListWidget_Staff.clear()
+
         for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i])
+            item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Staff.addItem(item)
 
     def searchByName(self):
@@ -1313,60 +1327,50 @@ class Ui_MainWindow(object):
 
     def ShowStudentLogFunc(self):
         self.hideall()
-        #self.LoginTitle.show()
         self.LogButton_Exit.show()
         self.LogButton_Generate.show()
-        #self.Login_uname.show()
-        #self.LoginButton.show()
         self.LogLabel_End.show()
         self.LogLabel_Start.show()
-
         self.LogTableView_Staff.show()
         self.LogListWidget_Staff.show()
         self.LogListWidget_Student.show()
-        self.LogTreeView_Student.show()
-        self.LogTreeView_Generic.show()
-        # self.LogStudentButton_SearchID.hide()
+        self.LogTableView_Student.show()
+        self.LogTableView_Generic.show()
         self.LogStudentButton_SearchName.show()
         self.LogStudentLabel_SearchName.show()
         self.LogStudentLogLabel_SearchID.show()
         self.LogStudentText_SearchID.show()
         self.LogStudentText_SearchName.show()
-
-        self.LogStaffButton_SearchId.show()
+        self.LogStaffButton_SearchID.show()
         self.LogStaffButton_SearchName.show()
         self.LogStaffLabel_SearchName.show()
-        # self.LogStaffLogLabel_SearchID.hide()
         self.LogStaffText_SearchID.show()
         self.LogStaffText_SearchName.show()
-
         self.LogStaffLabel_SearchID.show()
-        self.LogStaffButton_SearchId.show()
+        self.LogStaffButton_SearchID.show()
         self.LogStaffButton_SearchName.show()
-        self.LogTreeView_Generic.show()
-        self.LogTreeView_Student.show()
+        self.LogTableView_Generic.show()
+        self.LogTableView_Student.show()
         self.LogStudentButton_SearchID.show()
         self.DismissWidget.show()
         self.LogOffAdmin2.show()
         self.StartDateEdit.show()
         self.EndDateEdit.show()
-
         self.LogLabel_Title.show()
         self.LogListWidget_Staff.show()
-        #self.LogOffAdmin.show()
-
-        #self.LogOffstaff.show()
-
-        self.LogStaffButton_SearchId.show()
+        self.LogStaffButton_SearchID.show()
         Sys.showLogData()
 
     def searchNameStudentLog(self):
         print("A")
         result = []
+
+        print(sDate,eDate)
         name = str(self.LogStudentText_SearchName.text())
         result = Sys.searchByName(name)
         print(result)
         ui.LogListWidget_Student.clear()
+
         for i in range(0, len(result)):
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Student.addItem(item)
@@ -1406,14 +1410,6 @@ class Ui_MainWindow(object):
             ui.StudentView.addItem(item)
 
         self.StudentView.show()
-
-        # temp = self.StudentSearch_ID.text()
-        # if(temp != ''):
-        #     for i in range(0, len(data)):
-        #         if(data[3] == int(temp)):
-        #             name = data[i][0] + " " + data[i][1]
-        #             item = QtGui.QListWidgetItem(name)
-        #             self.StudentSearch_ID.scrollToItem()
         self.StudentSearch_ID.show()
         self.StudentSearch_Name.show()
 
@@ -1426,6 +1422,8 @@ class Ui_MainWindow(object):
         self.LogOffAdminStudent.show()
 
     def hideall(self):
+        #comment out to make things work again
+        #self.disableAll()
         #log hide
         self.LoginTitle.hide()
         self.LogButton_Exit.hide()
@@ -1434,50 +1432,40 @@ class Ui_MainWindow(object):
         self.LoginButton.hide()
         self.LogLabel_End.hide()
         self.LogLabel_Start.hide()
-
         self.LogTableView_Staff.hide()
         self.LogListWidget_Staff.hide()
         self.LogListWidget_Student.hide()
-        self.LogTreeView_Student.hide()
-        self.LogTreeView_Generic.hide()
+        self.LogTableView_Student.hide()
+        self.LogTableView_Generic.hide()
         #self.LogStudentButton_SearchID.hide()
         self.LogStudentButton_SearchName.hide()
         self.LogStudentLabel_SearchName.hide()
         self.LogStudentLogLabel_SearchID.hide()
         self.LogStudentText_SearchID.hide()
         self.LogStudentText_SearchName.hide()
-
-
-        self.LogStaffButton_SearchId.hide()
+        self.LogStaffButton_SearchID.hide()
         self.LogStaffButton_SearchName.hide()
         self.LogStaffLabel_SearchName.hide()
         #self.LogStaffLogLabel_SearchID.hide()
         self.LogStaffText_SearchID.hide()
         self.LogStaffText_SearchName.hide()
-
         self.LogStaffLabel_SearchID.hide()
-        self.LogStaffButton_SearchId.hide()
+        self.LogStaffButton_SearchID.hide()
         self.LogStaffButton_SearchName.hide()
-        self.LogTreeView_Generic.hide()
-        self.LogTreeView_Student.hide()
+        self.LogTableView_Generic.hide()
+        self.LogTableView_Student.hide()
         self.LogStudentButton_SearchID.hide()
         self.DismissWidget.hide()
         self.LogOffAdmin2.hide()
         self.StartDateEdit.hide()
         self.EndDateEdit.hide()
-
-
         self.LogLabel_Title.hide()
         self.LogListWidget_Staff.hide()
         self.LogOffAdmin.hide()
-
-        self.LogOffstaff.hide()
-
-        self.LogStaffButton_SearchId.hide()
+        self.LogOffStaff.hide()
+        self.LogStaffButton_SearchID.hide()
         self.LoginTitle.hide()
-        self.LoginTitle.hide()
-        self.LoginTitle.hide()
-        self.LoginTitle.hide()
+        self.LogButton_Exit.hide()
 
         #staff hide
 
@@ -1490,17 +1478,18 @@ class Ui_MainWindow(object):
         self.StaffButton_Cancel.hide()
         self.StaffSearch_ID.hide()
         self.StaffSearch_Name.hide()
-        self.LogOffstaff.hide()
+        self.LogOffStaff.hide()
 
         #listview hide
-        self.label.hide()
-        self.label_2.hide()
-        self.pushButton.hide()
-        self.pushButton_3.hide()
-        self.pushButton_2.hide()
-        self.pushButton_4.hide()
-        self.listWidget.hide()
-        self.listWidget_2.hide()
+        self.LeftListTitle.hide()
+        self.RightListTitle.hide()
+        self.LeftClear.hide()
+        self.RightClear.hide()
+        self.LeftList.hide()
+        self.RightList.hide()
+        self.LeftStudentPicture.hide()
+        self.RightStudentPicture.hide()
+        self.SplittingLine.hide()
 
         #login hide
         self.Username.hide()
@@ -1525,10 +1514,6 @@ class Ui_MainWindow(object):
         self.adminlabel_log.hide()
         self.adminlabel_checkout.hide()
         self.StudentCheckout.hide()
-
-        #for log
-        self.LogButton_Exit.hide()
-        #self.LogOffAdminStudent.hide()
 
         #hide all student window
         self.StudentButton_Picture.hide()
@@ -1583,17 +1568,135 @@ class Ui_MainWindow(object):
         self.StudentButton_Cancel.hide()
         self.StudentButton_SaveEdit.hide()
 
+    def disableAll(self):
+        #log
+        #log all
+        self.LogOffAdmin.setEnabled(False)
+        self.LogOffAdmin2.setEnabled(False)
+        self.LogButton_Exit.setEnabled(False)
+        self.StartDateEdit.setEnabled(False)
+        self.EndDateEdit.setEnabled(False)
+        self.LogButton_Generate.setEnabled(False)
+        self.DismissWidget.setEnabled(False)
+        #log generic
+        self.LogTableView_Generic.setEnabled(False)
+        #log student
+        self.LogListWidget_Student.setEnabled(False)
+        self.LogTableView_Student.setEnabled(False)
+        self.LogStudentText_SearchName.setEnabled(False)
+        self.LogStudentText_SearchID.setEnabled(False)
+        self.LogStudentButton_SearchName.setEnabled(False)
+        self.LogStudentButton_SearchID.setEnabled(False)
+        #log staff
+        self.LogTableView_Staff.setEnabled(False)
+        self.LogListWidget_Staff.setEnabled(False)
+        self.LogStaffText_SearchName.setEnabled(False)
+        self.LogStaffText_SearchID.setEnabled(False)
+        self.LogStaffButton_SearchName.setEnabled(False)
+        self.LogStaffButton_SearchID.setEnabled(False)
+
+        #staff
+        #staff textfields
+        self.StaffText_Name.setEnabled(False)
+        self.StaffText_ID.setEnabled(False)
+        self.StaffText_Email.setEnabled(False)
+        self.StaffText_Pass.setEnabled(False)
+        self.StaffText_CPass.setEnabled(False)
+        self.StaffSearch_Name.setEnabled(False)
+        self.StaffSearch_ID.setEnabled(False)
+        #staff buttons
+        self.StaffButton_SearchName.setEnabled(False)
+        self.StaffButton_SearchID.setEnabled(False)
+        self.StaffButton_SaveAdd.setEnabled(False)
+        self.StaffButton_SaveEdit.setEnabled(False)
+        self.StaffButton_Cancel.setEnabled(False)
+        self.StaffButton_Add.setEnabled(False)
+        self.StaffButton_Edit.setEnabled(False)
+        self.StaffButton_Remove.setEnabled(False)
+        self.StaffButton_Promote.setEnabled(False)
+        self.StaffButton_Exit.setEnabled(False)
+        self.LogOffStaff.setEnabled(False)
+        self.LogOffAdmin_Staff.setEnabled(False)
+        #staff lists
+        self.StaffView.setEnabled(False)
+
+        #listview
+        #listview buttons
+        self.LeftClear.setEnabled(False)
+        self.RightClear.setEnabled(False)
+        #listview lists
+        self.LeftList.setEnabled(False)
+        self.RightList.setEnabled(False)
+
+        #login
+        self.LoginButton.setEnabled(False)
+        self.Login_uname.setEnabled(False)
+        self.Login_password.setEnabled(False)
+
+        # hiding main admin page
+        self.EditStudent.hide()
+        self.EditStaff.hide()
+        self.StudentLog.hide()
+        self.EditStudent.hide()
+        self.StudentLog.hide()
+        self.LogOffAdmin1.hide()
+        self.adminlabel_welcome.hide()
+        self.adminlabel_student.hide()
+        self.adminlabel_staff.hide()
+        self.adminlabel_log.hide()
+        self.adminlabel_checkout.hide()
+        self.StudentCheckout.hide()
+
+        #student
+        #student textfields
+        self.StudentText_Name.setEnabled(False)
+        self.StudentText_ID.setEnabled(False)
+        self.StudentText_Grade.setEnabled(False)
+        self.StudentText_GName.setEnabled(False)
+        self.StudentText_RFID.setEnabled(False)
+        self.StudentSearch_Name.setEnabled(False)
+        self.StudentSearch_ID.setEnabled(False)
+        #student buttons
+        self.StudentButton_SaveAdd.setEnabled(False)
+        self.StudentButton_SaveEdit.setEnabled(False)
+        self.StudentButton_SearchName.setEnabled(False)
+        self.StudentButton_SearchID.setEnabled(False)
+        self.StudentButton_Add.setEnabled(False)
+        self.StudentButton_Edit.setEnabled(False)
+        self.StudentButton_Remove.setEnabled(False)
+        self.StudentButton_Exit.setEnabled(False)
+        self.LogOffAdmin.setEnabled(False)
+        #student lists
+        self.StudentView.setEnabled(False)
+
+    def enableListview(self):
+        self.LeftClear.setEnabled(True)
+        self.RightClear.setEnabled(True)
+        self.LeftList.setEnabled(True)
+        self.RightList.setEnabled(True)
+        self.LogOffStaff.setEnabled(True)
+
+    def enableLogin(self):
+        self.LoginButton.setEnabled(True)
+        self.Login_uname.setEnabled(True)
+        self.Login_password.setEnabled(True)
+
     def showMain(self):
-        #show for main
-        self.label.show()
-        self.label_2.show()
-        self.pushButton.show()
-        self.pushButton_3.show()
-        self.pushButton_2.show()
-        self.pushButton_4.show()
-        self.listWidget.show()
-        self.listWidget_2.show()
-        self.LogOffstaff.show()
+        self.hideall()
+        self.enableListview()
+        #show main application
+        self.LeftListTitle.show()
+        self.RightListTitle.show()
+        self.LeftClear.show()
+        self.RightClear.show()
+        self.LeftList.show()
+        self.RightList.show()
+        self.LeftStudentPicture.show()
+        self.RightStudentPicture.show()
+        self.SplittingLine.show()
+        self.LogOffStaff.show()
+        self.LeftClear.raise_()
+        self.LeftList.raise_()
 
     def showMainAdmin(self):
         #show admin page
@@ -1609,6 +1712,7 @@ class Ui_MainWindow(object):
         self.StudentCheckout.show()
 
     def showLogin(self):
+        self.enableLogin()
         self.Username.show()
         self.Password.show()
         self.LoginButton.show()
@@ -1616,22 +1720,47 @@ class Ui_MainWindow(object):
         self.Login_uname.show()
         self.Login_password.show()        
 
-    def handleClear1(self):
-        items = ui.listWidget.count()
-        rangedList = range(items)
-        rangedList = rangedList.__reversed__()
-        for i in rangedList:
-            if ui.listWidget.isItemSelected(ui.listWidget.item(i)) == True:
-                ui.listWidget.takeItem(i)
+    def listItemToPicture(self, item):
+        picture = Sys.searchByName(item)[0].image
+        pixmap = QtGui.QPixmap(picture)
+        return pixmap.scaled(180, 170, QtCore.Qt.KeepAspectRatio)
 
-    def handleClear2(self):
-        items = ui.listWidget_2.count()
+
+    def handleClearLeft(self):
+        items = ui.LeftList.count()
+        if (items == 0):
+            self.popupMessage2(MainWindow, "Cannot remove that which is not there.")
+            return
         rangedList = range(items)
         rangedList = rangedList.__reversed__()
         for i in rangedList:
-            if ui.listWidget_2.isItemSelected(ui.listWidget_2.item(i)) == True:
-                ui.listWidget_2.takeItem(i)
-                break
+            if ui.LeftList.isItemSelected(ui.LeftList.item(i)) == True:
+                item = ui.LeftList.takeItem(i)
+        #reset picture to first student in queue
+        if (len(ui.LeftList) > 0):
+            self.LeftStudentPicture.setPixmap(self.listItemToPicture(self.LeftList.item(0).text()))
+        # remove picture if list is empty
+        else:
+            #doesn't clear picture need an empty picture
+            ui.RightStudentPicture.setText("")
+
+    def handleClearRight(self):
+        items = ui.RightList.count()
+        if (items == 0):
+            self.popupMessage2(MainWindow, "Cannot remove that which is not there.")
+            return
+        rangedList = range(items)
+        rangedList = rangedList.__reversed__()
+        for i in rangedList:
+            if ui.RightList.isItemSelected(ui.RightList.item(i)) == True:
+                ui.RightList.takeItem(i)
+        #reset picture to next student
+        if (len(ui.RightList) > 0):
+            self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.item(0).text()))
+        #remove picture if list is empty
+        else:
+            ui.RightStudentPicture.setText("")
+
 
     def handleViewDetail(self):
         picpath = "../pictures/"
@@ -1798,8 +1927,16 @@ class Ui_MainWindow(object):
                         self.StudentView.repaint()
 
     def handleviewLogStudent(self):
+        conn = connectDB()
+        cur = conn.cursor()
         name = self.LogStudentText_SearchName.text()
         num = self.LogListWidget_Student.currentRow()
+        sDate = ui.StartDateEdit.date()
+        eDate = ui.EndDateEdit.date()
+
+        sDate = sDate.toPyDate()
+        eDate = eDate.toPyDate()
+
         print(num)
         if name == "":
             student = Sys.studentList[num]
@@ -1807,8 +1944,85 @@ class Ui_MainWindow(object):
             result = Sys.searchByName(name)
             print(len(result))
             student = result[num]
-        print(student.Name)
+        print(student.Name,"asd")
+        cur.execute("SELECT * FROM LOG WHERE StudentID = "+ str(student.studentId))
+        dataMain = cur.fetchall()
 
+        data = {'Student ID': [], 'Staff ID': [], 'Date': [], 'Time': []}
+        count = 0
+        print(dataMain)
+        for i in range(0, len(dataMain)):
+            logDate = str(dataMain[i][2]).split(" ")[0]
+            logDate = datetime.datetime.strptime(logDate, '%Y-%m-%d').date()
+            difference = eDate - sDate
+            print(difference)
+            logdiff = logDate - sDate
+            if((logdiff <= difference) and (logdiff >= datetime.timedelta(days=0))):
+                count = count + 1
+                print("Checks out!")
+                print(difference)
+                data['Student ID'].append(str(dataMain[i][0]))
+                data['Staff ID'].append(str(dataMain[i][1]))
+                data['Date'].append(str(logDate))
+                data['Time'].append(str(dataMain[i][2]).split(" ")[1])
+        ui.LogTableView_Student.setColumnCount(4)
+        ui.LogTableView_Student.setRowCount(count)
+        # LogTableView_Generic = QTableWidget(len(dataMain), 4)
+        horHeaders = []
+        for n, key in enumerate(sorted(data.keys())):
+            horHeaders.append(key)
+            for m, item in enumerate(data[key]):
+                newitem = QtGui.QTableWidgetItem(item)
+                ui.LogTableView_Student.setItem(m, n, newitem)
+            ui.LogTableView_Student.setHorizontalHeaderLabels(horHeaders)
+            ui.LogTableView_Student.show()
+
+    def handleviewLogStaff(self):
+        conn = connectDB()
+        cur = conn.cursor()
+        name = self.LogStaffText_SearchName.text()
+        num = self.LogListWidget_Staff.currentRow()
+        sDate = ui.StartDateEdit.date()
+        eDate = ui.EndDateEdit.date()
+
+        sDate = sDate.toPyDate()
+        eDate = eDate.toPyDate()
+
+        print(num)
+        if name == "":
+            staff = Sys.staffList[num]
+        else:
+            result = Sys.searchByNameStaff(name)
+            print(len(result))
+            staff = result[num]
+        cur.execute("SELECT * FROM LOG WHERE StudentID = " + str(staff.staffId))
+        dataMain = cur.fetchall()
+
+        data = {'Student ID': [], 'Staff ID': [], 'Date': [], 'Time': []}
+        count = 0
+        for i in range(0, len(dataMain)):
+            logDate = str(dataMain[i][2]).split(" ")[0]
+            logDate = datetime.datetime.strptime(logDate, '%Y-%m-%d').date()
+            difference = eDate - sDate
+            print(difference)
+            logdiff = logDate - sDate
+            if((logdiff <= difference) and (logdiff >= datetime.timedelta(days=0))):
+                count = count + 1
+                data['Student ID'].append(str(dataMain[i][0]))
+                data['Staff ID'].append(str(dataMain[i][1]))
+                data['Date'].append(str(dataMain[i][2]).split(" ")[0])
+                data['Time'].append(str(dataMain[i][2]).split(" ")[1])
+        ui.LogTableView_Staff.setColumnCount(4)
+        ui.LogTableView_Staff.setRowCount(count)
+        # LogTableView_Generic = QTableWidget(len(dataMain), 4)
+        horHeaders = []
+        for n, key in enumerate(sorted(data.keys())):
+            horHeaders.append(key)
+            for m, item in enumerate(data[key]):
+                newitem = QTableWidgetItem(item)
+                ui.LogTableView_Staff.setItem(m, n, newitem)
+            ui.LogTableView_Staff.setHorizontalHeaderLabels(horHeaders)
+            ui.LogTableView_Staff.show()
 
     def handleEditSaveStudent(self, MainWindow):
         id = self.StudentText_ID.text()
@@ -2133,7 +2347,6 @@ class WorkerThread(QThread):
         serverSocket.listen(5)
         threads = []
         while True:
-
             (clientsocket, address) = serverSocket.accept()
             clientsocket.settimeout(60)
             try:
@@ -2141,29 +2354,43 @@ class WorkerThread(QThread):
                 threads.append(t)
                 t.start()
             except:
+                print("Just keep ignoring it all.")
                 continue
         serverSocket.close()
 
 def client_thread(clientsocket):
     message = clientsocket.recv(2048)
     rfid = message.decode("utf-8")
-    temp = search_query(rfid[2:])
+    (temp, temppic) = search_query(rfid[2:])
     if(rfid[0:2] == "R1"):
         item = QtGui.QListWidgetItem(temp)
-        ui.listWidget.addItem(item)
+        ui.LeftList.addItem(item)
+        if (len(ui.LeftList) == 1):
+            pixmapL = QtGui.QPixmap(temppic)
+            pixmapL = pixmapL.scaled(180, 170, QtCore.Qt.KeepAspectRatio)
+            ui.LeftStudentPicture.setPixmap(pixmapL)
+
     elif(rfid[0:2] == "R2"):
         item = QtGui.QListWidgetItem(temp)
-        ui.listWidget_2.addItem(item)
+        ui.RightList.addItem(item)
+        if (len(ui.RightList) == 1):
+            pixmapR = QtGui.QPixmap(temppic)
+            pixmapR = pixmapR.scaled(180, 170, QtCore.Qt.KeepAspectRatio)
+            ui.RightStudentPicture.setPixmap(pixmapR)
     MainWindow.update()
     clientsocket.close()
+    print("Thread Complete")
 
-placeHolder = [["E2000017571001991550787E", "Kashif Iqbal"], ["E20051860607016213308EA2" ,"Joe Smith"], ["E2000016551401070900BF7D", "Nupur Pandey"], ["E20000175710020015507886", "Bibek"], ["E2005186060701621260955C", "Austin Hasting"], ["E2000016551400980900BF95", "Albaro Tinoco"]]
+picture = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/lin.png"
+wrong = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/student1.jpg"
+placeHolder = [["E2000017571001991550787E", "Kashif Iqbal", picture], ["E20051860607016213308EA2" ,"Joe Smith", picture], ["E2000016551401070900BF7D", "Nupur Pandey", picture], ["E20000175710020015507886", "Bibek", picture], ["E2005186060701621260955C", "Austin Hastings", wrong], ["E2000016551400980900BF95", "Albaro Tinoco", wrong]]
 
 def search_query(rfid):
     for i in range(0, len(placeHolder)):
         if rfid == placeHolder[i][0]:
-            return placeHolder[i][1]
+            return (placeHolder[i][1], placeHolder[i][2])
     return "Not Found!"
+
 
 app = QtGui.QApplication(sys.argv)
 MainWindow = QtGui.QMainWindow()
