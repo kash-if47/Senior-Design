@@ -12,6 +12,8 @@ import pymysql
 import datetime
 
 filename = ""
+searchStaffStatus = 0
+searchStudentStatus = 0
 
 def connectDB():
     conn = pymysql.connect(host='localhost', port=3306, user='root', passwd='rfid1234', db='rfid')
@@ -35,6 +37,8 @@ class System(object):
     studentList = []
     staffList = []
     logList = []
+    TagNamePicList = []
+
 
     def __init__(self):
         try:
@@ -55,11 +59,11 @@ class System(object):
             data2 = cur.fetchall()
             for i in range(0, len(data2)):
                 fName = data2[i][0]
-                email = data2[i][1]
+                Email = data2[i][1]
                 password = data2[i][2]
                 staffId = data2[i][3]
                 isAdmin = data2[i][4]
-                staff = Staff(staffId, fName, email, password, isAdmin)
+                staff = Staff(staffId, fName, Email, password, isAdmin)
                 self.staffList.append(staff)
 
             temp = cur.execute("SELECT * FROM LOG")
@@ -94,28 +98,37 @@ class System(object):
     def searchByName(self, name):
         print(str(len(self.studentList)))
         result = []
+        name = name.lower()
+
         for i in range(0, len(self.studentList)):
             fullName = self.studentList[i].Name
+            fullName = fullName.lower()
+
             if name in fullName:
-                print("found " + fullName)
+                #print("found " + fullName)
                 result.append(self.studentList[i])
         return result
 
     def searchByNameStaff(self, name):
+        print("search staff name")
+        searchStaffStatus=1
         result = []
+        name = name.lower()
         for i in range(0, len(self.staffList)):
             fullName = self.staffList[i].Name
+            fullName = fullName.lower()
             if name in fullName:
-                print("found " + fullName)
+                #print("found " + fullName)
                 result.append(self.staffList[i])
         return result
 
     def searchByID(self, id):
+
         result = []
         for i in range(0, len(self.studentList)):
             idval = self.studentList[i].studentId
             if int(id) == int(idval) :
-                print("found " + id)
+                #print("found " + id)
                 result.append(self.studentList[i])
         if(len(result) == 0):
             print("not found")
@@ -123,10 +136,12 @@ class System(object):
 
     def searchByIdStaff(self, id):
         result = []
+        print("search staff id")
+        print(searchStaffStatus)
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
             if int(id) == int(idval) :
-                print("found " + id)
+                #print("found " + id)
                 result.append(self.staffList[i])
         if(len(result) == 0):
             print("not found")
@@ -137,7 +152,7 @@ class System(object):
         for i in range(0, len(self.studentList)):
             idval = self.studentList[i].studentId
             if int(id) == idval:
-                print("found " + id)
+                #print("found " + id)
                 result = True
 
         return result
@@ -147,9 +162,22 @@ class System(object):
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
             if int(id) == idval:
-                print("found " + id)
+                #print("found " + id)
                 result = True
         return result
+
+    def getTagNamePic(self):
+        conn = connectDB()
+        cur = conn.cursor()
+        temp = cur.execute("SELECT * FROM student")
+        data = cur.fetchall()
+        for i in range(0, len(data)):
+            Name = data[i][0]
+            tagId = data[i][1]
+            pic = data[i][5]
+            tnp = TagNamePic(tagId,Name, pic)
+            print(tnp)
+            self.TagNamePicList.append(tnp)
 
     def addnewStudent(self,name,id,rfid,gname,pic,grade):
         conn = connectDB()
@@ -160,11 +188,11 @@ class System(object):
         conn.commit()
         conn.close()
 
-    def addnewStaff(self,name,id,email,password,is_admin):
+    def addnewStaff(self,name,id,Email,password,is_admin):
         conn = connectDB()
         cur = conn.cursor()
         query3 = "INSERT INTO STAFF (Fname, Email, Password, StaffID, isAdmin) VALUES (%s,%s,%s,%s,%s);"
-        queryval = (name, email, password, id, is_admin)
+        queryval = (name, Email, password, id, is_admin)
         addq = cur.execute(query3,queryval)
         conn.commit()
         conn.close()
@@ -174,15 +202,16 @@ class System(object):
             idval = self.studentList[i].studentId
             print(idval)
             if int(id) == int(idval):
-                print("found " + id)
+                #print("found " + id)
                 del self.studentList[i]
+                break
 
     def removeStaff(self,id,user):
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
             print(idval)
             if int(id) == int(idval):
-                print("found " + id)
+                #print("found " + id)
                 if(user == self.staffList[i].Email):
                     print("Removal Denied")
                     return 0
@@ -196,8 +225,10 @@ class System(object):
             idval = self.staffList[i].staffId
             if int(id) == int(idval):
                 if (self.staffList[i].isAdmin):
+                    print("Already Admin")
                     return True
                 else:
+                    print("Not Admin")
                     return False
 
 
@@ -222,22 +253,23 @@ class System(object):
 
         conn.close()
 
-    def editStaff(self,name,email,password,id):
+    def editStaff(self,name,Email,password,id):
 
         conn = connectDB()
         cur = conn.cursor()
-        cur.execute ("""   UPDATE staff  SET Fname=%s, Email=%s, Password=%s  WHERE StaffID=%s""", (name, email, password, id,))
+        cur.execute ("""   UPDATE staff  SET Fname=%s, Email=%s, Password=%s  WHERE StaffID=%s""", (name, Email, password, id,))
         conn.commit()
         temp = cur.execute("SELECT * FROM staff")
+        print(str(temp) + " This is temp" )
         data = cur.fetchall()
         self.staffList = []
         for i in range(0, len(data)):
             fName = data[i][0]
-            email = data[i][1]
+            Email = data[i][1]
             password = data[i][2]
             staffId = data[i][3]
             isAdmin = data[i][4]
-            staff = Staff(staffId, fName, email, password, isAdmin)
+            staff = Staff(staffId, fName, Email, password, isAdmin)
             self.staffList.append(staff)
 
         conn.close()
@@ -330,16 +362,29 @@ class Student(object):
 class Staff(object):
     staffId = 0
     Name = ""
-    email = ""
+    Email = ""
     password = ""
     isAdmin = 0
 
-    def __init__(self, staffId, Name, email, password, isAdmin):
+    def __init__(self, staffId, Name, Email, password, isAdmin):
         self.staffId = staffId
         self.Name = Name
-        self.email = email
+        self.Email = Email
         self.password = password
         self.isAdmin = isAdmin
+
+
+class TagNamePic(object):
+    Tag = ""
+    Name = ""
+    Pic = ""
+
+
+    def __init__(self, Tag, Name, Pic):
+        self.Tag = Tag
+        self.Name = Name
+        self.Pic = Pic
+
 
 
 class Log(object):
@@ -416,14 +461,7 @@ class Ui_MainWindow(object):
         self.SplittingLine.setFrameShadow(QtGui.QFrame.Sunken)
         self.SplittingLine.setObjectName(_fromUtf8("SplittingLine"))
 
-        # self.centralwidget = QtGui.QWidget(MainWindow)
-        # self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        # self.gridLayout = QtGui.QGridLayout(self.centralwidget)
-        # self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        #
-        # MainWindow.setCentralWidget(self.centralwidget)
         MainWindow.keyPressEvent = self.newOnKeyPressEvent
-
         #=======================================================
         #login Page
         self.Username = QtGui.QLabel(MainWindow)
@@ -745,7 +783,7 @@ class Ui_MainWindow(object):
         self.StudentLabel_Picture_2.setObjectName(_fromUtf8("StudentLabel_Picture_2"))
 
         self.StudentLabel_SearchName = QtGui.QLabel(MainWindow)
-        self.StudentLabel_SearchName.setGeometry(QtCore.QRect(10, 700, 31, 16))
+        self.StudentLabel_SearchName.setGeometry(QtCore.QRect(10, 680, 91, 16))
         self.StudentLabel_SearchName.setObjectName(_fromUtf8("StudentLabel_SearchName"))
 
         self.StudentLabel_SearchID = QtGui.QLabel(MainWindow)
@@ -1000,6 +1038,7 @@ class Ui_MainWindow(object):
         self.StaffView = QtGui.QListWidget(MainWindow)
         self.StaffView.setGeometry(QtCore.QRect(10, 60, 450, 550))
         self.StaffView.setObjectName(_fromUtf8("StaffView"))
+        self.StaffView.itemClicked.connect(self.handleViewDetailStaff)
 
         #logoffbutton
         self.LogOffAdmin_Staff = QtGui.QCommandLinkButton(MainWindow)
@@ -1019,12 +1058,22 @@ class Ui_MainWindow(object):
             self.handleEditSaveStudent(MainWindow)
 
     def confirmsavestaff(self):
-        if (self.popupMessage(MainWindow,"Do your really want to edit this staff? ")):
-            self.handleEditSaveStaff(MainWindow)
-            self.enableLeftStaff()
+        password1 = self.StaffText_Pass.text()
+        password2 = self.StaffText_CPass.text()
+
+
+
+
+
+        if(password1 == password2):
+            if (self.popupMessage(MainWindow,"Do your really want to edit this staff? ")):
+                self.handleEditSaveStaff(MainWindow)
+                self.enableLeftStaff()
+        else:
+            self.popupMessage2(MainWindow, "Password do not match. ")
 
     def newOnKeyPressEvent(self,event):
-        if ((event.key() == QtCore.Qt.Key_Enter) and (self.LoginButton.isEnabled())):
+        if (((event.key() == QtCore.Qt.Key_Enter) or (event.key() == QtCore.Qt.Key_Return)) and (self.LoginButton.isEnabled())):
             print("enter ")
             self.MainAdminfunc(MainWindow)
         if (event.key() == QtCore.Qt.Key_1):
@@ -1046,21 +1095,31 @@ class Ui_MainWindow(object):
         self.StudentLabel_Picture_2.setPixmap(pixmap)
 
     def handleViewDetailStaff(self):
-        # print("Bullshit")
         name = self.StaffSearch_Name.text()
         num = self.StaffView.currentRow()
-        print(num)
-        if name == "":
-            staff = Sys.staffList[num]
-        else:
-            result = Sys.searchByNameStaff(name)
-            print(len(result))
-            staff = result[num]
+        id = self.StaffSearch_ID.text()
+        print(searchStaffStatus,"****")
+        staff = []
+        if(searchStaffStatus == 2):
+            print("search id")
+            if id == "":
+                staff = Sys.staffList[num]
 
-        self.StaffText_Email.setText(str(staff.email))
+            else:
+                result = Sys.searchByIdStaff(id)
+                staff = result[num]
+
+        else:
+            if name == "":
+                staff = Sys.staffList[num]
+            else:
+                result = Sys.searchByNameStaff(name)
+                print(len(result))
+                staff = result[num]
+
+        self.StaffText_Email.setText(str(staff.Email))
         self.StaffText_ID.setText(str(staff.staffId))
         self.StaffText_Name.setText(staff.Name)
-        # QtCoreApplication::processEvents()
         print("Do nothing")
         print(os.getcwd())
 
@@ -1207,6 +1266,9 @@ class Ui_MainWindow(object):
             ui.LogListWidget_Staff.addItem(item)
 
     def searchByName(self):
+        global searchStudentStatus
+        searchStaffStatus = 1
+
         name = self.StudentSearch_Name.text()
         result = Sys.searchByName(name)
         print(result)
@@ -1217,6 +1279,9 @@ class Ui_MainWindow(object):
         self.StudentView.show()
 
     def searchByNameStaff(self):
+        global searchStaffStatus
+        searchStaffStatus = 1
+
         name = self.StaffSearch_Name.text()
         result = Sys.searchByNameStaff(name)
         ui.StaffView.clear()
@@ -1226,6 +1291,9 @@ class Ui_MainWindow(object):
         self.StaffView.show()
 
     def searchByIdStaff(self):
+        global searchStaffStatus
+        searchStaffStatus = 2
+
         id = self.StaffSearch_ID.text()
         if id == "":
             result = Sys.staffList
@@ -1282,6 +1350,9 @@ class Ui_MainWindow(object):
         self.StudentSearch_ID.setEnabled(False)
 
     def searchByID(self):
+        global searchStudentStatus
+        searchStudentStatus = 2
+
         id = self.StudentSearch_ID.text()
 
         if id == "":
@@ -1388,7 +1459,7 @@ class Ui_MainWindow(object):
         self.LogOffAdmin.show()
         self.StudentLabel_Name.show()
         self.StudentLabel_Picture.show()
-        self.StudentLabel_SearchName.show()
+        #self.StudentLabel_SearchName.show()
         self.StudentLabel_RFID.show()
         self.StudentButton_Add.show()
         self.StudentLabel_GName.show()
@@ -1403,6 +1474,9 @@ class Ui_MainWindow(object):
         self.StudentText_Picture.hide()
         self.StudentButton_Picture.show()
         self.StudentText_RFID.show()
+        self.StudentLabel_SearchName.show()
+
+
 
         result = Sys.getStudentNames()
         for i in range(0, len(result)):
@@ -1697,6 +1771,8 @@ class Ui_MainWindow(object):
         self.LogOffStaff.show()
         self.LeftClear.raise_()
         self.LeftList.raise_()
+        self.RightClear.raise_()
+        self.RightList.raise_()
 
     def showMainAdmin(self):
         #show admin page
@@ -1724,7 +1800,6 @@ class Ui_MainWindow(object):
         picture = Sys.searchByName(item)[0].image
         pixmap = QtGui.QPixmap(picture)
         return pixmap.scaled(180, 170, QtCore.Qt.KeepAspectRatio)
-
 
     def handleClearLeft(self):
         items = ui.LeftList.count()
@@ -1761,22 +1836,29 @@ class Ui_MainWindow(object):
         else:
             ui.RightStudentPicture.setText("")
 
-
     def handleViewDetail(self):
         picpath = "../pictures/"
         # item = self.StudentView.currentItem().text()
         # print(item)
         name = self.StudentSearch_Name.text()
         num = self.StudentView.currentRow()
+        id = self.StudentSearch_ID.text()
+        student =[]
         print(num)
-        if name == "":
-            student = Sys.studentList[num]
+        if searchStudentStatus == 2:
+            if id =="":
+                student = Sys.studentList[num]
+            else:
+                student = Sys.searchByID(id)
+                student = student[num]
         else:
-            result = Sys.searchByName(name)
-            print(len(result))
-            student = result[num]
+            if name == "":
+                student = Sys.studentList[num]
+            else:
+                result = Sys.searchByName(name)
+                print(len(result))
+                student = result[num]
 
-        print(student.image)
         self.StudentText_GName.setText(student.guardian)
         self.StudentText_Grade.setText(str(student.grade))
         self.StudentText_ID.setText(str(student.studentId))
@@ -1819,31 +1901,34 @@ class Ui_MainWindow(object):
                 self.popupMessage(MainWindow,"This student id already exist.")
             if not result:
                 if (self.popupMessage(MainWindow, "Are you sure the information is correct? ")):
+                    if (filename == destination):
+                        print("File already exists")
+                    else:
                         shutil.copy(filename, destination)
-                        Sys.studentList.append(Student(name,int(id),rfid,gname,pic,int(grade)))
-                        Sys.addnewStudent(name,int(id),rfid,gname,pic,int(grade))
-                        self.searchByName()
-                        print("Input validated")
-                        print("Save1 Clicked")
-                        self.enable()
-                        self.StudentView.setEnabled(True)
-                        self.StudentButton_Exit.setEnabled(True)
+                    Sys.studentList.append(Student(name,int(id),rfid,gname,pic,int(grade)))
+                    Sys.addnewStudent(name,int(id),rfid,gname,pic,int(grade))
+                    self.searchByName()
+                    print("Input validated")
+                    print("Save1 Clicked")
+                    self.enable()
+                    self.StudentView.setEnabled(True)
+                    self.StudentButton_Exit.setEnabled(True)
 
-                        self.StudentButton_SearchName.setEnabled(True)
-                        #self.StudentButton_ViewDetails.setEnabled(True)
-                        self.StudentButton_Add.setEnabled(True)
-                        self.StudentButton_Edit.setEnabled(True)
-                        self.StudentButton_Remove.setEnabled(True)
-                        self.StudentButton_SaveEdit.setEnabled(True)
-                        self.StudentButton_SaveAdd.setEnabled(True)
-                        self.StudentButton_SearchID.setEnabled(True)
-                        self.StudentButton_SearchName.setEnabled(True)
-                        self.LogOffAdmin.setEnabled(True)
-                        self.StudentSearch_Name.setEnabled(True)
-                        self.StudentSearch_ID.setEnabled(True)
+                    self.StudentButton_SearchName.setEnabled(True)
+                    #self.StudentButton_ViewDetails.setEnabled(True)
+                    self.StudentButton_Add.setEnabled(True)
+                    self.StudentButton_Edit.setEnabled(True)
+                    self.StudentButton_Remove.setEnabled(True)
+                    self.StudentButton_SaveEdit.setEnabled(True)
+                    self.StudentButton_SaveAdd.setEnabled(True)
+                    self.StudentButton_SearchID.setEnabled(True)
+                    self.StudentButton_SearchName.setEnabled(True)
+                    self.LogOffAdmin.setEnabled(True)
+                    self.StudentSearch_Name.setEnabled(True)
+                    self.StudentSearch_ID.setEnabled(True)
 
-                        self.clearallfunction(MainWindow)
-                        self.StudentView.repaint()
+                    self.clearallfunction(MainWindow)
+                    self.StudentView.repaint()
 
         # confirmation=QMessage()
         # confirmation.exec()
@@ -1865,7 +1950,7 @@ class Ui_MainWindow(object):
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)
-        self.StudentButton_SaveEtit.setEnabled(True)
+        self.StudentButton_SaveEdit.setEnabled(True)
         self.StudentButton_SaveAdd.setEnabled(True)
         self.StudentButton_SearchID.setEnabled(True)
         self.StudentButton_SearchName.setEnabled(True)
@@ -1897,12 +1982,12 @@ class Ui_MainWindow(object):
 
     def handleAddStaffSave(self, MainWindow):
         id = self.StaffText_ID.text()
-        email = self.StaffText_Email.text()
+        Email = self.StaffText_Email.text()
         name = self.StaffText_Name.text()
         password = self.StaffText_Pass.text()
         cpassword = self.StaffText_CPass.text()
 
-        if (id == "" or email == "" or name == "" or password == "" or cpassword == ""):
+        if (id == "" or Email == "" or name == "" or password == "" or cpassword == ""):
             print("One or more of the inputs is blank")
             self.popupMessage2(MainWindow, "Please fill in all the fields. ")
         else:
@@ -1917,8 +2002,8 @@ class Ui_MainWindow(object):
                     self.popupMessage(MainWindow, "This staff id already exist.")
                 if not result:
                     if (self.popupMessage(MainWindow, "Are you sure the information is correct? ")):
-                        Sys.staffList.append(Staff(id, name, email, password, 0))
-                        Sys.addnewStaff(name, int(id), email, password, 0)
+                        Sys.staffList.append(Staff(id, name, Email, password, 0))
+                        Sys.addnewStaff(name, int(id), Email, password, 0)
                         self.searchByNameStaff()
                         print("Input validated")
                         print("Save1 Clicked")
@@ -2056,19 +2141,26 @@ class Ui_MainWindow(object):
 
     def handleEditSaveStaff(self, MainWindow):
         name = self.StaffText_Name.text()
-        email = self.StaffText_Email.text()
+        Email = self.StaffText_Email.text()
         id = self.StaffText_ID.text()
-        password = self.StaffText_Pass.text()
-        Sys.editStaff(name, email, password, id)
-        Ui_MainWindow.searchByName(self)
+        password1 = self.StaffText_Pass.text()
+        password2 = self.StaffText_CPass.text()
+        for staff in(Sys.staffList):
+            if(staff.Email == Email):
+                oldPassword = staff.password
+        if(password1 == password2 and password1==""):
+            Sys.editStaff(name, Email, oldPassword, id)
+        if password1 != password2 :
+            self.popupMessage2(MainWindow, "Password do not match.")
+        if(password1!="" and password1 == password2):
+            Sys.editStaff(name, Email, password1, id)
+            Ui_MainWindow.searchByName(self)
 
         self.enable()
 
         self.StudentView.setEnabled(True)
         self.StudentButton_Exit.setEnabled(True)
-
         self.StudentButton_SearchName.setEnabled(True)
-        #self.StudentButton_ViewDetails.setEnabled(True)
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)
@@ -2213,9 +2305,6 @@ class Ui_MainWindow(object):
             conn = connectDB()
             cur = conn.cursor()
             addq = cur.execute(query, query2)
-
-
-
             self.clearallfunction(MainWindow)
             conn.commit()
             conn.close()
@@ -2224,8 +2313,8 @@ class Ui_MainWindow(object):
     def RemoveStafffunc(self, name):
         name =  self.StaffText_Name.text()
         id = self.StaffText_ID.text()
-        email = self.StaffText_Email.text()
-        if(email == currentUser):
+        Email = self.StaffText_Email.text()
+        if(Email == currentUser):
             self.popupMessage2(MainWindow, "Admins are not allowed to remove themselves. \nPlease get another admin to remove you. ")
         else:
             if(self.popupMessage(MainWindow,"Do you really want to delete " + name + " from the database ?")):
@@ -2239,7 +2328,6 @@ class Ui_MainWindow(object):
                     self.clearallfunction(MainWindow)
                     conn.commit()
                     conn.close()
-                    self.searchByNameStaff()
                 else:
                     self.popupMessage2(MainWindow,"Admins are not allowed to remove themselves. Please get another admin to remove you. ")
 
@@ -2296,14 +2384,17 @@ class Ui_MainWindow(object):
         self.StaffLabel_Password.show()
         self.StaffLabel_CPassword.show()
         self.StaffText_Name.setEnabled(True)
-        self.StaffText_Email.setEnabled(True)
-        self.StaffText_ID.setEnabled(True)
+        self.StaffText_Email.setEnabled(False)
+        self.StaffText_ID.setEnabled(False)
         self.StaffText_Pass.setEnabled(True)
         self.StaffText_CPass.setEnabled(True)
         self.StaffButton_SaveEdit.setEnabled(True)
         self.StaffButton_Cancel.setEnabled(True)
         self.StaffText_Pass.show()
         self.StaffText_CPass.show()
+        self.StaffText_Pass.setText("")
+        self.StaffText_CPass.clear()
+
 
     def handleStaffCancel(self):
         self.clearStaff()
@@ -2319,10 +2410,12 @@ class Ui_MainWindow(object):
 
     def PromoteFunction (self):
         print('this')
+        global Sys
         id = self.StaffText_ID.text()
         if(Sys.promoteStaff(id)):
             self.popupMessage2(MainWindow, self.StaffText_Name.text() + " is already an admin.")
         else:
+            print("Not admin----")
             if(self.popupMessage(MainWindow, "Are you sure you want to promote " + self.StaffText_Name.text() + " to an admin?")):
                 query = "UPDATE staff  SET isAdmin=1  WHERE StaffID=%s;"
                 query2 = (id)
@@ -2332,6 +2425,15 @@ class Ui_MainWindow(object):
                 conn.commit()
                 conn.close()
                 print("admin updated")
+                print(Sys.staffList[1].Name)
+                for i in range(0,len( Sys.staffList)):
+                    print(i)
+                    if(Sys.staffList[i].staffId == id):
+
+                        Sys.staffList[i].isAdmin = 1
+                        break
+                self.searchByNameStaff("")
+                print(Sys.staffList[2].isAdmin, "kjkkkkkkkkkkkkkkkkkkkk")
             else:
                 print("admin canceled")
 
@@ -2383,13 +2485,16 @@ def client_thread(clientsocket):
 
 picture = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/lin.png"
 wrong = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/student1.jpg"
-placeHolder = [["E2000017571001991550787E", "Kashif Iqbal", picture], ["E20051860607016213308EA2" ,"Joe Smith", picture], ["E2000016551401070900BF7D", "Nupur Pandey", picture], ["E20000175710020015507886", "Bibek", picture], ["E2005186060701621260955C", "Austin Hastings", wrong], ["E2000016551400980900BF95", "Albaro Tinoco", wrong]]
+#placeHolder = [["E2000017571001991550787E", "Kashif Iqbal", picture], ["E20051860607016213308EA2" ,"Matt Johnson", picture], ["E2000016551401070900BF7D", "Nupur Pandey", picture], ["E20000175710020015507886", "Bibek", picture], ["E2005186060701621260955C", "Austin Hastings", wrong], ["E2000016551400980900BF95", "Albaro Tinoco", wrong]]
 
 def search_query(rfid):
-    for i in range(0, len(placeHolder)):
-        if rfid == placeHolder[i][0]:
-            return (placeHolder[i][1], placeHolder[i][2])
-    return "Not Found!"
+    Sys.getTagNamePic()
+    print(len(Sys.TagNamePicList))
+    for i in range(0, len(Sys.TagNamePicList)):
+
+        if rfid == Sys.TagNamePicList[i].Tag:
+            return (Sys.TagNamePicList[i].Name, Sys.TagNamePicList[i].Pic)
+    # return ("Not Found!", "Really!")
 
 
 app = QtGui.QApplication(sys.argv)
