@@ -317,6 +317,7 @@ class System(object):
             print("not found")
         return result
 
+    # Used in RedrawTables(), ShowStudentLogFunc()
     def showLogData(self):
         conn = connectDB()
         cur = conn.cursor()
@@ -369,12 +370,14 @@ class System(object):
             ui.LogListWidget_Staff.addItem(item)
         print(result)
 
+    # Not used in any other location, just defined below
     def showStudentReport(self):
         result = Sys.getStudentNames()
         for i in range(0, len(result)):
             item = QtGui.QListWidgetItem(result[i])
             ui.LogListWidget_Student.addItem(item)
 
+    # Not used in any other location, just defined below
     def showStaffReport(self):
         result = Sys.getStaffNames()
         for i in range(0, len(result)):
@@ -711,7 +714,13 @@ class Ui_MainWindow(object):
         self.LogButton_Generate.setGeometry(QtCore.QRect(360, 560, 75, 23))
         self.LogButton_Generate.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogButton_Generate.setObjectName(_fromUtf8("LogButton_Generate"))
-        self.LogButton_Generate.clicked.connect(self.redrawTables)
+        self.LogButton_Generate.clicked.connect(self.redrawTables)\
+
+        self.LogButton_Print = QtGui.QPushButton(MainWindow)
+        self.LogButton_Print.setGeometry(QtCore.QRect(450, 560, 75, 23))
+        self.LogButton_Print.setMaximumSize(QtCore.QSize(1200, 900))
+        self.LogButton_Print.setObjectName(_fromUtf8("LogButton_PrintPDF"))
+        self.LogButton_Print.clicked.connect(self.PrintPDF)
 
         self.LogButton_Exit = QtGui.QPushButton(MainWindow)
         self.LogButton_Exit.setGeometry(QtCore.QRect(710, 560, 75, 23))
@@ -974,11 +983,13 @@ class Ui_MainWindow(object):
         self.StaffText_Name.setGeometry(QtCore.QRect(670, 60, 241, 31))
         self.StaffText_Name.setFont(font)
         self.StaffText_Name.setObjectName(_fromUtf8("StaffText_Name"))
+        self.StaffText_Name.setValidator(azvalidator)
 
         self.StaffText_ID = QtGui.QLineEdit(MainWindow)
         self.StaffText_ID.setGeometry(QtCore.QRect(670, 130, 241, 31))
         self.StaffText_ID.setFont(font)
         self.StaffText_ID.setObjectName(_fromUtf8("StaffText_ID"))
+        self.StaffText_ID.setValidator(intvalidator)
 
         self.StaffText_Email = QtGui.QLineEdit(MainWindow)
         self.StaffText_Email.setGeometry(QtCore.QRect(670, 200, 241, 31))
@@ -1102,6 +1113,7 @@ class Ui_MainWindow(object):
         #Log
         self.LogButton_Exit.setText(_translate("MainWindow", "Exit", None))
         self.LogButton_Generate.setText(_translate("Dismissal", "Generate", None))
+        self.LogButton_Print.setText(_translate("Dismissal", "Print PDF", None))
         self.LogButton_Exit.setText(_translate("Dismissal", "Exit", None))
         self.LogLabel_Title.setText(_translate("Dismissal", "Dismissal Log", None))
         self.LogLabel_Start.setText(_translate("Dismissal", "Start Date", None))
@@ -1202,6 +1214,12 @@ class Ui_MainWindow(object):
         self.StaffText_CPass.setEnabled(True)
         self.StaffText_Email.setEnabled(True)
 
+    def CancelActionfunc(self, MainWindow):
+        self.hideall()
+        self.showMainAdmin()
+        ui.StudentView.clear()
+        ui.StaffView.clear()
+
     def confirmsavestudent(self):
         checkduplicateid = int(self.StudentText_ID.text())
         duplicatecheck = Sys.searchByID(checkduplicateid)
@@ -1232,255 +1250,21 @@ class Ui_MainWindow(object):
         else:
             self.popupMessage2(MainWindow, "Password do not match. ")
 
-    def enableStaff(self):
-        self.StaffButton_Add.setEnabled(False)
-        self.StaffButton_Edit.setEnabled(False)
-        self.StaffButton_Exit.setEnabled(False)
-        self.StaffButton_Promote.setEnabled(False)
-        self.StaffButton_Remove.setEnabled(False)
-        self.StaffSearch_Name.setEnabled(False)
-        self.StaffText_Pass.setEnabled(False)
-        self.StaffText_CPass.setEnabled(False)
-        self.StaffText_Email.setEnabled(False)
-        self.StaffText_ID.setEnabled(False)
-        self.StaffText_Name.setEnabled(False)
-        self.StaffView.setEnabled(False)
-        self.LogOffAdmin_Staff.setEnabled(False)
-        self.StaffButton_SearchID.setEnabled(False)
-        self.StaffButton_SearchName.setEnabled(False)
-        self.StaffSearch_ID.setEnabled(False)
-        self.StaffSearch_Name.setEnabled(False)
+    def clearStaff(self):
+        self.StaffText_Name.clear()
+        self.StaffText_ID.clear()
+        self.StaffText_Pass.clear()
+        self.StaffText_CPass.clear()
+        self.StaffText_Email.clear()
 
-    def enable(self):
-        self.StudentText_ID.setEnabled(False)
-        self.StudentText_GName.setEnabled(False)
-        self.StudentText_Grade.setEnabled(False)
-        self.StudentText_Name.setEnabled(False)
-        self.StudentText_RFID.setEnabled(False)
-        self.StudentView.setEnabled(False)
-        self.StudentButton_Exit.setEnabled(False)
-        self.StudentText_Picture.setEnabled(False)
-
-        self.StudentButton_Picture.setEnabled(False)
-        self.StudentButton_SearchName.setEnabled(False)
-        #self.StudentButton_ViewDetails.setEnabled(False)
-        self.StudentButton_Add.setEnabled(False)
-        self.StudentButton_Edit.setEnabled(False)
-        self.StudentButton_Remove.setEnabled(False)
-        self.StudentButton_SaveEdit.setEnabled(False)
-        self.StudentButton_SaveAdd.setEnabled(False)
-        self.StudentButton_SearchID.setEnabled(False)
-        self.StudentButton_SearchName.setEnabled(False)
-        self.LogOffAdmin.setEnabled(False)
-        self.StudentSearch_Name.setEnabled(False)
-        self.StudentSearch_ID.setEnabled(False)
-
-    def enableListview(self):
-        self.LeftClear.setEnabled(True)
-        self.RightClear.setEnabled(True)
-        self.LeftList.setEnabled(True)
-        self.RightList.setEnabled(True)
-        self.LogOffStaff.setEnabled(True)
-        self.LeftClear.raise_()
-        self.LeftList.raise_()
-        self.RightClear.raise_()
-        self.RightList.raise_()
-
-    def enableLogin(self):
-        self.LoginButton.setEnabled(True)
-        self.Login_uname.setEnabled(True)
-        self.Login_password.setEnabled(True)
-        self.LoginButton.raise_()
-        self.Login_uname.raise_()
-        self.Login_password.raise_()
-
-    def handleBrowse(self):
-        global filename
-        filename = QtGui.QFileDialog.getOpenFileName()
-        pixmap = QtGui.QPixmap(filename)
-        pixmap = pixmap.scaled(510, 440, QtCore.Qt.KeepAspectRatio)
-        self.StudentLabel_Picture_2.setPixmap(pixmap)
-
-    def handleViewDetailStaff(self):
-
-        name = self.StaffSearch_Name.text()
-        num = self.StaffView.currentRow()
-        id = self.StaffSearch_ID.text()
-        print(searchStaffStatus,"****")
-        staff = []
-        if(searchStaffStatus == 2):
-            print("search id")
-            if id == "":
-                staff = Sys.staffList[num]
-
-            else:
-                result = Sys.searchByIdStaff(id)
-                staff = result[num]
-
-        else:
-            if name == "":
-                staff = Sys.staffList[num]
-            else:
-                result = Sys.searchByNameStaff(name)
-                print(len(result))
-                staff = result[num]
-
-        self.StaffText_Email.setText(str(staff.Email))
-        self.StaffText_ID.setText(str(staff.staffId))
-        self.StaffText_Name.setText(staff.Name)
-        print("Do nothing")
-        print(os.getcwd())
-
-    def keyPressEvent(self,event):
-        if event.key() == QtCore.Qt.Key_0 :
-            self.close()
-
-    def hideall(self):
-        #comment out to make things work again
-        #self.disableAll()
-        #log hide
-        self.LoginTitle.hide()
-        self.LogButton_Exit.hide()
-        self.LogButton_Generate.hide()
-        self.Login_uname.hide()
-        self.LoginButton.hide()
-        self.LogLabel_End.hide()
-        self.LogLabel_Start.hide()
-        self.LogTableView_Staff.hide()
-        self.LogListWidget_Staff.hide()
-        self.LogListWidget_Student.hide()
-        self.LogTableView_Student.hide()
-        self.LogTableView_Generic.hide()
-        #self.LogStudentButton_SearchID.hide()
-        self.LogStudentButton_SearchName.hide()
-        self.LogStudentLabel_SearchName.hide()
-        self.LogStudentLogLabel_SearchID.hide()
-        self.LogStudentText_SearchID.hide()
-        self.LogStudentText_SearchName.hide()
-        self.LogStaffButton_SearchID.hide()
-        self.LogStaffButton_SearchName.hide()
-        self.LogStaffLabel_SearchName.hide()
-        #self.LogStaffLogLabel_SearchID.hide()
-        self.LogStaffText_SearchID.hide()
-        self.LogStaffText_SearchName.hide()
-        self.LogStaffLabel_SearchID.hide()
-        self.LogStaffButton_SearchID.hide()
-        self.LogStaffButton_SearchName.hide()
-        self.LogTableView_Generic.hide()
-        self.LogTableView_Student.hide()
-        self.LogStudentButton_SearchID.hide()
-        self.DismissWidget.hide()
-        self.LogOffAdmin2.hide()
-        self.StartDateEdit.hide()
-        self.EndDateEdit.hide()
-        self.LogLabel_Title.hide()
-        self.LogListWidget_Staff.hide()
-        self.LogOffAdmin.hide()
-        self.LogOffStaff.hide()
-        self.LogStaffButton_SearchID.hide()
-        self.LoginTitle.hide()
-        self.LogButton_Exit.hide()
-
-        #staff hide
-
-        self.StaffLabel_SearchName.hide()
-        self.StaffLabel_SearchID.hide()
-        self.StaffButton_SearchID.hide()
-        self.StaffButton_SearchName.hide()
-        self.StaffButton_SaveAdd.hide()
-        self.StaffButton_SaveEdit.hide()
-        self.StaffButton_Cancel.hide()
-        self.StaffSearch_ID.hide()
-        self.StaffSearch_Name.hide()
-        self.LogOffStaff.hide()
-
-        #listview hide
-        self.LeftListTitle.hide()
-        self.RightListTitle.hide()
-        self.LeftClear.hide()
-        self.RightClear.hide()
-        self.LeftList.hide()
-        self.RightList.hide()
-        self.LeftStudentPicture.hide()
-        self.RightStudentPicture.hide()
-        self.SplittingLine.hide()
-
-        #login hide
-        self.Username.hide()
-        self.Password.hide()
-        self.LoginButton.hide()
-        self.LoginTitle.hide()
-        self.Login_uname.hide()
-        self.Login_uname.clear()
-        self.Login_password.hide()
-        self.Login_password.clear()
-
-        #hiding main admin page
-        self.EditStudent.hide()
-        self.EditStaff.hide()
-        self.StudentLog.hide()
-        self.EditStudent.hide()
-        self.StudentLog.hide()
-        self.LogOffAdmin1.hide()
-        self.adminlabel_welcome.hide()
-        self.adminlabel_student.hide()
-        self.adminlabel_staff.hide()
-        self.adminlabel_log.hide()
-        self.adminlabel_checkout.hide()
-        self.StudentCheckout.hide()
-
-        #hide all student window
-        self.StudentButton_Picture.hide()
-        self.StudentLabel_Grade.hide()
-        self.StudentLabel_ID.hide()
-        self.StudentLabel_Picture_2.hide()
-        self.StudentLabel_SearchID.hide()
-        self.StudentButton_Remove.hide()
-        self.StudentButton_Exit.hide()
-        self.StudentButton_Edit.hide()
-        self.LogOffAdmin.hide()
-        self.StudentLabel_Name.hide()
-        self.StudentLabel_Picture.hide()
-        self.StudentLabel_SearchName.hide()
-        self.StudentLabel_RFID.hide()
-        self.StudentButton_Add.hide()
-        self.StudentLabel_GName.hide()
-        self.StudentText_GName.hide()
-        self.StudentText_Grade.hide()
-        self.StudentText_ID.hide()
-        self.StudentText_Name.hide()
-        self.StudentText_Picture.hide()
-        self.StudentText_RFID.hide()
-        self.StudentSearch_ID.hide()
-        self.StudentSearch_Name.hide()
-        self.StudentButton_SearchID.hide()
-        self.StudentSearch_Name.hide()
-        self.StudentView.hide()
-        self.StudentView.clear()
-
-        #hide all staff window
-        self.StaffButton_Add.hide()
-        self.StaffButton_Edit.hide()
-        self.StaffButton_Exit.hide()
-        self.StaffButton_Promote.hide()
-        self.StaffButton_Remove.hide()
-        self.StaffLabel_Email.hide()
-        self.StaffLabel_ID.hide()
-        self.StaffLabel_Name.hide()
-        self.StaffLabel_Password.hide()
-        self.StaffLabel_CPassword.hide()
-        self.StaffSearch_Name.hide()
-        self.StaffText_Pass.hide()
-        self.StaffText_CPass.hide()
-        self.StaffText_Email.hide()
-        self.StaffText_ID.hide()
-        self.StaffText_Name.hide()
-        self.StaffView.hide()
-        self.LogOffAdmin_Staff.hide()
-        self.StudentButton_SearchName.hide()
-        self.StudentButton_SaveAdd.hide()
-        self.StudentButton_Cancel.hide()
-        self.StudentButton_SaveEdit.hide()
+    def clearallfunction(self,MainWindow):
+        self.StudentText_Name.clear()
+        self.StudentText_RFID.clear()
+        self.StudentText_Grade.clear()
+        self.StudentText_GName.clear()
+        self.StudentText_ID.clear()
+        self.StudentText_Picture.clear()
+        self.StudentLabel_Picture_2.clear()
 
     def disableAll(self):
         #log
@@ -1491,6 +1275,7 @@ class Ui_MainWindow(object):
         self.StartDateEdit.setEnabled(False)
         self.EndDateEdit.setEnabled(False)
         self.LogButton_Generate.setEnabled(False)
+        self.LogButton_Print.setEnabled(False)
         self.DismissWidget.setEnabled(False)
         #log generic
         self.LogTableView_Generic.setEnabled(False)
@@ -1583,480 +1368,191 @@ class Ui_MainWindow(object):
         #student lists
         self.StudentView.setEnabled(False)
 
+    def editStudentfunc(self, MainWindow):
+        self.hideall()
+        self.showStudentWindow()
+        self.StudentButton_Cancel.show()
+        self.StudentButton_SaveEdit.show()
+        self.enable()
+        self.StudentButton_Cancel.setEnabled(True)
+        self.StudentButton_SaveEdit.setEnabled(True)
+        self.StudentText_Name.setEnabled(True)
+        self.StudentText_RFID.setEnabled(True)
+        self.StudentText_Grade.setEnabled(True)
+        self.StudentText_GName.setEnabled(True)
+        #getting student id that is being editted
+        Sys.editstudentid = int(self.StudentText_ID.text())
+        self.StudentText_ID.setEnabled(True)
+        self.StudentText_Picture.setEnabled(True)
+        self.StudentButton_Picture.setEnabled(True)
 
+    def enableStaff(self):
+        self.StaffButton_Add.setEnabled(False)
+        self.StaffButton_Edit.setEnabled(False)
+        self.StaffButton_Exit.setEnabled(False)
+        self.StaffButton_Promote.setEnabled(False)
+        self.StaffButton_Remove.setEnabled(False)
+        self.StaffSearch_Name.setEnabled(False)
+        self.StaffText_Pass.setEnabled(False)
+        self.StaffText_CPass.setEnabled(False)
+        self.StaffText_Email.setEnabled(False)
+        self.StaffText_ID.setEnabled(False)
+        self.StaffText_Name.setEnabled(False)
+        self.StaffView.setEnabled(False)
+        self.LogOffAdmin_Staff.setEnabled(False)
+        self.StaffButton_SearchID.setEnabled(False)
+        self.StaffButton_SearchName.setEnabled(False)
+        self.StaffSearch_ID.setEnabled(False)
+        self.StaffSearch_Name.setEnabled(False)
 
-    def updateLeftPicture(self):
-        self.LeftStudentPicture.setPixmap(self.listItemToPicture(self.LeftList.currentItem().text()))
+    def enable(self):
+        self.StudentText_ID.setEnabled(False)
+        self.StudentText_GName.setEnabled(False)
+        self.StudentText_Grade.setEnabled(False)
+        self.StudentText_Name.setEnabled(False)
+        self.StudentText_RFID.setEnabled(False)
+        self.StudentView.setEnabled(False)
+        self.StudentButton_Exit.setEnabled(False)
+        self.StudentText_Picture.setEnabled(False)
 
-    def updateRightPicture(self):
-        self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.currentItem().text()))
+        self.StudentButton_Picture.setEnabled(False)
+        self.StudentButton_SearchName.setEnabled(False)
+        #self.StudentButton_ViewDetails.setEnabled(False)
+        self.StudentButton_Add.setEnabled(False)
+        self.StudentButton_Edit.setEnabled(False)
+        self.StudentButton_Remove.setEnabled(False)
+        self.StudentButton_SaveEdit.setEnabled(False)
+        self.StudentButton_SaveAdd.setEnabled(False)
+        self.StudentButton_SearchID.setEnabled(False)
+        self.StudentButton_SearchName.setEnabled(False)
+        self.LogOffAdmin.setEnabled(False)
+        self.StudentSearch_Name.setEnabled(False)
+        self.StudentSearch_ID.setEnabled(False)
 
-    def tabControl(self):
-        self.redrawTables()
+    def enableListview(self):
+        self.LeftClear.setEnabled(True)
+        self.RightClear.setEnabled(True)
+        self.LeftList.setEnabled(True)
+        self.RightList.setEnabled(True)
+        self.LogOffStaff.setEnabled(True)
+        self.LeftClear.raise_()
+        self.LeftList.raise_()
+        self.RightClear.raise_()
+        self.RightList.raise_()
 
-    def redrawTables(self):
-        print("Generate Clicked")
-        self.handleviewLogStudent()
-        self.handleviewLogStaff()
-        Sys.showLogData()
+    def enableLogin(self):
+        self.LoginButton.setEnabled(True)
+        self.Login_uname.setEnabled(True)
+        self.Login_password.setEnabled(True)
+        self.LoginButton.raise_()
+        self.Login_uname.raise_()
+        self.Login_password.raise_()
 
-    def searchIDStudentLog(self):
-        result = []
-        print("by id")
-        id = self.LogStudentText_SearchID.text()
-        result = Sys.searchByID(id)
-        ui.LogListWidget_Student.clear()
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].Name)
-            ui.LogListWidget_Student.addItem(item)
+    def EditstaffFunc(self):
+        Sys.editstaffid = int(self.StaffText_ID.text())
+        Sys.editstaffemail = self.StaffText_Email.text()
+        self.enableRightStaff()
+        self.StaffButton_SaveEdit.show()
+        self.StaffButton_Cancel.show()
+        Sys.editstaffid = int(self.StaffText_ID.text())
+        Sys.editstaffemail = self.StaffText_Email.text()
 
-    def searchNameStaffLog(self):
-        result = []
-        name = self.LogStaffText_SearchName.text()
+    def enableLeftStaff(self):
+        self.enableStaff()
+        self.StaffButton_Add.setEnabled(True)
+        self.StaffButton_Edit.setEnabled(True)
+        self.StaffButton_Exit.setEnabled(True)
+        self.StaffButton_Promote.setEnabled(True)
+        self.StaffButton_Remove.setEnabled(True)
+        self.StaffLabel_Email.setEnabled(True)
+        self.StaffLabel_ID.setEnabled(True)
+        self.StaffLabel_Name.setEnabled(True)
+        self.StaffLabel_Password.setEnabled(True)
+        self.StaffLabel_CPassword.setEnabled(True)
+        self.StaffSearch_Name.setEnabled(True)
+        self.StaffText_Pass.setEnabled(False)
+        self.StaffText_Pass.setEnabled(False)
+        self.StaffText_Email.setEnabled(False)
+        self.StaffText_ID.setEnabled(False)
+        self.StaffText_Name.setEnabled(False)
+        self.StaffView.setEnabled(True)
+        self.LogOffAdmin_Staff.setEnabled(True)
+        self.StaffLabel_SearchName.setEnabled(True)
+        self.StaffLabel_SearchID.setEnabled(True)
+        self.StaffButton_SearchID.setEnabled(True)
+        self.StaffButton_SearchName.setEnabled(True)
+        self.StaffSearch_ID.setEnabled(True)
+        self.StaffSearch_Name.setEnabled(True)
+        self.StaffButton_SaveEdit.hide()
+        self.StaffButton_SaveAdd.hide()
+        self.StaffButton_Cancel.hide()
+        self.StaffLabel_CPassword.hide()
+        self.StaffLabel_Password.hide()
+        self.StaffText_CPass.hide()
+        self.StaffText_Pass.hide()
 
-        result = Sys.searchByNameStaff(name)
-        ui.LogListWidget_Staff.clear()
-        if len(result) == 0:
-            result = Sys.staffList
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].Name)
-            ui.LogListWidget_Staff.addItem(item)
-
-    def searchIDStaffLog(self):
-        result = []
-        id = self.LogStaffText_SearchID.text()
-        if id == "":
-            result = Sys.staffList
-        else:
-            result = Sys.searchByIdStaff(id)
-        ui.LogListWidget_Staff.clear()
-
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].Name)
-            ui.LogListWidget_Staff.addItem(item)
-
-    def searchByName(self):
-        global searchStudentStatus
-        searchStaffStatus = 1
-
-        name = self.StudentSearch_Name.text()
-        result = Sys.searchByName(name)
-        print(result)
-        ui.StudentView.clear()
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].Name)
-            ui.StudentView.addItem(item)
-        self.StudentView.show()
-
-    def searchByNameStaff(self):
-        global searchStaffStatus
-        searchStaffStatus = 1
-
-        name = self.StaffSearch_Name.text()
-        result = Sys.searchByNameStaff(name)
-        ui.StaffView.clear()
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].Name)
-            ui.StaffView.addItem(item)
-        self.StaffView.show()
-
-    def searchByIdStaff(self):
-        global searchStaffStatus
-        searchStaffStatus = 2
-
-        id = self.StaffSearch_ID.text()
-        if id == "":
-            result = Sys.staffList
-        else:
-            result = Sys.searchByIdStaff(id)
-        ui.StaffView.clear()
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].Name)
-            ui.StaffView.addItem(item)
-        self.enableLeftStaff()
-        self.StaffView.show()
-
-    def searchByID(self):
-        global searchStudentStatus
-        searchStudentStatus = 2
-
-        id = self.StudentSearch_ID.text()
-
-        if id == "":
-            result = Sys.studentList
-        else:
-            result = Sys.searchByID(id)
-        ui.StudentView.clear()
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].Name)
-            ui.StudentView.addItem(item)
-        self.StudentView.show()
-
-    def showStaffWindow(self):
-        self.enableLeftStaff()
-        self.StaffButton_Add.show()
-        self.StaffButton_Edit.show()
-        self.StaffButton_Exit.show()
-        self.StaffButton_Promote.show()
-        self.StaffButton_Remove.show()
-        self.StaffLabel_Email.show()
-        self.StaffLabel_ID.show()
-        self.StaffLabel_Name.show()
+    def enableRightStaff(self):
+        self.enableStaff()
+        self.StaffButton_SaveEdit.show()
+        self.StaffButton_Cancel.show()
         self.StaffLabel_Password.show()
         self.StaffLabel_CPassword.show()
-        self.StaffSearch_Name.show()
+        self.StaffText_Name.setEnabled(True)
+        self.StaffText_Email.setEnabled(True)
+        self.StaffText_ID.setEnabled(True)
+        self.StaffText_Pass.setEnabled(True)
+        self.StaffText_CPass.setEnabled(True)
+        self.StaffButton_SaveEdit.setEnabled(True)
+        self.StaffButton_Cancel.setEnabled(True)
         self.StaffText_Pass.show()
         self.StaffText_CPass.show()
-        self.StaffText_Email.show()
-        self.StaffText_ID.show()
-        self.StaffText_Name.show()
-        result = Sys.getStaffNames()
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i])
-            ui.StaffView.addItem(item)
-        self.StaffView.show()
-        self.LogOffAdmin_Staff.show()
-        self.StaffLabel_SearchName.show()
-        self.StaffLabel_SearchID.show()
-        self.StaffButton_SearchID.show()
-        self.StaffButton_SearchName.show()
-        self.StaffSearch_ID.show()
-        self.StaffSearch_Name.show()
+        self.StaffText_Pass.setText("")
+        self.StaffText_CPass.clear()
 
-    def ShowStudentLogFunc(self):
-        self.hideall()
-        self.LogButton_Exit.show()
-        self.LogButton_Generate.show()
-        self.LogLabel_End.show()
-        self.LogLabel_Start.show()
-        self.LogTableView_Staff.show()
-        self.LogListWidget_Staff.show()
-        self.LogListWidget_Student.show()
-        self.LogTableView_Student.show()
-        self.LogTableView_Generic.show()
-        self.LogStudentButton_SearchName.show()
-        self.LogStudentLabel_SearchName.show()
-        self.LogStudentLogLabel_SearchID.show()
-        self.LogStudentText_SearchID.show()
-        self.LogStudentText_SearchName.show()
-        self.LogStaffButton_SearchID.show()
-        self.LogStaffButton_SearchName.show()
-        self.LogStaffLabel_SearchName.show()
-        self.LogStaffText_SearchID.show()
-        self.LogStaffText_SearchName.show()
-        self.LogStaffLabel_SearchID.show()
-        self.LogStaffButton_SearchID.show()
-        self.LogStaffButton_SearchName.show()
-        self.LogTableView_Generic.show()
-        self.LogTableView_Student.show()
-        self.LogStudentButton_SearchID.show()
-        self.DismissWidget.show()
-        self.LogOffAdmin2.show()
-        self.StartDateEdit.show()
-        self.EndDateEdit.show()
-        self.LogLabel_Title.show()
-        self.LogListWidget_Staff.show()
-        self.LogStaffButton_SearchID.show()
-        Sys.showLogData()
+    def handleBrowse(self):
+        global filename
+        filename = QtGui.QFileDialog.getOpenFileName()
+        if filename != "":
+            pixmap = QtGui.QPixmap(filename)
+            pixmap = pixmap.scaled(510, 440, QtCore.Qt.KeepAspectRatio)
+            self.StudentLabel_Picture_2.setPixmap(pixmap)
+        MainWindow.setWindowState(MainWindow.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+        # this will activate the window
+        MainWindow.activateWindow()
 
-    def searchNameStudentLog(self):
-        print("A")
-        result = []
+    def handleViewDetailStaff(self):
 
-        print(sDate, eDate)
-        name = str(self.LogStudentText_SearchName.text())
-        result = Sys.searchByName(name)
-        print(result)
-        ui.LogListWidget_Student.clear()
+        name = self.StaffSearch_Name.text()
+        num = self.StaffView.currentRow()
+        id = self.StaffSearch_ID.text()
+        print(searchStaffStatus,"****")
+        staff = []
+        if(searchStaffStatus == 2):
+            print("search id")
+            if id == "":
+                staff = Sys.staffList[num]
 
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i].Name)
-            ui.LogListWidget_Student.addItem(item)
-        ui.LogListWidget_Student.show()
-
-    def showStudentWindow(self):
-        self.StudentButton_SearchName.show()
-        self.StudentLabel_Grade.show()
-        self.StudentLabel_ID.show()
-        self.StudentLabel_Picture_2.show()
-        self.StudentLabel_SearchID.show()
-        self.StudentButton_Remove.show()
-        self.StudentButton_Exit.show()
-        self.StudentButton_Edit.show()
-        self.LogOffAdmin.show()
-        self.StudentLabel_Name.show()
-        self.StudentLabel_Picture.show()
-        # self.StudentLabel_SearchName.show()
-        self.StudentLabel_RFID.show()
-        self.StudentButton_Add.show()
-        self.StudentLabel_GName.show()
-        self.StudentText_GName.show()
-        self.StudentText_Grade.show()
-        self.StudentText_ID.show()
-        self.StudentButton_SearchID.show()
-        self.StudentView.show()
-        self.StudentSearch_Name.show()
-        self.StudentButton_Exit.show()
-        self.StudentText_Name.show()
-        self.StudentText_Picture.hide()
-        self.StudentButton_Picture.show()
-        self.StudentText_RFID.show()
-        self.StudentLabel_SearchName.show()
-
-        result = Sys.getStudentNames()
-        for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i])
-            ui.StudentView.addItem(item)
-
-        self.StudentView.show()
-        self.StudentSearch_ID.show()
-        self.StudentSearch_Name.show()
-
-    def showLog(self):
-        self.LogButton_Exit.show()
-        self.LogOffAdminStudent.show()
-
-    def showMain(self):
-        self.hideall()
-        self.enableListview()
-        #show main application
-        self.LeftListTitle.show()
-        self.RightListTitle.show()
-        self.LeftClear.show()
-        self.RightClear.show()
-        self.LeftList.show()
-        self.RightList.show()
-        self.LeftStudentPicture.show()
-        self.RightStudentPicture.show()
-        self.SplittingLine.show()
-        self.LogOffStaff.show()
-
-    def showMainAdmin(self):
-        #show admin page
-        self.EditStudent.show()
-        self.EditStaff.show()
-        self.StudentLog.show()
-        self.LogOffAdmin1.show()
-        self.StudentCheckout.show()
-
-        self.adminlabel_welcome.show()
-        self.adminlabel_student.show()
-        self.adminlabel_staff.show()
-        self.adminlabel_log.show()
-        self.adminlabel_checkout.show()
-
-        self.EditStudent.raise_()
-        self.EditStaff.raise_()
-        self.StudentLog.raise_()
-        self.LogOffAdmin1.raise_()
-        self.StudentCheckout.raise_()
-
-    def showLogin(self):
-        self.enableLogin()
-        self.Username.show()
-        self.Password.show()
-        self.LoginButton.show()
-        self.LoginTitle.show()
-        self.Login_uname.show()
-        self.Login_password.show()        
-
-    def listItemToPicture(self, item):
-        try:
-            picture = Sys.searchByName(item)[0].image
-        except IndexError:
-            picture = ""
-        print(picture)
-        pixmap = QtGui.QPixmap(picture)
-        return pixmap.scaled(180, 170, QtCore.Qt.KeepAspectRatio)
-
-    def handleClearLeft(self):
-        items = ui.LeftList.count()
-        if (items == 0):
-            self.popupMessage2(MainWindow, "Cannot remove that which is not there.")
-            return
-        rangedList = range(items)
-        rangedList = rangedList.__reversed__()
-        count = len(Sys.listL) - 1
-        for i in rangedList:
-            if ui.LeftList.isItemSelected(ui.LeftList.item(i)) == True:
-                item = ui.LeftList.takeItem(i)
-                break
-            count = count - 1
-        print(Sys.listL)
-        if(Sys.listL[count] != -1):
-            print("Calling Log with ID: " + str(Sys.listL[count]))
-            Sys.logEntry(Sys.listL[count])
-            del Sys.listL[count]
-        else:
-            del Sys.listL[count]
-        #reset picture to first student in queue
-        if (len(ui.LeftList) > 0):
-            self.LeftStudentPicture.setPixmap(self.listItemToPicture(self.LeftList.item(0).text()))
-        # remove picture if list is empty
-        else:
-            #doesn't clear picture need an empty picture
-            ui.RightStudentPicture.setText("")
-
-    def handleClearRight(self):
-        items = ui.RightList.count()
-        if (items == 0):
-            self.popupMessage2(MainWindow, "Cannot remove that which is not there.")
-            return
-        rangedList = range(items)
-        rangedList = rangedList.__reversed__()
-        for i in rangedList:
-            if ui.RightList.isItemSelected(ui.RightList.item(i)) == True:
-                ui.RightList.takeItem(i)
-                break
-        #reset picture to next student
-        if (len(ui.RightList) > 0):
-            self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.item(0).text()))
-        #remove picture if list is empty
-        else:
-            ui.RightStudentPicture.setText("")
-
-    def handleViewDetail(self):
-        picpath = "../pictures/"
-        # item = self.StudentView.currentItem().text()
-        # print(item)
-        name = self.StudentSearch_Name.text()
-        num = self.StudentView.currentRow()
-        id = self.StudentSearch_ID.text()
-        student =[]
-        print(num)
-        if searchStudentStatus == 2:
-            if id =="":
-                student = Sys.studentList[num]
             else:
-                student = Sys.searchByID(id)
-                student = student[num]
+                result = Sys.searchByIdStaff(id)
+                staff = result[num]
+
         else:
             if name == "":
-                student = Sys.studentList[num]
+                staff = Sys.staffList[num]
             else:
-                result = Sys.searchByName(name)
+                result = Sys.searchByNameStaff(name)
                 print(len(result))
-                student = result[num]
+                staff = result[num]
 
-        self.StudentText_GName.setText(student.guardian)
-        self.StudentText_Grade.setText(str(student.grade))
-        self.StudentText_ID.setText(str(student.studentId))
-        self.StudentText_Name.setText(student.Name)
-        pixmap = QtGui.QPixmap(student.image)
-        pixmap = pixmap.scaled(510,440,QtCore.Qt.KeepAspectRatio)
-        #self.StudentLabel_Picture_2.setPixmap(QtGui.QPixmap(os.getcwd() + picpath + "student1.jpg"))
-        self.StudentLabel_Picture_2.setPixmap(pixmap)
-        #self.StudentLabel_Picture_2.setText("aaa")
-        #QtCoreApplication::processEvents()
-        self.StudentText_RFID.setText(student.tagId)
+        self.StaffText_Email.setText(str(staff.Email))
+        self.StaffText_ID.setText(str(staff.staffId))
+        self.StaffText_Name.setText(staff.Name)
         print("Do nothing")
         print(os.getcwd())
 
-    def handleAddSave(self, MainWindow):
-        global filename
-        print(filename,"this this")
-        temp = filename.split("/")
-        temp = temp[-1]
-        print(temp)
-        destination = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/"
-        pic = destination +"/"+ temp
-        print("pp"+pic)
-
-
-        id = self.StudentText_ID.text()
-        grade = self.StudentText_Grade.text()
-        rfid = self.StudentText_RFID.text()
-        name = self.StudentText_Name.text()
-        gname = self.StudentText_GName.text()
-
-
-        if(id == "" or grade == "" or rfid == "" or name == "" or gname == ""):
-            print("One of the inputs is blank")
-            self.popupMessage2(MainWindow, "Please fill in all the fields. ")
-
-        else:
-            result = Sys.checkDuplicateID(id)
-            if result:
-                self.popupMessage(MainWindow,"This student id already exist.")
-            if not result:
-                if (self.popupMessage(MainWindow, "Are you sure the information is correct? ")):
-                    if (filename == destination):
-                        print("File already exists")
-                    else:
-                        shutil.copy(filename, destination)
-                    Sys.studentList.append(Student(name,int(id),rfid,gname,pic,int(grade)))
-                    Sys.addnewStudent(name,int(id),rfid,gname,pic,int(grade))
-                    self.searchByName()
-                    print("Input validated")
-                    print("Save1 Clicked")
-                    self.enable()
-                    self.StudentView.setEnabled(True)
-                    self.StudentButton_Exit.setEnabled(True)
-
-                    self.StudentButton_SearchName.setEnabled(True)
-                    #self.StudentButton_ViewDetails.setEnabled(True)
-                    self.StudentButton_Add.setEnabled(True)
-                    self.StudentButton_Edit.setEnabled(True)
-                    self.StudentButton_Remove.setEnabled(True)
-                    self.StudentButton_SaveEdit.setEnabled(True)
-                    self.StudentButton_SaveAdd.setEnabled(True)
-                    self.StudentButton_SearchID.setEnabled(True)
-                    self.StudentButton_SearchName.setEnabled(True)
-                    self.LogOffAdmin.setEnabled(True)
-                    self.StudentSearch_Name.setEnabled(True)
-                    self.StudentSearch_ID.setEnabled(True)
-
-                    self.clearallfunction(MainWindow)
-                    self.StudentView.repaint()
-
-        # confirmation=QMessage()
-        # confirmation.exec()
-        #
-
-    def handleAddCancel(self, MainWindow):
-        self.StudentButton_SaveAdd.hide()
-        self.StudentButton_Cancel.hide()
-        self.StudentButton_SaveEdit.hide()
-        self.clearallfunction(MainWindow)
-        self.enable()
-        Sys.editstudentid = -1
-        self.StudentView.setEnabled(True)
-        self.StudentButton_Exit.setEnabled(True)
-
-        self.StudentButton_SearchName.setEnabled(True)
-        #self.StudentButton_ViewDetails.setEnabled(True)
-        self.StudentButton_Add.setEnabled(True)
-        self.StudentButton_Edit.setEnabled(True)
-        self.StudentButton_Remove.setEnabled(True)
-        self.StudentButton_SaveEdit.setEnabled(True)
-        self.StudentButton_SaveAdd.setEnabled(True)
-        self.StudentButton_SearchID.setEnabled(True)
-        self.StudentButton_SearchName.setEnabled(True)
-        self.LogOffAdmin.setEnabled(True)
-        self.StudentSearch_Name.setEnabled(True)
-        self.StudentSearch_ID.setEnabled(True)
-
-    def popupMessage(self, MainWindow,StringText):
-        PopupMessage = QtGui.QMessageBox()
-        PopupMessage.setWindowTitle("Confirmation")
-        PopupMessage.setIcon(4)
-        PopupMessage.setText(StringText)
-        PopupMessage.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
-        result = PopupMessage.exec()
-        print(result)
-        if result==4194304:
-            return False
-        else:
-            return True
-
-    def popupMessage2(self, MainWindow, StringText):
-            PopupMessage2 = QtGui.QMessageBox()
-            PopupMessage2.setWindowTitle("Confirmation")
-            PopupMessage2.setIcon(4)
-            PopupMessage2.setText(StringText)
-            PopupMessage2.setStandardButtons(QtGui.QMessageBox.Ok )
-            result = PopupMessage2.exec()
-            print(result)
+    def keyPressEvent(self,event):
+        if event.key() == QtCore.Qt.Key_0 :
+            self.close()
 
     def handleAddStaffSave(self, MainWindow):
         id = self.StaffText_ID.text()
@@ -2256,8 +1752,353 @@ class Ui_MainWindow(object):
 
         print("Save2 Clicked")
 
-    def MainAdminfunc(self, MainWindow):
+    def handleClearLeft(self):
+        items = ui.LeftList.count()
+        if (items == 0):
+            self.popupMessage2(MainWindow, "Cannot remove that which is not there.")
+            return
+        rangedList = range(items)
+        rangedList = rangedList.__reversed__()
+        count = len(Sys.listL) - 1
+        for i in rangedList:
+            if ui.LeftList.isItemSelected(ui.LeftList.item(i)) == True:
+                item = ui.LeftList.takeItem(i)
+                break
+            count = count - 1
+        print(Sys.listL)
+        if(Sys.listL[count] != -1):
+            print("Calling Log with ID: " + str(Sys.listL[count]))
+            Sys.logEntry(Sys.listL[count])
+            del Sys.listL[count]
+        else:
+            del Sys.listL[count]
+        #reset picture to first student in queue
+        if (len(ui.LeftList) > 0):
+            self.LeftStudentPicture.setPixmap(self.listItemToPicture(self.LeftList.item(0).text()))
+        # remove picture if list is empty
+        else:
+            #doesn't clear picture need an empty picture
+            ui.RightStudentPicture.setText("")
+
+    def handleClearRight(self):
+        items = ui.RightList.count()
+        if (items == 0):
+            self.popupMessage2(MainWindow, "Cannot remove that which is not there.")
+            return
+        rangedList = range(items)
+        rangedList = rangedList.__reversed__()
+        for i in rangedList:
+            if ui.RightList.isItemSelected(ui.RightList.item(i)) == True:
+                ui.RightList.takeItem(i)
+                break
+        #reset picture to next student
+        if (len(ui.RightList) > 0):
+            self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.item(0).text()))
+        #remove picture if list is empty
+        else:
+            ui.RightStudentPicture.setText("")
+
+    def handleViewDetail(self):
+        picpath = "../pictures/"
+        # item = self.StudentView.currentItem().text()
+        # print(item)
+        name = self.StudentSearch_Name.text()
+        num = self.StudentView.currentRow()
+        id = self.StudentSearch_ID.text()
+        student =[]
+        print(num)
+        if searchStudentStatus == 2:
+            if id =="":
+                student = Sys.studentList[num]
+            else:
+                student = Sys.searchByID(id)
+                student = student[num]
+        else:
+            if name == "":
+                student = Sys.studentList[num]
+            else:
+                result = Sys.searchByName(name)
+                print(len(result))
+                student = result[num]
+
+        self.StudentText_GName.setText(student.guardian)
+        self.StudentText_Grade.setText(str(student.grade))
+        self.StudentText_ID.setText(str(student.studentId))
+        self.StudentText_Name.setText(student.Name)
+        pixmap = QtGui.QPixmap(student.image)
+        pixmap = pixmap.scaled(510,440,QtCore.Qt.KeepAspectRatio)
+        #self.StudentLabel_Picture_2.setPixmap(QtGui.QPixmap(os.getcwd() + picpath + "student1.jpg"))
+        self.StudentLabel_Picture_2.setPixmap(pixmap)
+        #self.StudentLabel_Picture_2.setText("aaa")
+        #QtCoreApplication::processEvents()
+        self.StudentText_RFID.setText(student.tagId)
+        print("Do nothing")
+        print(os.getcwd())
+
+    def handleAddSave(self, MainWindow):
+        global filename
+        print(filename,"this this")
+        temp = filename.split("/")
+        temp = temp[-1]
+        print(temp)
+        destination = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/"
+        pic = destination +"/"+ temp
+        print("pp"+pic)
+
+
+        id = self.StudentText_ID.text()
+        grade = self.StudentText_Grade.text()
+        rfid = self.StudentText_RFID.text()
+        name = self.StudentText_Name.text()
+        gname = self.StudentText_GName.text()
+
+
+        if(id == "" or grade == "" or rfid == "" or name == "" or gname == ""):
+            print("One of the inputs is blank")
+            self.popupMessage2(MainWindow, "Please fill in all the fields. ")
+
+        else:
+            result = Sys.checkDuplicateID(id)
+            if result:
+                self.popupMessage(MainWindow,"This student id already exist.")
+            if not result:
+                if (self.popupMessage(MainWindow, "Are you sure the information is correct? ")):
+                    if (filename == destination):
+                        print("File already exists")
+                    else:
+                        shutil.copy(filename, destination)
+                    Sys.studentList.append(Student(name,int(id),rfid,gname,pic,int(grade)))
+                    Sys.addnewStudent(name,int(id),rfid,gname,pic,int(grade))
+                    self.searchByName()
+                    print("Input validated")
+                    print("Save1 Clicked")
+                    self.enable()
+                    self.StudentView.setEnabled(True)
+                    self.StudentButton_Exit.setEnabled(True)
+
+                    self.StudentButton_SearchName.setEnabled(True)
+                    #self.StudentButton_ViewDetails.setEnabled(True)
+                    self.StudentButton_Add.setEnabled(True)
+                    self.StudentButton_Edit.setEnabled(True)
+                    self.StudentButton_Remove.setEnabled(True)
+                    self.StudentButton_SaveEdit.setEnabled(True)
+                    self.StudentButton_SaveAdd.setEnabled(True)
+                    self.StudentButton_SearchID.setEnabled(True)
+                    self.StudentButton_SearchName.setEnabled(True)
+                    self.LogOffAdmin.setEnabled(True)
+                    self.StudentSearch_Name.setEnabled(True)
+                    self.StudentSearch_ID.setEnabled(True)
+
+                    self.clearallfunction(MainWindow)
+                    self.StudentView.repaint()
+
+        # confirmation=QMessage()
+        # confirmation.exec()
+        #
+
+    def handleAddCancel(self, MainWindow):
+        self.StudentButton_SaveAdd.hide()
+        self.StudentButton_Cancel.hide()
+        self.StudentButton_SaveEdit.hide()
+        self.clearallfunction(MainWindow)
+        self.enable()
+        Sys.editstudentid = -1
+        self.StudentView.setEnabled(True)
+        self.StudentButton_Exit.setEnabled(True)
+
+        self.StudentButton_SearchName.setEnabled(True)
+        #self.StudentButton_ViewDetails.setEnabled(True)
+        self.StudentButton_Add.setEnabled(True)
+        self.StudentButton_Edit.setEnabled(True)
+        self.StudentButton_Remove.setEnabled(True)
+        self.StudentButton_SaveEdit.setEnabled(True)
+        self.StudentButton_SaveAdd.setEnabled(True)
+        self.StudentButton_SearchID.setEnabled(True)
+        self.StudentButton_SearchName.setEnabled(True)
+        self.LogOffAdmin.setEnabled(True)
+        self.StudentSearch_Name.setEnabled(True)
+        self.StudentSearch_ID.setEnabled(True)
+
+    def handleStaffCancel(self):
+        self.clearStaff()
+        self.enableLeftStaff()
+        Sys.editstaffid = -1
+        Sys.editstaffemail = ""
+
+    def hideall(self):
+        #comment out to make things work again
+        #self.disableAll()
+        #log hide
+        self.LoginTitle.hide()
+        self.LogButton_Exit.hide()
+        self.LogButton_Generate.hide()
+        self.LogButton_Print.hide()
+        self.LogButton_Exit.hide()
+        self.Login_uname.hide()
+        self.LoginButton.hide()
+        self.LogLabel_End.hide()
+        self.LogLabel_Start.hide()
+        self.LogTableView_Staff.hide()
+        self.LogListWidget_Staff.hide()
+        self.LogListWidget_Student.hide()
+        self.LogTableView_Student.hide()
+        self.LogTableView_Generic.hide()
+        #self.LogStudentButton_SearchID.hide()
+        self.LogStudentButton_SearchName.hide()
+        self.LogStudentLabel_SearchName.hide()
+        self.LogStudentLogLabel_SearchID.hide()
+        self.LogStudentText_SearchID.hide()
+        self.LogStudentText_SearchName.hide()
+        self.LogStaffButton_SearchID.hide()
+        self.LogStaffButton_SearchName.hide()
+        self.LogStaffLabel_SearchName.hide()
+        #self.LogStaffLogLabel_SearchID.hide()
+        self.LogStaffText_SearchID.hide()
+        self.LogStaffText_SearchName.hide()
+        self.LogStaffLabel_SearchID.hide()
+        self.LogStaffButton_SearchID.hide()
+        self.LogStaffButton_SearchName.hide()
+        self.LogTableView_Generic.hide()
+        self.LogTableView_Student.hide()
+        self.LogStudentButton_SearchID.hide()
+        self.DismissWidget.hide()
+        self.LogOffAdmin2.hide()
+        self.StartDateEdit.hide()
+        self.EndDateEdit.hide()
+        self.LogLabel_Title.hide()
+        self.LogListWidget_Staff.hide()
+        self.LogOffAdmin.hide()
+        self.LogOffStaff.hide()
+        self.LogStaffButton_SearchID.hide()
+        self.LoginTitle.hide()
+
+
+        #staff hide
+
+        self.StaffLabel_SearchName.hide()
+        self.StaffLabel_SearchID.hide()
+        self.StaffButton_SearchID.hide()
+        self.StaffButton_SearchName.hide()
+        self.StaffButton_SaveAdd.hide()
+        self.StaffButton_SaveEdit.hide()
+        self.StaffButton_Cancel.hide()
+        self.StaffSearch_ID.hide()
+        self.StaffSearch_Name.hide()
+        self.LogOffStaff.hide()
+
+        #listview hide
+        self.LeftListTitle.hide()
+        self.RightListTitle.hide()
+        self.LeftClear.hide()
+        self.RightClear.hide()
+        self.LeftList.hide()
+        self.RightList.hide()
+        self.LeftStudentPicture.hide()
+        self.RightStudentPicture.hide()
+        self.SplittingLine.hide()
+
+        #login hide
+        self.Username.hide()
+        self.Password.hide()
+        self.LoginButton.hide()
+        self.LoginTitle.hide()
+        self.Login_uname.hide()
+        self.Login_uname.clear()
+        self.Login_password.hide()
+        self.Login_password.clear()
+
+        #hiding main admin page
+        self.EditStudent.hide()
+        self.EditStaff.hide()
+        self.StudentLog.hide()
+        self.EditStudent.hide()
+        self.StudentLog.hide()
+        self.LogOffAdmin1.hide()
+        self.adminlabel_welcome.hide()
+        self.adminlabel_student.hide()
+        self.adminlabel_staff.hide()
+        self.adminlabel_log.hide()
+        self.adminlabel_checkout.hide()
+        self.StudentCheckout.hide()
+
+        #hide all student window
+        self.StudentButton_Picture.hide()
+        self.StudentLabel_Grade.hide()
+        self.StudentLabel_ID.hide()
+        self.StudentLabel_Picture_2.hide()
+        self.StudentLabel_SearchID.hide()
+        self.StudentButton_Remove.hide()
+        self.StudentButton_Exit.hide()
+        self.StudentButton_Edit.hide()
+        self.LogOffAdmin.hide()
+        self.StudentLabel_Name.hide()
+        self.StudentLabel_Picture.hide()
+        self.StudentLabel_SearchName.hide()
+        self.StudentLabel_RFID.hide()
+        self.StudentButton_Add.hide()
+        self.StudentLabel_GName.hide()
+        self.StudentText_GName.hide()
+        self.StudentText_Grade.hide()
+        self.StudentText_ID.hide()
+        self.StudentText_Name.hide()
+        self.StudentText_Picture.hide()
+        self.StudentText_RFID.hide()
+        self.StudentSearch_ID.hide()
+        self.StudentSearch_Name.hide()
+        self.StudentButton_SearchID.hide()
+        self.StudentSearch_Name.hide()
+        self.StudentView.hide()
+        self.StudentView.clear()
+
+        #hide all staff window
+        self.StaffButton_Add.hide()
+        self.StaffButton_Edit.hide()
+        self.StaffButton_Exit.hide()
+        self.StaffButton_Promote.hide()
+        self.StaffButton_Remove.hide()
+        self.StaffLabel_Email.hide()
+        self.StaffLabel_ID.hide()
+        self.StaffLabel_Name.hide()
+        self.StaffLabel_Password.hide()
+        self.StaffLabel_CPassword.hide()
+        self.StaffSearch_Name.hide()
+        self.StaffText_Pass.hide()
+        self.StaffText_CPass.hide()
+        self.StaffText_Email.hide()
+        self.StaffText_ID.hide()
+        self.StaffText_Name.hide()
+        self.StaffView.hide()
+        self.LogOffAdmin_Staff.hide()
+        self.StudentButton_SearchName.hide()
+        self.StudentButton_SaveAdd.hide()
+        self.StudentButton_Cancel.hide()
+        self.StudentButton_SaveEdit.hide()
+
+    def listItemToPicture(self, item):
+        try:
+            picture = Sys.searchByName(item)[0].image
+        except IndexError:
+            picture = ""
+        print(picture)
+        pixmap = QtGui.QPixmap(picture)
+        return pixmap.scaled(180, 170, QtCore.Qt.KeepAspectRatio)
+
+    def LogOffAdminfunc(self, MainWindow):
         #when Admin Login is clicked is clicked
+        self.hideall()
+        self.showLogin()
+
+    def LogAdminfunc(self, MainWindow):
+        self.hideall()
+        self.showLog()
+
+    def LogOffStafffunc(self, MainWindow):
+        #when Admin Login is clicked is clicked
+        self.hideall()
+        self.showLogin()
+
+    def MainAdminfunc(self, MainWindow):
+        # when Admin Login is clicked is clicked
         global currentUser
         try:
             conn = connectDB()
@@ -2281,7 +2122,6 @@ class Ui_MainWindow(object):
                         self.hideall()
                         self.showMain()
 
-
                         print("Show Staff Page")
                 else:
                     print("Show Incorrect Password message!")
@@ -2298,22 +2138,9 @@ class Ui_MainWindow(object):
                 self.showMain()
                 print("Show staff Page")
 
-    def LogOffAdminfunc(self, MainWindow):
-        #when Admin Login is clicked is clicked
-        self.hideall()
-        self.showLogin()
-
-    def LogAdminfunc(self, MainWindow):
-        self.hideall()
-        self.showLog()
-
-    def LogOffStafffunc(self, MainWindow):
-        #when Admin Login is clicked is clicked
-        self.hideall()
-        self.showLogin()
-
-    def newOnKeyPressEvent(self,event):
-        if (((event.key() == QtCore.Qt.Key_Enter) or (event.key() == QtCore.Qt.Key_Return)) and (self.LoginButton.isEnabled())):
+    def newOnKeyPressEvent(self, event):
+        if (((event.key() == QtCore.Qt.Key_Enter) or (event.key() == QtCore.Qt.Key_Return)) and (
+        self.LoginButton.isEnabled())):
             print("enter ")
             self.MainAdminfunc(MainWindow)
         if (event.key() == QtCore.Qt.Key_1):
@@ -2327,48 +2154,65 @@ class Ui_MainWindow(object):
             print("Clearing Right Side")
             self.handleClearRight()
 
-    def CancelActionfunc(self, MainWindow):
-        self.hideall()
-        self.showMainAdmin()
-        ui.StudentView.clear()
-        ui.StaffView.clear()
+    def PromoteFunction (self):
+        print('this')
+        global Sys
+        id = self.StaffText_ID.text()
+        if(Sys.promoteStaff(id)):
+            self.popupMessage2(MainWindow, self.StaffText_Name.text() + " is already an admin.")
+        else:
+            print("Not admin----")
+            if(self.popupMessage(MainWindow, "Are you sure you want to promote " + self.StaffText_Name.text() + " to an admin?")):
+                query = "UPDATE staff  SET isAdmin=1  WHERE StaffID=%s;"
+                query2 = (id)
+                conn = connectDB()
+                cur = conn.cursor()
+                addq = cur.execute(query, query2)
+                conn.commit()
+                conn.close()
+                print("admin updated")
+                print(Sys.staffList[1].Name)
+                for i in range(0,len( Sys.staffList)):
+                    print(i)
+                    if(Sys.staffList[i].staffId == id):
 
-    def ShowAdminFunc(self, MainWindow):
-        self.hideall()
-        self.showStudentWindow()
-        self.StudentButton_Picture.setEnabled(False)
+                        Sys.staffList[i].isAdmin = 1
+                        break
+                self.searchByNameStaff("")
+                print(Sys.staffList[2].isAdmin, "kjkkkkkkkkkkkkkkkkkkkk")
+            else:
+                print("admin canceled")
 
-    def ShowStaffWindonFunc(self,MainWindow):
-        self.hideall()
-        self.showStaffWindow()
-        self.enableLeftStaff()
+    def popupMessage(self, MainWindow,StringText):
+        PopupMessage = QtGui.QMessageBox()
+        PopupMessage.setWindowTitle("Confirmation")
+        PopupMessage.setIcon(4)
+        PopupMessage.setText(StringText)
+        PopupMessage.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+        result = PopupMessage.exec()
+        print(result)
+        if result==4194304:
+            return False
+        else:
+            return True
 
-    def clearallfunction(self,MainWindow):
-        self.StudentText_Name.clear()
-        self.StudentText_RFID.clear()
-        self.StudentText_Grade.clear()
-        self.StudentText_GName.clear()
-        self.StudentText_ID.clear()
-        self.StudentText_Picture.clear()
-        self.StudentLabel_Picture_2.clear()
+    def popupMessage2(self, MainWindow, StringText):
+            PopupMessage2 = QtGui.QMessageBox()
+            PopupMessage2.setWindowTitle("Confirmation")
+            PopupMessage2.setIcon(4)
+            PopupMessage2.setText(StringText)
+            PopupMessage2.setStandardButtons(QtGui.QMessageBox.Ok )
+            result = PopupMessage2.exec()
+            print(result)
 
-    def editStudentfunc(self, MainWindow):
-        self.hideall()
-        self.showStudentWindow()
-        self.StudentButton_Cancel.show()
-        self.StudentButton_SaveEdit.show()
-        self.enable()
-        self.StudentButton_Cancel.setEnabled(True)
-        self.StudentButton_SaveEdit.setEnabled(True)
-        self.StudentText_Name.setEnabled(True)
-        self.StudentText_RFID.setEnabled(True)
-        self.StudentText_Grade.setEnabled(True)
-        self.StudentText_GName.setEnabled(True)
-        #getting student id that is being editted
-        Sys.editstudentid = int(self.StudentText_ID.text())
-        self.StudentText_ID.setEnabled(True)
-        self.StudentText_Picture.setEnabled(True)
-        self.StudentButton_Picture.setEnabled(True)
+    def PrintPDF(self):
+        print("print")
+
+    def redrawTables(self):
+        print("Generate Clicked")
+        self.handleviewLogStudent()
+        self.handleviewLogStaff()
+        Sys.showLogData()
 
     def RemoveStudentfunc(self, name):
         name =  self.StudentText_Name.text()
@@ -2407,110 +2251,288 @@ class Ui_MainWindow(object):
                 else:
                     self.popupMessage2(MainWindow,"Admins are not allowed to remove themselves. Please get another admin to remove you. ")
 
-    def EditstaffFunc(self):
-        Sys.editstaffid = int(self.StaffText_ID.text())
-        Sys.editstaffemail = self.StaffText_Email.text()
-        self.enableRightStaff()
-        self.StaffButton_SaveEdit.show()
-        self.StaffButton_Cancel.show()
-        Sys.editstaffid = int(self.StaffText_ID.text())
-        Sys.editstaffemail = self.StaffText_Email.text()
+    def searchIDStudentLog(self):
+        result = []
+        print("by id")
+        id = self.LogStudentText_SearchID.text()
+        result = Sys.searchByID(id)
+        ui.LogListWidget_Student.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.LogListWidget_Student.addItem(item)
 
-    def clearStaff(self):
-        self.StaffText_Name.clear()
-        self.StaffText_ID.clear()
-        self.StaffText_Pass.clear()
-        self.StaffText_CPass.clear()
-        self.StaffText_Email.clear()
+    def searchNameStaffLog(self):
+        result = []
+        name = self.LogStaffText_SearchName.text()
 
-    def enableLeftStaff(self):
-        self.enableStaff()
-        self.StaffButton_Add.setEnabled(True)
-        self.StaffButton_Edit.setEnabled(True)
-        self.StaffButton_Exit.setEnabled(True)
-        self.StaffButton_Promote.setEnabled(True)
-        self.StaffButton_Remove.setEnabled(True)
-        self.StaffLabel_Email.setEnabled(True)
-        self.StaffLabel_ID.setEnabled(True)
-        self.StaffLabel_Name.setEnabled(True)
-        self.StaffLabel_Password.setEnabled(True)
-        self.StaffLabel_CPassword.setEnabled(True)
-        self.StaffSearch_Name.setEnabled(True)
-        self.StaffText_Pass.setEnabled(False)
-        self.StaffText_Pass.setEnabled(False)
-        self.StaffText_Email.setEnabled(False)
-        self.StaffText_ID.setEnabled(False)
-        self.StaffText_Name.setEnabled(False)
-        self.StaffView.setEnabled(True)
-        self.LogOffAdmin_Staff.setEnabled(True)
-        self.StaffLabel_SearchName.setEnabled(True)
-        self.StaffLabel_SearchID.setEnabled(True)
-        self.StaffButton_SearchID.setEnabled(True)
-        self.StaffButton_SearchName.setEnabled(True)
-        self.StaffSearch_ID.setEnabled(True)
-        self.StaffSearch_Name.setEnabled(True)
-        self.StaffButton_SaveEdit.hide()
-        self.StaffButton_SaveAdd.hide()
-        self.StaffButton_Cancel.hide()
-        self.StaffLabel_CPassword.hide()
-        self.StaffLabel_Password.hide()
-        self.StaffText_CPass.hide()
-        self.StaffText_Pass.hide()
+        result = Sys.searchByNameStaff(name)
+        ui.LogListWidget_Staff.clear()
+        if len(result) == 0:
+            result = Sys.staffList
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.LogListWidget_Staff.addItem(item)
 
-    def enableRightStaff(self):
-        self.enableStaff()
-        self.StaffButton_SaveEdit.show()
-        self.StaffButton_Cancel.show()
+    def searchIDStaffLog(self):
+        result = []
+        id = self.LogStaffText_SearchID.text()
+        if id == "":
+            result = Sys.staffList
+        else:
+            result = Sys.searchByIdStaff(id)
+        ui.LogListWidget_Staff.clear()
+
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.LogListWidget_Staff.addItem(item)
+
+    def searchByName(self):
+        global searchStudentStatus
+        searchStaffStatus = 1
+
+        name = self.StudentSearch_Name.text()
+        result = Sys.searchByName(name)
+        print(result)
+        ui.StudentView.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.StudentView.addItem(item)
+        self.StudentView.show()
+
+    def searchByNameStaff(self):
+        global searchStaffStatus
+        searchStaffStatus = 1
+
+        name = self.StaffSearch_Name.text()
+        result = Sys.searchByNameStaff(name)
+        ui.StaffView.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.StaffView.addItem(item)
+        self.StaffView.show()
+
+    def searchByIdStaff(self):
+        global searchStaffStatus
+        searchStaffStatus = 2
+
+        id = self.StaffSearch_ID.text()
+        if id == "":
+            result = Sys.staffList
+        else:
+            result = Sys.searchByIdStaff(id)
+        ui.StaffView.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.StaffView.addItem(item)
+        self.enableLeftStaff()
+        self.StaffView.show()
+
+    def searchByID(self):
+        global searchStudentStatus
+        searchStudentStatus = 2
+
+        id = self.StudentSearch_ID.text()
+
+        if id == "":
+            result = Sys.studentList
+        else:
+            result = Sys.searchByID(id)
+        ui.StudentView.clear()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.StudentView.addItem(item)
+        self.StudentView.show()
+
+    def showStaffWindow(self):
+        self.enableLeftStaff()
+        self.StaffButton_Add.show()
+        self.StaffButton_Edit.show()
+        self.StaffButton_Exit.show()
+        self.StaffButton_Promote.show()
+        self.StaffButton_Remove.show()
+        self.StaffLabel_Email.show()
+        self.StaffLabel_ID.show()
+        self.StaffLabel_Name.show()
         self.StaffLabel_Password.show()
         self.StaffLabel_CPassword.show()
-        self.StaffText_Name.setEnabled(True)
-        self.StaffText_Email.setEnabled(True)
-        self.StaffText_ID.setEnabled(True)
-        self.StaffText_Pass.setEnabled(True)
-        self.StaffText_CPass.setEnabled(True)
-        self.StaffButton_SaveEdit.setEnabled(True)
-        self.StaffButton_Cancel.setEnabled(True)
+        self.StaffSearch_Name.show()
         self.StaffText_Pass.show()
         self.StaffText_CPass.show()
-        self.StaffText_Pass.setText("")
-        self.StaffText_CPass.clear()
+        self.StaffText_Email.show()
+        self.StaffText_ID.show()
+        self.StaffText_Name.show()
+        result = Sys.getStaffNames()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i])
+            ui.StaffView.addItem(item)
+        self.StaffView.show()
+        self.LogOffAdmin_Staff.show()
+        self.StaffLabel_SearchName.show()
+        self.StaffLabel_SearchID.show()
+        self.StaffButton_SearchID.show()
+        self.StaffButton_SearchName.show()
+        self.StaffSearch_ID.show()
+        self.StaffSearch_Name.show()
 
-    def handleStaffCancel(self):
-        self.clearStaff()
+    def ShowStudentLogFunc(self):
+        self.hideall()
+        self.LogButton_Exit.show()
+        self.LogButton_Generate.show()
+        self.LogButton_Print.show()
+        self.LogLabel_End.show()
+        self.LogLabel_Start.show()
+        self.LogTableView_Staff.show()
+        self.LogListWidget_Staff.show()
+        self.LogListWidget_Student.show()
+        self.LogTableView_Student.show()
+        self.LogTableView_Generic.show()
+        self.LogStudentButton_SearchName.show()
+        self.LogStudentLabel_SearchName.show()
+        self.LogStudentLogLabel_SearchID.show()
+        self.LogStudentText_SearchID.show()
+        self.LogStudentText_SearchName.show()
+        self.LogStaffButton_SearchID.show()
+        self.LogStaffButton_SearchName.show()
+        self.LogStaffLabel_SearchName.show()
+        self.LogStaffText_SearchID.show()
+        self.LogStaffText_SearchName.show()
+        self.LogStaffLabel_SearchID.show()
+        self.LogStaffButton_SearchID.show()
+        self.LogStaffButton_SearchName.show()
+        self.LogTableView_Generic.show()
+        self.LogTableView_Student.show()
+        self.LogStudentButton_SearchID.show()
+        self.DismissWidget.show()
+        self.LogOffAdmin2.show()
+        self.StartDateEdit.show()
+        self.EndDateEdit.show()
+        self.LogLabel_Title.show()
+        self.LogListWidget_Staff.show()
+        self.LogStaffButton_SearchID.show()
+        Sys.showLogData()
+
+    def searchNameStudentLog(self):
+        print("A")
+        result = []
+
+        print(sDate, eDate)
+        name = str(self.LogStudentText_SearchName.text())
+        result = Sys.searchByName(name)
+        print(result)
+        ui.LogListWidget_Student.clear()
+
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i].Name)
+            ui.LogListWidget_Student.addItem(item)
+        ui.LogListWidget_Student.show()
+
+    def showStudentWindow(self):
+        self.StudentButton_SearchName.show()
+        self.StudentLabel_Grade.show()
+        self.StudentLabel_ID.show()
+        self.StudentLabel_Picture_2.show()
+        self.StudentLabel_SearchID.show()
+        self.StudentButton_Remove.show()
+        self.StudentButton_Exit.show()
+        self.StudentButton_Edit.show()
+        self.LogOffAdmin.show()
+        self.StudentLabel_Name.show()
+        self.StudentLabel_Picture.show()
+        # self.StudentLabel_SearchName.show()
+        self.StudentLabel_RFID.show()
+        self.StudentButton_Add.show()
+        self.StudentLabel_GName.show()
+        self.StudentText_GName.show()
+        self.StudentText_Grade.show()
+        self.StudentText_ID.show()
+        self.StudentButton_SearchID.show()
+        self.StudentView.show()
+        self.StudentSearch_Name.show()
+        self.StudentButton_Exit.show()
+        self.StudentText_Name.show()
+        self.StudentText_Picture.hide()
+        self.StudentButton_Picture.show()
+        self.StudentText_RFID.show()
+        self.StudentLabel_SearchName.show()
+
+        result = Sys.getStudentNames()
+        for i in range(0, len(result)):
+            item = QtGui.QListWidgetItem(result[i])
+            ui.StudentView.addItem(item)
+
+        self.StudentView.show()
+        self.StudentSearch_ID.show()
+        self.StudentSearch_Name.show()
+
+    def showLog(self):
+        self.LogButton_Exit.show()
+        self.LogOffAdminStudent.show()
+
+    def showMain(self):
+        self.hideall()
+        self.enableListview()
+        #show main application
+        self.LeftListTitle.show()
+        self.RightListTitle.show()
+        self.LeftClear.show()
+        self.RightClear.show()
+        self.LeftList.show()
+        self.RightList.show()
+        self.LeftStudentPicture.show()
+        self.RightStudentPicture.show()
+        self.SplittingLine.show()
+        self.LogOffStaff.show()
+
+    def showMainAdmin(self):
+        #show admin page
+        self.EditStudent.show()
+        self.EditStaff.show()
+        self.StudentLog.show()
+        self.LogOffAdmin1.show()
+        self.StudentCheckout.show()
+
+        self.adminlabel_welcome.show()
+        self.adminlabel_student.show()
+        self.adminlabel_staff.show()
+        self.adminlabel_log.show()
+        self.adminlabel_checkout.show()
+
+        self.EditStudent.raise_()
+        self.EditStaff.raise_()
+        self.StudentLog.raise_()
+        self.LogOffAdmin1.raise_()
+        self.StudentCheckout.raise_()
+
+    def showLogin(self):
+        self.enableLogin()
+        self.Username.show()
+        self.Password.show()
+        self.LoginButton.show()
+        self.LoginTitle.show()
+        self.Login_uname.show()
+        self.Login_password.show()
+
+    def ShowAdminFunc(self, MainWindow):
+        self.hideall()
+        self.showStudentWindow()
+        self.StudentButton_Picture.setEnabled(False)
+
+    def ShowStaffWindonFunc(self,MainWindow):
+        self.hideall()
+        self.showStaffWindow()
         self.enableLeftStaff()
-        Sys.editstaffid = -1
-        Sys.editstaffemail = ""
 
+    def tabControl(self):
+        self.redrawTables()
+        #get current index of dismiss widget
+        #tab control needs to save variable
+        #new function printPDF reads from that variable for the switch case to print the data that is currently shown
 
+    def updateLeftPicture(self):
+        self.LeftStudentPicture.setPixmap(self.listItemToPicture(self.LeftList.currentItem().text()))
 
-    def PromoteFunction (self):
-        print('this')
-        global Sys
-        id = self.StaffText_ID.text()
-        if(Sys.promoteStaff(id)):
-            self.popupMessage2(MainWindow, self.StaffText_Name.text() + " is already an admin.")
-        else:
-            print("Not admin----")
-            if(self.popupMessage(MainWindow, "Are you sure you want to promote " + self.StaffText_Name.text() + " to an admin?")):
-                query = "UPDATE staff  SET isAdmin=1  WHERE StaffID=%s;"
-                query2 = (id)
-                conn = connectDB()
-                cur = conn.cursor()
-                addq = cur.execute(query, query2)
-                conn.commit()
-                conn.close()
-                print("admin updated")
-                print(Sys.staffList[1].Name)
-                for i in range(0,len( Sys.staffList)):
-                    print(i)
-                    if(Sys.staffList[i].staffId == id):
-
-                        Sys.staffList[i].isAdmin = 1
-                        break
-                self.searchByNameStaff("")
-                print(Sys.staffList[2].isAdmin, "kjkkkkkkkkkkkkkkkkkkkk")
-            else:
-                print("admin canceled")
+    def updateRightPicture(self):
+        self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.currentItem().text()))
 
 class WorkerThread(QThread):
     def __init__(self, parent = None):
