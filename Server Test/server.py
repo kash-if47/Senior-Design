@@ -2170,9 +2170,17 @@ MainWindow = QtGui.QMainWindow()
 ui = Ui_MainWindow()
 ui.setupUi(MainWindow)
 
+"""
+Comment Type 1
+"""
+
+## Comment Type 2
+
 if __name__ == "__main__":
     MainWindow.show()
     Sys = System()
 
 
     sys.exit(app.exec_())
+	
+
