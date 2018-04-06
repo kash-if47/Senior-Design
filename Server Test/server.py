@@ -15,8 +15,8 @@ filename = ""
 searchStaffStatus = 0
 searchStudentStatus = 0
 
-#   function connects to the DB using pymysql module
-#   returns the establish connection to make various queries on DB
+##   function connects to the DB using pymysql module
+##   returns the establish connection to make various queries on DB
 def connectDB():
     conn = pymysql.connect(host='localhost', port=3306, user='root', passwd='rfid1234', db='rfid')
     # cur = conn.cursor()
@@ -50,13 +50,13 @@ class System(object):
     listL = []
     listR = []
 
-    #System Functions
+    ##System Functions
     def __init__(self):
         try:
             conn = connectDB()
             cur = conn.cursor()
 
-            #   Fetching initial data from Student table on the DB and appending to a list self.studentList
+            ##   Fetching initial data from Student table on the DB and appending to a list self.studentList
             cur.execute("SELECT * FROM student")
             data = cur.fetchall()
             for i in range(0, len(data)):
@@ -70,7 +70,7 @@ class System(object):
                 #self.studentList.append(student)
                 self.studentList.append(Student(Name, studentId, tagId, guardian, pic,grade))
 
-            #   Fetching initial data from Staff table on the DB and appending to a list self.staffList
+            ##   Fetching initial data from Staff table on the DB and appending to a list self.staffList
             cur.execute("SELECT * FROM staff")
             data2 = cur.fetchall()
             for i in range(0, len(data2)):
@@ -83,9 +83,9 @@ class System(object):
                 #self.staffList.append(staff)
                 self.staffList.append(Staff(staffId, fName, Email, password, isAdmin))
 
-        #   Fetching all the data from LOG on the DB and appending to a list off the self.logList
-        #   Pulls all log data from DB and inputs to a list, Does the list update
-        #   with new log information after list has appended? From initial append ????
+        ##   Fetching all the data from LOG on the DB and appending to a list off the self.logList
+        ##   Pulls all log data from DB and inputs to a list, Does the list update
+        ##   with new log information after list has appended? From initial append ????
             cur.execute("SELECT * FROM LOG")
             data = cur.fetchall()
             for i in range(0, len(data2)):
@@ -99,8 +99,8 @@ class System(object):
         except:
             print("db error HEHE")
 
-    #   Adds new student from the editStudent on the gui left, provides no checking of invalid or duplicate responses
-    #   inputs the data to the Database for the newly created student
+    ##   Adds new student from the editStudent on the gui left, provides no checking of invalid or duplicate responses
+    ##   inputs the data to the Database for the newly created student
     def addnewStudent(self,name,id,rfid,gname,pic,grade):
         conn = connectDB()
         cur = conn.cursor()
@@ -110,8 +110,8 @@ class System(object):
         conn.commit()
         conn.close()
 
-    #   Adds new staff from the editStaff on the gui middle, provides no checking of invalid or duplicate responses
-    #   inputs the data to the Database for the newly created staff
+    ##   Adds new staff from the editStaff on the gui middle, provides no checking of invalid or duplicate responses
+    ##   inputs the data to the Database for the newly created staff
     def addnewStaff(self,name,id,Email,password,is_admin):
         conn = connectDB()
         cur = conn.cursor()
@@ -121,9 +121,9 @@ class System(object):
         conn.commit()
         conn.close()
 
-    #   Function goes through the entire list of currently available students in self.studentList
-    #   checking each STUDENT id (function name makes no distinction of STAFF) for duplicates in studentID
-    #   returns bool False if no id match the studentList, True if a current student has that identical ID
+    ##   Function goes through the entire list of currently available students in self.studentList
+    ##   checking each STUDENT id (function name makes no distinction of STAFF) for duplicates in studentID
+    ##   returns bool False if no id match the studentList, True if a current student has that identical ID
     def checkDuplicateID(self,id):
         result = False
         for i in range(0, len(self.studentList)):
@@ -134,9 +134,9 @@ class System(object):
 
         return result
 
-    #   Function goes through the entire list of currently available staff in self.staffList
-    #   checking each STAFF id for duplicates in staffID
-    #   returns bool False if no id match the staffList, True if a current staff member has identical ID
+    ##   Function goes through the entire list of currently available staff in self.staffList
+    ##   checking each STAFF id for duplicates in staffID
+    ##   returns bool False if no id match the staffList, True if a current staff member has identical ID
     def checkDuplicateIDStaff(self,id):
         result = False
         for i in range(0, len(self.staffList)):
@@ -146,19 +146,19 @@ class System(object):
                 result = True
         return result
 
-    #   Function takes email address as parameter, goes through the entire list of self.staffList
-    #   if there is a staff with a matching email then return that staff's ID number
-    #   returns Staff's ID number or -1/False if no staff have that maching email
+    ##   Function takes email address as parameter, goes through the entire list of self.staffList
+    ##   if there is a staff with a matching email then return that staff's ID number
+    ##   returns Staff's ID number or -1/False if no staff have that maching email
     def emailToId(self, email):
         for i in range (0, len(self.staffList)):
             if email == self.staffList[i].Email:
                 return self.staffList[i].staffId
         return -1
 
-    #   Function takes parameters needed to add/edit a student, connects to the DB and updates the student table
-    #   found in edit student gui left, once pressed list of available students will appear. Selecting student in question
-    #   then pressing editstudent will allow the admin to edit all fields of the currently selected student. (student id should not be allowed to be modified )
-    #   Creates new empty studentList and then repopulates all data from DB into newly created list.
+    ##   Function takes parameters needed to add/edit a student, connects to the DB and updates the student table
+    ##   found in edit student gui left, once pressed list of available students will appear. Selecting student in question
+    ##   then pressing editstudent will allow the admin to edit all fields of the currently selected student. (student id should not be allowed to be modified )
+    ##   Creates new empty studentList and then repopulates all data from DB into newly created list.
     def editStudent(self,id,grade,rfid,name,gname,pic):
         conn = connectDB()
         cur = conn.cursor()
@@ -182,10 +182,10 @@ class System(object):
         Sys.editstudentid = -1
         conn.close()
 
-    #   Function takes parameters needed to add/edit a staff, connects to the DB and updates the staff table
-    #   found in edit staff gui middle, once pressed list of available staff will appear. Selecting staff in question
-    #   then pressing editstaff will allow the admin to edit all fields of the currently selected student. (staff id should not be allowed to be modified )
-    #   Creates new empty staffList and then repopulates all data from DB into newly created list.
+    ##   Function takes parameters needed to add/edit a staff, connects to the DB and updates the staff table
+    ##   found in edit staff gui middle, once pressed list of available staff will appear. Selecting staff in question
+    ##   then pressing editstaff will allow the admin to edit all fields of the currently selected student. (staff id should not be allowed to be modified )
+    ##   Creates new empty staffList and then repopulates all data from DB into newly created list.
     def editStaff(self,name,Email,password,id):
 
         conn = connectDB()
@@ -208,7 +208,7 @@ class System(object):
         self.editstaffemail = ""
         conn.close()
 
-    #   Function returns list of studentNames found in the most current list of self.studentList and returns list to calling function
+    ##   Function returns list of studentNames found in the most current list of self.studentList and returns list to calling function
     def getStudentNames(self):
         result = []
         for i in range(0, len(self.studentList)):
@@ -216,7 +216,7 @@ class System(object):
             result.append(name)
         return result
 
-    #   Function returns list of staffNames found in the most current list of self.staffList and returns list to calling function
+    ##   Function returns list of staffNames found in the most current list of self.staffList and returns list to calling function
     def getStaffNames(self):
         result = []
         for i in range(0, len(self.staffList)):
@@ -224,28 +224,28 @@ class System(object):
             result.append(name)
         return result
 
-    #   Function returns image from a STUDENT where the current id the function is comparing itself to is from the selected student's ID in the GUI
+    ##   Function returns image from a STUDENT where the current id the function is comparing itself to is from the selected student's ID in the GUI
     def getPicFromID(self):
         for i in range(0, len(self.studentList)):
             if self.studentList[i].studentId == Sys.editstudentid:
                 return self.studentList[i].image
 
-    #   Function returns Student Name based on the parameter, id, by going through all students in self.studentList
+    ##   Function returns Student Name based on the parameter, id, by going through all students in self.studentList
     def getStudentNameById(self, id):
         for i in range(0, len(self.studentList)):
             if self.studentList[i].studentId == id:
                 return self.studentList[i].Name
         return -1
 
-    #   Function returns Staff Name based on the parameter, id, by going through all staff in self.staffList
+    ##   Function returns Staff Name based on the parameter, id, by going through all staff in self.staffList
     def getStaffNameById(self, id):
         for i in range(0, len(self.staffList)):
             if self.staffList[i].staffId == id:
                 return self.staffList[i].Name
         return -1
 
-    #   Function adds new log entry, inserts into the DB log table with the staffID and StudentID of the GLOBAL currentUser
-    #   Log table automatically adds the date time in the table
+    ##  Function adds new log entry, inserts into the DB log table with the staffID and StudentID of the GLOBAL currentUser
+    ##   Log table automatically adds the date time in the table
     def logEntry(self, studentId):
         print("Log Entry Funct with input: " + str(studentId))
         staffId = self.emailToId(currentUser)
@@ -257,8 +257,8 @@ class System(object):
         conn.commit()
         conn.close()
 
-    #   Function takes the rfid Tag as parameter to look up a STUDENT
-    #   if a student has the matching rfid tag in question, that student(name, tagid, studentID, gName, etc) is returned to the calling function
+    ##   Function takes the rfid Tag as parameter to look up a STUDENT
+    ##   if a student has the matching rfid tag in question, that student(name, tagid, studentID, gName, etc) is returned to the calling function
     def lookUpRfid(self, rfid):
         for i in range(0, len(self.studentList)):
             if self.studentList[i].tagId == rfid:
@@ -266,8 +266,8 @@ class System(object):
                 return self.studentList[i]
         return -1
 
-    #   Function is used to promote a Staff member as an admin, its parameter ID, goes through the entire
-    #   staffList and finds the machine staff, checks to see if isAdmin is True/False returns bool
+    ##   Function is used to promote a Staff member as an admin, its parameter ID, goes through the entire
+    ##   staffList and finds the machine staff, checks to see if isAdmin is True/False returns bool
     def promoteStaff(self,id):
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
@@ -279,13 +279,13 @@ class System(object):
                     print("Not Admin")
                     return False
 
-    #   Function does not makes any sense, uses searchbyname function with parameter (empty str)
+    ##   Function does not makes any sense, uses searchbyname function with parameter (empty str)
     def redraw(self):
         self.searchByName("")
 
-    #   function takes id as parameter and goes through all students in studentList, if the student is found. they are deleted from the list
-    #   Problems can occur because this is only superficial. The student is not actually deleted from the DB and will appear again if
-    #   a function repopulates the studentList
+    ##   function takes id as parameter and goes through all students in studentList, if the student is found. they are deleted from the list
+    ##   Problems can occur because this is only superficial. The student is not actually deleted from the DB and will appear again if
+    ##   a function repopulates the studentList
     def removeStudent(self,id):
         for i in range(0, len(self.studentList)):
             idval = self.studentList[i].studentId
@@ -295,9 +295,9 @@ class System(object):
                 del self.studentList[i]     #Needs to be deleted from the DB for this to work correctly
                 break
 
-    #   function takes id, user as parameter and goes through all staff in staffList, if the staff is found. they are deleted from the list
-    #   Problems can occur because this is only superficial. The staff is not actually deleted from the DB and will appear again if
-    #   a function repopulates the staffList. CHECKS IF STAFF HAS EMAIL, doesn't make sense why removal would be denied
+    ##   function takes id, user as parameter and goes through all staff in staffList, if the staff is found. they are deleted from the list
+    ##   Problems can occur because this is only superficial. The staff is not actually deleted from the DB and will appear again if
+    ##   a function repopulates the staffList. CHECKS IF STAFF HAS EMAIL, doesn't make sense why removal would be denied
     def removeStaff(self,id,user):
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
@@ -312,9 +312,9 @@ class System(object):
                     print("Staff Removed")
                     return 1
 
-    #   Function takes string name as parameter, (prints the length of studentlist as string, why????)
-    #   name parameter is lowerCased, then searches the entire studentList
-    #   No return error if the name in question is not found in the studentList
+    ##   Function takes string name as parameter, (prints the length of studentlist as string, why????)
+    ##   name parameter is lowerCased, then searches the entire studentList
+    ##   No return error if the name in question is not found in the studentList
     def searchByName(self, name):
         print(str(len(self.studentList)))
         result = []
@@ -329,9 +329,9 @@ class System(object):
                 result.append(self.studentList[i])      #   append the student to result list and return
         return result
 
-    #   Function takes string name as parameter,
-    #   name parameter is lowerCased, then searches the entire studentList
-    #   No return error if the name in question is not found in the studentList
+    ##   Function takes string name as parameter,
+    ##   name parameter is lowerCased, then searches the entire studentList
+    ##   No return error if the name in question is not found in the studentList
     def searchByNameStaff(self, name):
         print("search staff name")
         searchStaffStatus=1
@@ -345,7 +345,7 @@ class System(object):
                 result.append(self.staffList[i])
         return result
 
-    #   Function searches STUDENT id from StudentList, if found, returns the Student in question
+    ##   Function searches STUDENT id from StudentList, if found, returns the Student in question
     def searchByID(self, id):
 
         result = []
@@ -360,14 +360,14 @@ class System(object):
             return -1   #why two return statements back to back? 1 should suffice
         return result
 
-    #   Function searches Staff id from staffList if the id matches we return 1 (This must be a temporary function as I see the old one below)
+    ##   Function searches Staff id from staffList if the id matches we return 1 (This must be a temporary function as I see the old one below)
     def searchStaffIdNew(self, id):
         for i in range(0, len(self.staffList)):
             if id == self.staffList[i].staffId:
                 return 1        # why return 1? each staff has ID 1?
         return -1
 
-    #   Function searches Staff id from STaffList, if found returns result list
+    ##   Function searches Staff id from STaffList, if found returns result list
     def searchByIdStaff(self, id):
         result = []
         print("search staff id")
@@ -383,12 +383,13 @@ class System(object):
             print("not found")
         return result
 
-    # Used in RedrawTables(), ShowStudentLogFunc()
+    ## Used in RedrawTables(), ShowStudentLogFunc()
     def showLogData(self):
         conn = connectDB()
         cur = conn.cursor()
         cur.execute("SELECT * FROM LOG")
-        dataMain = cur.fetchall()
+        cur.fetchall()
+	# Connection to DB established and is gathering all data from the LOG table 
         ui.LogListWidget_Staff.clear()
         ui.LogListWidget_Student.clear()
 
@@ -436,20 +437,22 @@ class System(object):
             ui.LogListWidget_Staff.addItem(item)
         print(result)
 
-    # Not used in any other location, just defined below
+    ## Not used in any other location, just defined below
     def showStudentReport(self):
         result = Sys.getStudentNames()
         for i in range(0, len(result)):
             item = QtGui.QListWidgetItem(result[i])
             ui.LogListWidget_Student.addItem(item)
 
-    # Not used in any other location, just defined below
+    ## Not used in any other location, just defined below
     def showStaffReport(self):
         result = Sys.getStaffNames()
         for i in range(0, len(result)):
             item = QtGui.QListWidgetItem(result[i])
             ui.LogListWidget_Staff.addItem(item)
-
+		
+    ## Function takes email as @param, searches entire staffList and if email matches current users' email, the function returns false
+    ## if the email is not the current user and is found to be someone elses email, it returns true
     def searchByEmail(self, email):
         for i in range(0, len(self.staffList)):
             tempEmail = self.staffList[i].Email
@@ -457,7 +460,7 @@ class System(object):
             if(tempEmail == email) and (Sys.editstaffid != tempId):
                 return True
         return False
-
+## Class body for student, defines the variables needed for each instance and all associated functions 
 class Student(object):
     studentId = 0
     tagId = ""
@@ -466,7 +469,7 @@ class Student(object):
     image = ""
     grade = 0
 
-    # The class "constructor" - It's actually an initializer
+    ## The class "constructor" - It's actually an initializer
     def __init__(self, Name, studentId, tagId, guardian, image, grade):
         self.studentId = studentId
         self.Name = Name
@@ -474,14 +477,16 @@ class Student(object):
         self.tagId = tagId
         self.image = image
         self.grade = grade
-
+	
+## Class body for every staff, defines the variables needed for each instance and all associated functions 
 class Staff(object):
     staffId = 0
     Name = ""
     Email = ""
     password = ""
     isAdmin = 0
-
+    
+    ## The class "constructor" is actually the initializer 
     def __init__(self, staffId, Name, Email, password, isAdmin):
         self.staffId = staffId
         self.Name = Name
@@ -489,12 +494,14 @@ class Staff(object):
         self.password = password
         self.isAdmin = isAdmin
 
+## Class log for each entry, defines the variables needed for each instance and all associated functions 
 class Log(object):
     staffID = 0
     studentID = 0
     date = ""
     timestamp = ""
 
+    ## The class "constructor" is actually the initializer 
     def __init__(self,staffID,studentID,date,time):
         self.staffID = staffID
         self.studentID = studentID
@@ -2477,7 +2484,6 @@ class Ui_MainWindow(object):
         self.LogStaffButton_SearchID.show()
         Sys.showLogData()
 
-    
     def searchNameStudentLog(self):
         print("A")
         result = []
@@ -2493,7 +2499,6 @@ class Ui_MainWindow(object):
             ui.LogListWidget_Student.addItem(item)
         ui.LogListWidget_Student.show()
 
-    ## This method shows the edit student page, it also gets all the student names in the system and displays it in the selection list. 
     def showStudentWindow(self):
         self.StudentButton_SearchName.show()
         self.StudentLabel_Grade.show()
@@ -2532,12 +2537,10 @@ class Ui_MainWindow(object):
         self.StudentSearch_ID.show()
         self.StudentSearch_Name.show()
 
-    ## Shows the log out button and exit button. 
     def showLog(self):
         self.LogButton_Exit.show()
         self.LogOffAdminStudent.show()
 
-    ## Hides all the widgets and shows only the widgets that are relevent to the Student Checkout page. 
     def showMain(self):
         self.hideall()
         self.enableListview()
@@ -2553,7 +2556,6 @@ class Ui_MainWindow(object):
         self.SplittingLine.show()
         self.LogOffStaff.show()
 
-    ## Shows the relevent widgets for the main administrator page. 
     def showMainAdmin(self):
         #show admin page
         self.EditStudent.show()
@@ -2574,7 +2576,6 @@ class Ui_MainWindow(object):
         self.LogOffAdmin1.raise_()
         self.StudentCheckout.raise_()
 
-    ## This method shows the relevent widgets for login and sets them enabled so that user can enter their login id and password. 
     def showLogin(self):
         self.enableLogin()
         self.Username.show()
@@ -2584,39 +2585,32 @@ class Ui_MainWindow(object):
         self.Login_uname.show()
         self.Login_password.show()
 
-    ## Hides all the widget. Then calls showStudentWindow() which then shows the relevent widgets for the edit student view.
     def ShowAdminFunc(self, MainWindow):
         self.hideall()
         self.showStudentWindow()
         self.StudentButton_Picture.setEnabled(False)
 
-    ## This function hides all the widgets and then calls shoStaffWindow() which shows the relevent widgets for the staff window.
     def ShowStaffWindonFunc(self,MainWindow):
         self.hideall()
         self.showStaffWindow()
         self.enableLeftStaff()
-	
-    ## Just refreshes the page when tab is changed on the all the log views. 
+
     def tabControl(self):
         self.redrawTables()
         #get current index of dismiss widget
         #tab control needs to save variable
         #new function printPDF reads from that variable for the switch case to print the data that is currently shown
 
-    ## On the Student Check out view it updates the left picture to the selected student. 
     def updateLeftPicture(self):
         self.LeftStudentPicture.setPixmap(self.listItemToPicture(self.LeftList.currentItem().text()))
-	
-    ## On the Student Check out view it updates the right picture to the selected student. 
+
     def updateRightPicture(self):
         self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.currentItem().text()))
 
-## This is a Qthread class that runs/starts the server that is listening on a particular port and ip for the c# client in the manufacturer provided api. 
 class WorkerThread(QThread):
     def __init__(self, parent = None):
         super(WorkerThread, self).__init__(parent)
-	
-    ## Starts the server in a new thread
+
     def run(self):
         serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("Server Log: " + socket.gethostname())
@@ -2636,7 +2630,6 @@ class WorkerThread(QThread):
                 continue
         serverSocket.close()
 
-## Takes the clientsocket object as input and updates the two lists and respective pictures for both lanes in the Student Checkout View. 
 def client_thread(clientsocket):
     message = clientsocket.recv(2048)
     rfid = message.decode("utf-8")
@@ -2676,7 +2669,6 @@ def client_thread(clientsocket):
     clientsocket.close()
     print("Thread Complete")
 
-## Helper/Wrapper function that takes rfid tag id (String) as an input, calls lookUpRfid in the Sys object and gets the name and image assoiciated with that id.
 def search_query(rfid):
     result = Sys.lookUpRfid(rfid)
     if result != -1:
@@ -2689,6 +2681,10 @@ MainWindow = QtGui.QMainWindow()
 ui = Ui_MainWindow()
 ui.setupUi(MainWindow)
 
+"""
+Comment Type 1
+"""
+
 ## Comment Type 2
 
 if __name__ == "__main__":
@@ -2698,6 +2694,7 @@ if __name__ == "__main__":
     listR = []
     global listL
     listL = []
+    print("I am awesome!")
     sys.exit(app.exec_())
 	
 
