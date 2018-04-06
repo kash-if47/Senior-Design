@@ -2371,7 +2371,8 @@ class Ui_MainWindow(object):
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.StudentView.addItem(item)
         self.StudentView.show()
-
+	
+	## This function is for searching the name of staff member
     def searchByNameStaff(self):
         global searchStaffStatus
         searchStaffStatus = 1
@@ -2383,7 +2384,8 @@ class Ui_MainWindow(object):
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.StaffView.addItem(item)
         self.StaffView.show()
-
+    
+	## This method grabs the staff id from search  staff by id text box and then shows the staff memeber on the list that matches the id 
     def searchByIdStaff(self):
         global searchStaffStatus
         searchStaffStatus = 2
@@ -2399,7 +2401,7 @@ class Ui_MainWindow(object):
             ui.StaffView.addItem(item)
         self.enableLeftStaff()
         self.StaffView.show()
-
+    ## This function gethe the student id from the search by id text box and then shrinks the list to just the student with that matches with that student id
     def searchByID(self):
         global searchStudentStatus
         searchStudentStatus = 2
@@ -2415,7 +2417,7 @@ class Ui_MainWindow(object):
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.StudentView.addItem(item)
         self.StudentView.show()
-
+    ## zthis method showss the edit staff window widgets and fills the list with the names of all the staff members
     def showStaffWindow(self):
         self.enableLeftStaff()
         self.StaffButton_Add.show()
@@ -2447,6 +2449,7 @@ class Ui_MainWindow(object):
         self.StaffSearch_ID.show()
         self.StaffSearch_Name.show()
 
+	## This method shows the student log tab, it also gets all the student names in the system and displays those who have log entries between the provided dates.  	
     def ShowStudentLogFunc(self):
         self.hideall()
         self.LogButton_Exit.show()
@@ -2484,6 +2487,7 @@ class Ui_MainWindow(object):
         self.LogStaffButton_SearchID.show()
         Sys.showLogData()
 
+	## This method searches the data log based on student name and outputs the result to the student log table
     def searchNameStudentLog(self):
         print("A")
         result = []
