@@ -1,6 +1,6 @@
 import socket
 import threading
-import glob
+import glob #   currently not being used .. ???
 import shutil
 import os
 import sys
@@ -15,11 +15,15 @@ filename = ""
 searchStaffStatus = 0
 searchStudentStatus = 0
 
+#   function connects to the DB using pymysql module
+#   returns the establish connection to make various queries on DB
 def connectDB():
     conn = pymysql.connect(host='localhost', port=3306, user='root', passwd='rfid1234', db='rfid')
     # cur = conn.cursor()
     return conn
 
+#   Encoding strings in best format for pyqt4
+#
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -51,7 +55,9 @@ class System(object):
         try:
             conn = connectDB()
             cur = conn.cursor()
-            temp = cur.execute("SELECT * FROM student")
+
+            #   Fetching initial data from Student table on the DB and appending to a list self.studentList
+            cur.execute("SELECT * FROM student")
             data = cur.fetchall()
             for i in range(0, len(data)):
                 Name = data[i][0]
@@ -60,9 +66,12 @@ class System(object):
                 guardian = data[i][3]
                 grade = data[i][4]
                 pic = data[i][5]
-                student = Student(Name, studentId, tagId, guardian, pic,grade)
-                self.studentList.append(student)
-            temp = cur.execute("SELECT * FROM staff")
+                #student = Student(Name, studentId, tagId, guardian, pic,grade)
+                #self.studentList.append(student)
+                self.studentList.append(Student(Name, studentId, tagId, guardian, pic,grade))
+
+            #   Fetching initial data from Staff table on the DB and appending to a list self.staffList
+            cur.execute("SELECT * FROM staff")
             data2 = cur.fetchall()
             for i in range(0, len(data2)):
                 fName = data2[i][0]
@@ -70,10 +79,14 @@ class System(object):
                 password = data2[i][2]
                 staffId = data2[i][3]
                 isAdmin = data2[i][4]
-                staff = Staff(staffId, fName, Email, password, isAdmin)
-                self.staffList.append(staff)
+                #staff = Staff(staffId, fName, Email, password, isAdmin)
+                #self.staffList.append(staff)
+                self.staffList.append(Staff(staffId, fName, Email, password, isAdmin))
 
-            temp = cur.execute("SELECT * FROM LOG")
+        #   Fetching all the data from LOG on the DB and appending to a list off the self.logList
+        #   Pulls all log data from DB and inputs to a list, Does the list update
+        #   with new log information after list has appended? From initial append ????
+            cur.execute("SELECT * FROM LOG")
             data = cur.fetchall()
             for i in range(0, len(data2)):
                 staffid = data2[i][0]
@@ -82,27 +95,35 @@ class System(object):
                 time = data2[i][3]
                 self.logList.append(Log(staffid,studentid,date,time))
 
+
         except:
             print("db error HEHE")
 
+    #   Adds new student from the editStudent on the gui left, provides no checking of invalid or duplicate responses
+    #   inputs the data to the Database for the newly created student
     def addnewStudent(self,name,id,rfid,gname,pic,grade):
         conn = connectDB()
         cur = conn.cursor()
-        query3 = "INSERT INTO STUDENT (Name, TagId, StudentID, GuardianName, grade, pic) VALUES (%s,%s,%s,%s,%s,%s);"
+        query = "INSERT INTO STUDENT (Name, TagId, StudentID, GuardianName, grade, pic) VALUES (%s,%s,%s,%s,%s,%s);"
         queryval = (name,rfid,id,gname,grade,pic)
-        addq = cur.execute(query3,queryval)
+        cur.execute(query,queryval)
         conn.commit()
         conn.close()
 
+    #   Adds new staff from the editStaff on the gui middle, provides no checking of invalid or duplicate responses
+    #   inputs the data to the Database for the newly created staff
     def addnewStaff(self,name,id,Email,password,is_admin):
         conn = connectDB()
         cur = conn.cursor()
-        query3 = "INSERT INTO STAFF (Fname, Email, Password, StaffID, isAdmin) VALUES (%s,%s,%s,%s,%s);"
+        query = "INSERT INTO STAFF (Fname, Email, Password, StaffID, isAdmin) VALUES (%s,%s,%s,%s,%s);"
         queryval = (name, Email, password, id, is_admin)
-        addq = cur.execute(query3,queryval)
+        cur.execute(query,queryval)
         conn.commit()
         conn.close()
 
+    #   Function goes through the entire list of currently available students in self.studentList
+    #   checking each STUDENT id (function name makes no distinction of STAFF) for duplicates in studentID
+    #   returns bool False if no id match the studentList, True if a current student has that identical ID
     def checkDuplicateID(self,id):
         result = False
         for i in range(0, len(self.studentList)):
@@ -113,6 +134,9 @@ class System(object):
 
         return result
 
+    #   Function goes through the entire list of currently available staff in self.staffList
+    #   checking each STAFF id for duplicates in staffID
+    #   returns bool False if no id match the staffList, True if a current staff member has identical ID
     def checkDuplicateIDStaff(self,id):
         result = False
         for i in range(0, len(self.staffList)):
@@ -122,12 +146,19 @@ class System(object):
                 result = True
         return result
 
+    #   Function takes email address as parameter, goes through the entire list of self.staffList
+    #   if there is a staff with a matching email then return that staff's ID number
+    #   returns Staff's ID number or -1/False if no staff have that maching email
     def emailToId(self, email):
         for i in range (0, len(self.staffList)):
             if email == self.staffList[i].Email:
                 return self.staffList[i].staffId
         return -1
 
+    #   Function takes parameters needed to add/edit a student, connects to the DB and updates the student table
+    #   found in edit student gui left, once pressed list of available students will appear. Selecting student in question
+    #   then pressing editstudent will allow the admin to edit all fields of the currently selected student. (student id should not be allowed to be modified )
+    #   Creates new empty studentList and then repopulates all data from DB into newly created list.
     def editStudent(self,id,grade,rfid,name,gname,pic):
         conn = connectDB()
         cur = conn.cursor()
@@ -135,7 +166,7 @@ class System(object):
             pic = Sys.getPicFromID()
         cur.execute ("""   UPDATE student   SET Name=%s, TagId=%s, StudentID=%s ,GuardianName=%s, grade=%s ,pic=%s  WHERE StudentID=%s""", (name, rfid, id, gname, grade, pic, Sys.editstudentid))
         conn.commit()
-        temp = cur.execute("SELECT * FROM student")
+        cur.execute("SELECT * FROM student")
         data = cur.fetchall()
         self.studentList = []
         for i in range(0, len(data)):
@@ -147,9 +178,14 @@ class System(object):
             pic = data[i][5]
             student = Student(Name, studentId, tagId, guardian, pic, grade)
             self.studentList.append(student)
+        #   Add notes about sys.editstudentid, confused about it's function
         Sys.editstudentid = -1
         conn.close()
 
+    #   Function takes parameters needed to add/edit a staff, connects to the DB and updates the staff table
+    #   found in edit staff gui middle, once pressed list of available staff will appear. Selecting staff in question
+    #   then pressing editstaff will allow the admin to edit all fields of the currently selected student. (staff id should not be allowed to be modified )
+    #   Creates new empty staffList and then repopulates all data from DB into newly created list.
     def editStaff(self,name,Email,password,id):
 
         conn = connectDB()
@@ -172,6 +208,7 @@ class System(object):
         self.editstaffemail = ""
         conn.close()
 
+    #   Function returns list of studentNames found in the most current list of self.studentList and returns list to calling function
     def getStudentNames(self):
         result = []
         for i in range(0, len(self.studentList)):
@@ -179,6 +216,7 @@ class System(object):
             result.append(name)
         return result
 
+    #   Function returns list of staffNames found in the most current list of self.staffList and returns list to calling function
     def getStaffNames(self):
         result = []
         for i in range(0, len(self.staffList)):
@@ -186,23 +224,28 @@ class System(object):
             result.append(name)
         return result
 
+    #   Function returns image from a STUDENT where the current id the function is comparing itself to is from the selected student's ID in the GUI
     def getPicFromID(self):
         for i in range(0, len(self.studentList)):
             if self.studentList[i].studentId == Sys.editstudentid:
                 return self.studentList[i].image
 
+    #   Function returns Student Name based on the parameter, id, by going through all students in self.studentList
     def getStudentNameById(self, id):
         for i in range(0, len(self.studentList)):
             if self.studentList[i].studentId == id:
                 return self.studentList[i].Name
         return -1
 
+    #   Function returns Staff Name based on the parameter, id, by going through all staff in self.staffList
     def getStaffNameById(self, id):
         for i in range(0, len(self.staffList)):
             if self.staffList[i].staffId == id:
                 return self.staffList[i].Name
         return -1
 
+    #   Function adds new log entry, inserts into the DB log table with the staffID and StudentID of the GLOBAL currentUser
+    #   Log table automatically adds the date time in the table
     def logEntry(self, studentId):
         print("Log Entry Funct with input: " + str(studentId))
         staffId = self.emailToId(currentUser)
@@ -210,10 +253,12 @@ class System(object):
         cur = conn.cursor()
         query = "INSERT INTO LOG (StaffID, StudentID) VALUES (%s,%s);"
         queryval = (staffId, studentId)
-        addq = cur.execute(query, queryval)
+        cur.execute(query, queryval)
         conn.commit()
         conn.close()
 
+    #   Function takes the rfid Tag as parameter to look up a STUDENT
+    #   if a student has the matching rfid tag in question, that student(name, tagid, studentID, gName, etc) is returned to the calling function
     def lookUpRfid(self, rfid):
         for i in range(0, len(self.studentList)):
             if self.studentList[i].tagId == rfid:
@@ -221,6 +266,8 @@ class System(object):
                 return self.studentList[i]
         return -1
 
+    #   Function is used to promote a Staff member as an admin, its parameter ID, goes through the entire
+    #   staffList and finds the machine staff, checks to see if isAdmin is True/False returns bool
     def promoteStaff(self,id):
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
@@ -232,46 +279,59 @@ class System(object):
                     print("Not Admin")
                     return False
 
+    #   Function does not makes any sense, uses searchbyname function with parameter (empty str)
     def redraw(self):
         self.searchByName("")
 
+    #   function takes id as parameter and goes through all students in studentList, if the student is found. they are deleted from the list
+    #   Problems can occur because this is only superficial. The student is not actually deleted from the DB and will appear again if
+    #   a function repopulates the studentList
     def removeStudent(self,id):
         for i in range(0, len(self.studentList)):
             idval = self.studentList[i].studentId
             print(idval)
             if int(id) == int(idval):
                 #print("found " + id)
-                del self.studentList[i]
+                del self.studentList[i]     #Needs to be deleted from the DB for this to work correctly
                 break
 
+    #   function takes id, user as parameter and goes through all staff in staffList, if the staff is found. they are deleted from the list
+    #   Problems can occur because this is only superficial. The staff is not actually deleted from the DB and will appear again if
+    #   a function repopulates the staffList. CHECKS IF STAFF HAS EMAIL, doesn't make sense why removal would be denied
     def removeStaff(self,id,user):
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
             print(idval)
             if int(id) == int(idval):
                 #print("found " + id)
-                if(user == self.staffList[i].Email):
+                if(user == self.staffList[i].Email):    #why? checking if staff has email?
                     print("Removal Denied")
                     return 0
                 else:
-                    del self.staffList[i]
+                    del self.staffList[i]       #superficial, needs to delete from DB
                     print("Staff Removed")
                     return 1
 
+    #   Function takes string name as parameter, (prints the length of studentlist as string, why????)
+    #   name parameter is lowerCased, then searches the entire studentList
+    #   No return error if the name in question is not found in the studentList
     def searchByName(self, name):
         print(str(len(self.studentList)))
         result = []
         name = name.lower()
 
-        for i in range(0, len(self.studentList)):
-            fullName = self.studentList[i].Name
+        for i in range(0, len(self.studentList)):   #for each name in StudentList
+            fullName = self.studentList[i].Name     #name is saved into fullName variable and lowerCased
             fullName = fullName.lower()
 
-            if name in fullName:
+            if name in fullName:    #   if the name we are searching for is found in the studentList(if name == fullname: ????)
                 #print("found " + fullName)
-                result.append(self.studentList[i])
+                result.append(self.studentList[i])      #   append the student to result list and return
         return result
 
+    #   Function takes string name as parameter,
+    #   name parameter is lowerCased, then searches the entire studentList
+    #   No return error if the name in question is not found in the studentList
     def searchByNameStaff(self, name):
         print("search staff name")
         searchStaffStatus=1
@@ -285,6 +345,7 @@ class System(object):
                 result.append(self.staffList[i])
         return result
 
+    #   Function searches STUDENT id from StudentList, if found, returns the Student in question
     def searchByID(self, id):
 
         result = []
@@ -293,17 +354,20 @@ class System(object):
             if int(id) == int(idval) :
                 #print("found " + id)
                 result.append(self.studentList[i])
+        #   else return -1 ??? (wouldn't this work here?)
         if(len(result) == 0):
             print("not found")
-            return -1
+            return -1   #why two return statements back to back? 1 should suffice
         return result
 
+    #   Function searches Staff id from staffList if the id matches we return 1 (This must be a temporary function as I see the old one below)
     def searchStaffIdNew(self, id):
         for i in range(0, len(self.staffList)):
             if id == self.staffList[i].staffId:
-                return 1
+                return 1        # why return 1? each staff has ID 1?
         return -1
 
+    #   Function searches Staff id from STaffList, if found returns result list
     def searchByIdStaff(self, id):
         result = []
         print("search staff id")
@@ -313,6 +377,8 @@ class System(object):
             if int(id) == int(idval) :
                 #print("found " + id)
                 result.append(self.staffList[i])
+                #return result
+            #else return -1
         if(len(result) == 0):
             print("not found")
         return result
