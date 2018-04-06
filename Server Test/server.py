@@ -388,7 +388,7 @@ class System(object):
         conn = connectDB()
         cur = conn.cursor()
         cur.execute("SELECT * FROM LOG")
-        cur.fetchall()
+        dataMain = cur.fetchall()
 	# Connection to DB established and is gathering all data from the LOG table 
         ui.LogListWidget_Staff.clear()
         ui.LogListWidget_Student.clear()
