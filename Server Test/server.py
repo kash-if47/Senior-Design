@@ -398,13 +398,15 @@ class System(object):
         sDate = sDate.toPyDate()
         eDate = eDate.toPyDate()
 
+        #tabControl()
+
         data = {'Student ID': [], 'Student Name': [], 'Staff ID': [], 'Staff Name': [], 'Date': [], 'Time': []}
         count = 0
         for i in range(0, len(dataMain)):
             logDate = str(dataMain[i][2]).split(" ")[0]
             logDate = datetime.datetime.strptime(logDate, '%Y-%m-%d').date()
             difference = eDate - sDate
-            print(difference)
+
             logdiff = logDate - sDate
             if ((logdiff <= difference) and (logdiff >= datetime.timedelta(days=0))):
                 count = count + 1
@@ -416,6 +418,14 @@ class System(object):
                 data['Time'].append(str(dataMain[i][2]).split(" ")[1])
             ui.LogTableView_Generic.setColumnCount(6)
             ui.LogTableView_Generic.setRowCount(count)
+        temp = str(difference).split(" ")
+        if (int(temp[0]) < 0):
+            today = QtCore.QDate.currentDate()
+            mindate = today.addMonths(-1)
+            ui.popupMessage2(MainWindow,
+                             "Please, make sure the start date is before the end date.")
+            ui.StartDateEdit.setDate(mindate)
+            ui.EndDateEdit.setDate(today)
         horHeaders = []
         for n, key in enumerate(sorted(data.keys())):
             horHeaders.append(key)
@@ -715,57 +725,57 @@ class Ui_MainWindow(object):
         self.LogLabel_Title.setObjectName(_fromUtf8("LogLabel_Title"))
 
         self.LogLabel_Start = QtGui.QLabel(MainWindow)
-        self.LogLabel_Start.setGeometry(QtCore.QRect(20, 540, 61, 21))
+        self.LogLabel_Start.setGeometry(QtCore.QRect(20, 750, 61, 21))
         self.LogLabel_Start.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogLabel_Start.setObjectName(_fromUtf8("LogLabel_Start"))
 
         self.LogLabel_End = QtGui.QLabel(MainWindow)
-        self.LogLabel_End.setGeometry(QtCore.QRect(190, 540, 61, 21))
+        self.LogLabel_End.setGeometry(QtCore.QRect(190, 750, 61, 21))
         self.LogLabel_End.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogLabel_End.setObjectName(_fromUtf8("LogLabel_End"))
 
-        self.LogStudentLabel_SearchName = QtGui.QLabel(self.StudentTab)
-        self.LogStudentLabel_SearchName.setGeometry(QtCore.QRect(0, 360, 101, 16))
+        self.LogStudentLabel_SearchName = QtGui.QLabel(MainWindow)
+        self.LogStudentLabel_SearchName.setGeometry(QtCore.QRect(10, 540, 101, 16))
         self.LogStudentLabel_SearchName.setObjectName(_fromUtf8("LogStudentLabel_SearchName"))
 
-        self.LogStudentLogLabel_SearchID = QtGui.QLabel(self.StudentTab)
-        self.LogStudentLogLabel_SearchID.setGeometry(QtCore.QRect(220, 360, 61, 16))
+        self.LogStudentLogLabel_SearchID = QtGui.QLabel(MainWindow)
+        self.LogStudentLogLabel_SearchID.setGeometry(QtCore.QRect(10, 640, 61, 16))
         self.LogStudentLogLabel_SearchID.setObjectName(_fromUtf8("LogStudentLogLabel_SearchID"))
 
-        self.LogStaffLabel_SearchName = QtGui.QLabel(self.StaffTab)
-        self.LogStaffLabel_SearchName.setGeometry(QtCore.QRect(0, 360, 101, 16))
+        self.LogStaffLabel_SearchName = QtGui.QLabel(MainWindow)
+        self.LogStaffLabel_SearchName.setGeometry(QtCore.QRect(10, 540, 101, 16))
         self.LogStaffLabel_SearchName.setObjectName(_fromUtf8("LogStaffLabel_SearchName"))
 
-        self.LogStaffLabel_SearchID = QtGui.QLabel(self.StaffTab)
-        self.LogStaffLabel_SearchID.setGeometry(QtCore.QRect(220, 360, 61, 16))
+        self.LogStaffLabel_SearchID = QtGui.QLabel(MainWindow)
+        self.LogStaffLabel_SearchID.setGeometry(QtCore.QRect(10, 640, 61, 16))
         self.LogStaffLabel_SearchID.setObjectName(_fromUtf8("LogStaffLabel_SearchID"))
 
         #Log Textfields
-        self.LogStudentText_SearchName = QtGui.QLineEdit(self.StudentTab)
-        self.LogStudentText_SearchName.setGeometry(QtCore.QRect(0, 390, 211, 31))
+        self.LogStudentText_SearchName = QtGui.QLineEdit(MainWindow)
+        self.LogStudentText_SearchName.setGeometry(QtCore.QRect(10, 570, 211, 31))
         self.LogStudentText_SearchName.setObjectName(_fromUtf8("LogStudentText_SearchName"))
 
-        self.LogStudentText_SearchID = QtGui.QLineEdit(self.StudentTab)
-        self.LogStudentText_SearchID.setGeometry(QtCore.QRect(220, 390, 181, 31))
+        self.LogStudentText_SearchID = QtGui.QLineEdit(MainWindow)
+        self.LogStudentText_SearchID.setGeometry(QtCore.QRect(10, 670, 211, 31))
         self.LogStudentText_SearchID.setObjectName(_fromUtf8("LogStudentText_SearchID"))
 
-        self.LogStaffText_SearchName = QtGui.QLineEdit(self.StaffTab)
-        self.LogStaffText_SearchName.setGeometry(QtCore.QRect(0, 390, 211, 31))
+        self.LogStaffText_SearchName = QtGui.QLineEdit(MainWindow)
+        self.LogStaffText_SearchName.setGeometry(QtCore.QRect(10, 570, 211, 31))
         self.LogStaffText_SearchName.setObjectName(_fromUtf8("LogStaffText_SearchName"))
 
-        self.LogStaffText_SearchID = QtGui.QLineEdit(self.StaffTab)
-        self.LogStaffText_SearchID.setGeometry(QtCore.QRect(220, 390, 181, 31))
+        self.LogStaffText_SearchID = QtGui.QLineEdit(MainWindow)
+        self.LogStaffText_SearchID.setGeometry(QtCore.QRect(10, 670, 211, 31))
         self.LogStaffText_SearchID.setObjectName(_fromUtf8("LogStaffText_SearchID"))
 
         #Log DateEdits
         self.StartDateEdit = QtGui.QDateEdit(MainWindow)
-        self.StartDateEdit.setGeometry(QtCore.QRect(10, 560, 110, 22))
+        self.StartDateEdit.setGeometry(QtCore.QRect(10, 770, 110, 22))
         self.StartDateEdit.setMaximumSize(QtCore.QSize(1200, 900))
         self.StartDateEdit.setObjectName(_fromUtf8("StartDateEdit"))
         self.StartDateEdit.setDate(mindate)
 
         self.EndDateEdit = QtGui.QDateEdit(MainWindow)
-        self.EndDateEdit.setGeometry(QtCore.QRect(180, 560, 110, 22))
+        self.EndDateEdit.setGeometry(QtCore.QRect(180, 770, 110, 22))
         self.EndDateEdit.setMaximumSize(QtCore.QSize(1200, 900))
         self.EndDateEdit.setObjectName(_fromUtf8("EndDateEdit"))
         self.EndDateEdit.setDate(today)
@@ -777,51 +787,50 @@ class Ui_MainWindow(object):
         self.LogOffAdmin2.setObjectName(_fromUtf8("LogOffAdmin2"))
 
         self.LogButton_Generate = QtGui.QPushButton(MainWindow)
-        self.LogButton_Generate.setGeometry(QtCore.QRect(360, 560, 75, 23))
+        self.LogButton_Generate.setGeometry(QtCore.QRect(360, 770, 75, 23))
         self.LogButton_Generate.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogButton_Generate.setObjectName(_fromUtf8("LogButton_Generate"))
-        self.LogButton_Generate.clicked.connect(self.redrawTables)\
+        self.LogButton_Generate.clicked.connect(self.redrawTables)
 
         self.LogButton_Print = QtGui.QPushButton(MainWindow)
-        self.LogButton_Print.setGeometry(QtCore.QRect(450, 560, 75, 23))
+        self.LogButton_Print.setGeometry(QtCore.QRect(450, 770, 75, 23))
         self.LogButton_Print.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogButton_Print.setObjectName(_fromUtf8("LogButton_PrintPDF"))
         self.LogButton_Print.clicked.connect(self.PrintPDF)
 
         self.LogButton_Exit = QtGui.QPushButton(MainWindow)
-        self.LogButton_Exit.setGeometry(QtCore.QRect(710, 560, 75, 23))
+        self.LogButton_Exit.setGeometry(QtCore.QRect(710, 770, 75, 23))
         self.LogButton_Exit.setMaximumSize(QtCore.QSize(1200, 900))
         self.LogButton_Exit.setObjectName(_fromUtf8("LogButton_Exit"))
         self.LogButton_Exit.clicked.connect(self.CancelActionfunc)
 
-        self.LogStudentButton_SearchName = QtGui.QPushButton(self.StudentTab)
-        self.LogStudentButton_SearchName.setGeometry(QtCore.QRect(130, 360, 75, 23))
+        self.LogStudentButton_SearchName = QtGui.QPushButton(MainWindow)
+        self.LogStudentButton_SearchName.setGeometry(QtCore.QRect(130, 540, 75, 23))
         self.LogStudentButton_SearchName.setObjectName(_fromUtf8("LogStudentButton_SearchName"))
         self.LogStudentButton_SearchName.clicked.connect(self.searchNameStudentLog)
 
-        self.LogStudentButton_SearchID = QtGui.QPushButton(self.StudentTab)
-        self.LogStudentButton_SearchID.setGeometry(QtCore.QRect(320, 360, 75, 23))
+        self.LogStudentButton_SearchID = QtGui.QPushButton(MainWindow)
+        self.LogStudentButton_SearchID.setGeometry(QtCore.QRect(130, 640, 75, 23))
         self.LogStudentButton_SearchID.setObjectName(_fromUtf8("LogStudentButton_SearchID"))
         self.LogStudentButton_SearchID.clicked.connect(self.searchIDStudentLog)
 
-        self.LogStaffButton_SearchName = QtGui.QPushButton(self.StaffTab)
-        self.LogStaffButton_SearchName.setGeometry(QtCore.QRect(130, 360, 75, 23))
+        self.LogStaffButton_SearchName = QtGui.QPushButton(MainWindow)
+        self.LogStaffButton_SearchName.setGeometry(QtCore.QRect(130, 540, 75, 23))
         self.LogStaffButton_SearchName.setObjectName(_fromUtf8("LogStaffButton_SearchName"))
         self.LogStaffButton_SearchName.clicked.connect(self.searchNameStaffLog)
 
-        self.LogStaffButton_SearchID = QtGui.QPushButton(self.StaffTab)
-        self.LogStaffButton_SearchID.setGeometry(QtCore.QRect(320, 360, 75, 23))
+        self.LogStaffButton_SearchID = QtGui.QPushButton(MainWindow)
+        self.LogStaffButton_SearchID.setGeometry(QtCore.QRect(130, 640, 75, 23))
         self.LogStaffButton_SearchID.setObjectName(_fromUtf8("LogStaffButton_SearchId"))
         self.LogStaffButton_SearchID.clicked.connect(self.searchIDStaffLog)
-
         #Log Lists
         self.LogListWidget_Student = QtGui.QListWidget(self.StudentTab)
-        self.LogListWidget_Student.setGeometry(QtCore.QRect(0, 0, 400, 361))
+        self.LogListWidget_Student.setGeometry(QtCore.QRect(0, 0, 270, 400))
         self.LogListWidget_Student.setObjectName(_fromUtf8("LogListWidget_Student"))
         self.LogListWidget_Student.itemClicked.connect(self.handleviewLogStudent)
 
         self.LogListWidget_Staff = QtGui.QListWidget(self.StaffTab)
-        self.LogListWidget_Staff.setGeometry(QtCore.QRect(0, 0, 400, 361))
+        self.LogListWidget_Staff.setGeometry(QtCore.QRect(0, 0, 270, 400))
         self.LogListWidget_Staff.setObjectName(_fromUtf8("LogListWidget_Staff"))
         self.LogListWidget_Staff.itemClicked.connect(self.handleviewLogStaff)
 
@@ -831,11 +840,11 @@ class Ui_MainWindow(object):
         self.LogTableView_Generic.setObjectName(_fromUtf8("LogTableView_Generic"))
 
         self.LogTableView_Student = QtGui.QTableWidget(self.StudentTab)
-        self.LogTableView_Student.setGeometry(QtCore.QRect(398, 0, 500, 421))
+        self.LogTableView_Student.setGeometry(QtCore.QRect(270, 0, 620, 421))
         self.LogTableView_Student.setObjectName(_fromUtf8("LogTableView_Student"))
 
         self.LogTableView_Staff = QtGui.QTableWidget(self.StaffTab)
-        self.LogTableView_Staff.setGeometry(QtCore.QRect(398, 0, 500, 420))
+        self.LogTableView_Staff.setGeometry(QtCore.QRect(270, 0, 620, 420))
         self.LogTableView_Staff.setObjectName(_fromUtf8("LogTableView_Staff"))
 
         #function added at end of log being created to prevent errors
@@ -1673,9 +1682,9 @@ class Ui_MainWindow(object):
         cur.execute("SELECT * FROM LOG WHERE StudentID = "+ str(student.studentId))
         dataMain = cur.fetchall()
 
-        data = {'Student ID': [], 'Staff ID': [], 'Date': [], 'Time': []}
+        data = {'Student ID': [], 'Staff ID': [],'Staff Name':[], 'Date': [], 'Time': []}
         count = 0
-        print(dataMain)
+        print("data main",dataMain)
         for i in range(0, len(dataMain)):
             logDate = str(dataMain[i][2]).split(" ")[0]
             logDate = datetime.datetime.strptime(logDate, '%Y-%m-%d').date()
@@ -1688,9 +1697,11 @@ class Ui_MainWindow(object):
                 print(difference)
                 data['Student ID'].append(str(dataMain[i][1]))
                 data['Staff ID'].append(str(dataMain[i][0]))
+                data['Staff Name'].append(Sys.getStaffNameById(dataMain[i][0]))
                 data['Date'].append(str(logDate))
                 data['Time'].append(str(dataMain[i][2]).split(" ")[1])
-        ui.LogTableView_Student.setColumnCount(4)
+
+        ui.LogTableView_Student.setColumnCount(5)
         ui.LogTableView_Student.setRowCount(count)
         # LogTableView_Generic = QTableWidget(len(dataMain), 4)
         horHeaders = []
@@ -1701,6 +1712,7 @@ class Ui_MainWindow(object):
                 ui.LogTableView_Student.setItem(m, n, newitem)
             ui.LogTableView_Student.setHorizontalHeaderLabels(horHeaders)
             ui.LogTableView_Student.show()
+
 
     def handleviewLogStaff(self):
         conn = connectDB()
@@ -2157,6 +2169,7 @@ class Ui_MainWindow(object):
     def LogAdminfunc(self, MainWindow):
         self.hideall()
         self.showLog()
+        self.hideLogSearch()
 
     def LogOffStafffunc(self, MainWindow):
         #when Admin Login is clicked is clicked
@@ -2190,6 +2203,8 @@ class Ui_MainWindow(object):
 
                         print("Show Staff Page")
                 else:
+                    self.popupMessage2(MainWindow, "Incorrect Password!!!")
+
                     print("Show Incorrect Password message!")
             conn.close()
         except:
@@ -2476,12 +2491,13 @@ class Ui_MainWindow(object):
         self.LogListWidget_Staff.show()
         self.LogStaffButton_SearchID.show()
         Sys.showLogData()
+        self.hideLogSearch()
 
     def searchNameStudentLog(self):
         print("A")
         result = []
 
-        print(sDate, eDate)
+        #print(sDate, eDate)
         name = str(self.LogStudentText_SearchName.text())
         result = Sys.searchByName(name)
         print(result)
@@ -2588,8 +2604,55 @@ class Ui_MainWindow(object):
         self.showStaffWindow()
         self.enableLeftStaff()
 
+    def hideLogSearch(self):
+        print("hidden")
+        self.LogStaffText_SearchID.hide()
+        self.LogStaffText_SearchName.hide()
+        self.LogStudentText_SearchID.hide()
+        self.LogStudentText_SearchName.hide()
+        self.LogStudentLabel_SearchName.hide()
+        self.LogStudentLogLabel_SearchID.hide()
+        self.LogStaffLabel_SearchName.hide()
+        self.LogStaffLabel_SearchID.hide()
+        self.LogStaffButton_SearchID.hide()
+        self.LogStaffButton_SearchName.hide()
+        self.LogStudentButton_SearchID.hide()
+        self.LogStudentButton_SearchName.hide()
+
     def tabControl(self):
         self.redrawTables()
+        tab = self.DismissWidget.currentIndex()
+        print("the tab",tab)
+        #hide all search things
+        self.hideLogSearch()
+        if(tab == 1):
+            self.LogStudentText_SearchID.show()
+            self.LogStudentText_SearchName.show()
+            self.LogStudentLabel_SearchName.show()
+            self.LogStudentLogLabel_SearchID.show()
+            self.LogStudentButton_SearchID.show()
+            self.LogStudentButton_SearchName.show()
+
+        if(tab == 2):
+            self.LogStaffText_SearchID.show()
+            self.LogStaffText_SearchName.show()
+            self.LogStaffLabel_SearchName.show()
+            self.LogStaffLabel_SearchID.show()
+            self.LogStaffButton_SearchID.show()
+            self.LogStaffButton_SearchName.show()
+
+
+
+
+
+
+        #if tab == 1
+        #show student
+
+        #if tab == 2
+        #show staff
+
+
         #get current index of dismiss widget
         #tab control needs to save variable
         #new function printPDF reads from that variable for the switch case to print the data that is currently shown
