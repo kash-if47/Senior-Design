@@ -2621,7 +2621,6 @@ class Ui_MainWindow(object):
         self.hideall()
         self.showStaffWindow()
         self.enableLeftStaff()
-<<<<<<< HEAD
 
     def hideLogSearch(self):
         print("hidden")
@@ -2637,11 +2636,8 @@ class Ui_MainWindow(object):
         self.LogStaffButton_SearchName.hide()
         self.LogStudentButton_SearchID.hide()
         self.LogStudentButton_SearchName.hide()
-
-=======
 	
 	## UPDATE OLD VERSION
->>>>>>> c43c9c4ff32c2eb742ae5082e628f3f2e220b4b4
     def tabControl(self):
         self.redrawTables()
         tab = self.DismissWidget.currentIndex()
