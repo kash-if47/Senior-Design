@@ -2681,4 +2681,5 @@ if __name__ == "__main__":
     listR = []
     global listL
     listL = []
+    print("I am awesome!")
     sys.exit(app.exec_())
