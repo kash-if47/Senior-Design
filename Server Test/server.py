@@ -2477,6 +2477,7 @@ class Ui_MainWindow(object):
         self.LogStaffButton_SearchID.show()
         Sys.showLogData()
 
+    
     def searchNameStudentLog(self):
         print("A")
         result = []
@@ -2492,6 +2493,7 @@ class Ui_MainWindow(object):
             ui.LogListWidget_Student.addItem(item)
         ui.LogListWidget_Student.show()
 
+    ## This method shows the edit student page, it also gets all the student names in the system and displays it in the selection list. 
     def showStudentWindow(self):
         self.StudentButton_SearchName.show()
         self.StudentLabel_Grade.show()
@@ -2530,10 +2532,12 @@ class Ui_MainWindow(object):
         self.StudentSearch_ID.show()
         self.StudentSearch_Name.show()
 
+    ## Shows the log out button and exit button. 
     def showLog(self):
         self.LogButton_Exit.show()
         self.LogOffAdminStudent.show()
 
+    ## Hides all the widgets and shows only the widgets that are relevent to the Student Checkout page. 
     def showMain(self):
         self.hideall()
         self.enableListview()
@@ -2549,6 +2553,7 @@ class Ui_MainWindow(object):
         self.SplittingLine.show()
         self.LogOffStaff.show()
 
+    ## Shows the relevent widgets for the main administrator page. 
     def showMainAdmin(self):
         #show admin page
         self.EditStudent.show()
@@ -2569,6 +2574,7 @@ class Ui_MainWindow(object):
         self.LogOffAdmin1.raise_()
         self.StudentCheckout.raise_()
 
+    ## This method shows the relevent widgets for login and sets them enabled so that user can enter their login id and password. 
     def showLogin(self):
         self.enableLogin()
         self.Username.show()
@@ -2578,32 +2584,39 @@ class Ui_MainWindow(object):
         self.Login_uname.show()
         self.Login_password.show()
 
+    ## Hides all the widget. Then calls showStudentWindow() which then shows the relevent widgets for the edit student view.
     def ShowAdminFunc(self, MainWindow):
         self.hideall()
         self.showStudentWindow()
         self.StudentButton_Picture.setEnabled(False)
 
+    ## This function hides all the widgets and then calls shoStaffWindow() which shows the relevent widgets for the staff window.
     def ShowStaffWindonFunc(self,MainWindow):
         self.hideall()
         self.showStaffWindow()
         self.enableLeftStaff()
-
+	
+    ## Just refreshes the page when tab is changed on the all the log views. 
     def tabControl(self):
         self.redrawTables()
         #get current index of dismiss widget
         #tab control needs to save variable
         #new function printPDF reads from that variable for the switch case to print the data that is currently shown
 
+    ## On the Student Check out view it updates the left picture to the selected student. 
     def updateLeftPicture(self):
         self.LeftStudentPicture.setPixmap(self.listItemToPicture(self.LeftList.currentItem().text()))
-
+	
+    ## On the Student Check out view it updates the right picture to the selected student. 
     def updateRightPicture(self):
         self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.currentItem().text()))
 
+## This is a Qthread class that runs/starts the server that is listening on a particular port and ip for the c# client in the manufacturer provided api. 
 class WorkerThread(QThread):
     def __init__(self, parent = None):
         super(WorkerThread, self).__init__(parent)
-
+	
+    ## Starts the server in a new thread
     def run(self):
         serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("Server Log: " + socket.gethostname())
@@ -2623,6 +2636,7 @@ class WorkerThread(QThread):
                 continue
         serverSocket.close()
 
+## Takes the clientsocket object as input and updates the two lists and respective pictures for both lanes in the Student Checkout View. 
 def client_thread(clientsocket):
     message = clientsocket.recv(2048)
     rfid = message.decode("utf-8")
@@ -2662,6 +2676,7 @@ def client_thread(clientsocket):
     clientsocket.close()
     print("Thread Complete")
 
+## Helper/Wrapper function that takes rfid tag id (String) as an input, calls lookUpRfid in the Sys object and gets the name and image assoiciated with that id.
 def search_query(rfid):
     result = Sys.lookUpRfid(rfid)
     if result != -1:
@@ -2674,10 +2689,6 @@ MainWindow = QtGui.QMainWindow()
 ui = Ui_MainWindow()
 ui.setupUi(MainWindow)
 
-"""
-Comment Type 1
-"""
-
 ## Comment Type 2
 
 if __name__ == "__main__":
@@ -2687,7 +2698,6 @@ if __name__ == "__main__":
     listR = []
     global listL
     listL = []
-    print("I am awesome!")
     sys.exit(app.exec_())
 	
 
