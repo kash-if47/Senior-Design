@@ -1420,6 +1420,7 @@ def search_query(rfid):
     for i in range(0, len(placeHolder)):
         if rfid == placeHolder[i][0]:
             return placeHolder[i][1]
+    print(rfid)
     return "Not Found!"
 
 

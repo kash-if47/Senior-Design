@@ -1,4 +1,6 @@
-
+import sys
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 import pymysql
 
 def connectDB():
@@ -8,7 +10,8 @@ def connectDB():
 
 conn = connectDB()
 cur = conn.cursor()
-
+cur.execute("SELECT * FROM LOG" )
+dataMain = cur.fetchall()
 # username = "kashif.iqbal@mavs.uta.edu"
 # inpassword = "1234"
 #
@@ -57,6 +60,35 @@ cur = conn.cursor()
 # self.StudentText_Picture.show()
 # self.StudentText_RFID.show()
 
-result = []
-result.append("hello")
-print(result)
+# result = []
+# result.append("hello")
+# print(result)
+
+
+
+data = {'Student ID': [], 'Staff ID': [], 'Date': [], 'Time': []}
+for i in range(0, len(dataMain)):
+    data['Student ID'].append(str(dataMain[i][0]))
+    data['Staff ID'].append(str(dataMain[i][1]))
+    data['Date'].append(str(dataMain[i][2]))
+    data['Time'].append(str(dataMain[i][3]))
+
+
+
+def main(args):
+
+    app = QApplication(args)
+    table = QTableWidget(len(dataMain),4)
+    horHeaders = []
+    for n, key in enumerate(sorted(data.keys())):
+        horHeaders.append(key)
+        for m, item in enumerate(data[key]):
+            newitem = QTableWidgetItem(item)
+            table.setItem(m, n, newitem)
+    table.setHorizontalHeaderLabels(horHeaders)
+    table.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    main(sys.argv)
