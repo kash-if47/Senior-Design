@@ -57,7 +57,6 @@ class System(object):
         try:
             conn = connectDB()
             cur = conn.cursor()
-
             ##   Fetching initial data from Student table on the DB and appending to a list self.studentList
             cur.execute("SELECT * FROM student")
             data = cur.fetchall()
@@ -68,8 +67,6 @@ class System(object):
                 guardian = data[i][3]
                 grade = data[i][4]
                 pic = data[i][5]
-                #student = Student(Name, studentId, tagId, guardian, pic,grade)
-                #self.studentList.append(student)
                 self.studentList.append(Student(Name, studentId, tagId, guardian, pic,grade))
 
             ##   Fetching initial data from Staff table on the DB and appending to a list self.staffList
@@ -81,8 +78,6 @@ class System(object):
                 password = data2[i][2]
                 staffId = data2[i][3]
                 isAdmin = data2[i][4]
-                #staff = Staff(staffId, fName, Email, password, isAdmin)
-                #self.staffList.append(staff)
                 self.staffList.append(Staff(staffId, fName, Email, password, isAdmin))
 
         ##   Fetching all the data from LOG on the DB and appending to a list off the self.logList
@@ -96,8 +91,6 @@ class System(object):
                 date = data2[i][2]
                 time = data2[i][3]
                 self.logList.append(Log(staffid,studentid,date,time))
-
-
         except:
             print("db error HEHE")
 
@@ -133,7 +126,6 @@ class System(object):
             if int(id) == idval:
                 #print("found " + id)
                 result = True
-
         return result
 
     ##   Function goes through the entire list of currently available staff in self.staffList
@@ -144,7 +136,6 @@ class System(object):
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
             if int(id) == idval:
-                #print("found " + id)
                 result = True
         return result
 
@@ -189,13 +180,11 @@ class System(object):
     ##   then pressing editstaff will allow the admin to edit all fields of the currently selected student. (staff id should not be allowed to be modified )
     ##   Creates new empty staffList and then repopulates all data from DB into newly created list.
     def editStaff(self,name,Email,password,id):
-
         conn = connectDB()
         cur = conn.cursor()
         cur.execute ("""   UPDATE staff  SET Fname=%s, Email=%s, Password=%s, StaffID=%s  WHERE StaffID=%s""", (name, Email, password, id, self.editstaffid))
         conn.commit()
         temp = cur.execute("SELECT * FROM staff")
-        print(str(temp) + " This is temp" )
         data = cur.fetchall()
         self.staffList = []
         for i in range(0, len(data)):
@@ -264,7 +253,6 @@ class System(object):
     def lookUpRfid(self, rfid):
         for i in range(0, len(self.studentList)):
             if self.studentList[i].tagId == rfid:
-                # self.logEntry(self.studentList[i].studentId)
                 return self.studentList[i]
         return -1
 
@@ -293,7 +281,6 @@ class System(object):
             idval = self.studentList[i].studentId
             print(idval)
             if int(id) == int(idval):
-                #print("found " + id)
                 del self.studentList[i]     #Needs to be deleted from the DB for this to work correctly
                 break
 
@@ -305,7 +292,6 @@ class System(object):
             idval = self.staffList[i].staffId
             print(idval)
             if int(id) == int(idval):
-                #print("found " + id)
                 if(user == self.staffList[i].Email):    #why? checking if staff has email?
                     print("Removal Denied")
                     return 0
@@ -321,13 +307,10 @@ class System(object):
         print(str(len(self.studentList)))
         result = []
         name = name.lower()
-
         for i in range(0, len(self.studentList)):   #for each name in StudentList
             fullName = self.studentList[i].Name     #name is saved into fullName variable and lowerCased
             fullName = fullName.lower()
-
             if name in fullName:    #   if the name we are searching for is found in the studentList(if name == fullname: ????)
-                #print("found " + fullName)
                 result.append(self.studentList[i])      #   append the student to result list and return
         return result
 
@@ -343,20 +326,16 @@ class System(object):
             fullName = self.staffList[i].Name
             fullName = fullName.lower()
             if name in fullName:
-                #print("found " + fullName)
                 result.append(self.staffList[i])
         return result
 
     ##   Function searches STUDENT id from StudentList, if found, returns the Student in question
     def searchByID(self, id):
-
         result = []
         for i in range(0, len(self.studentList)):
             idval = self.studentList[i].studentId
             if int(id) == int(idval) :
-                #print("found " + id)
                 result.append(self.studentList[i])
-        #   else return -1 ??? (wouldn't this work here?)
         if(len(result) == 0):
             print("not found")
             return -1   #why two return statements back to back? 1 should suffice
@@ -372,15 +351,11 @@ class System(object):
     ##   Function searches Staff id from STaffList, if found returns result list
     def searchByIdStaff(self, id):
         result = []
-        print("search staff id")
         print(searchStaffStatus)
         for i in range(0, len(self.staffList)):
             idval = self.staffList[i].staffId
             if int(id) == int(idval) :
-                #print("found " + id)
                 result.append(self.staffList[i])
-                #return result
-            #else return -1
         if(len(result) == 0):
             print("not found")
         return result
@@ -397,19 +372,14 @@ class System(object):
 
         sDate = ui.StartDateEdit.date()
         eDate = ui.EndDateEdit.date()
-
         sDate = sDate.toPyDate()
         eDate = eDate.toPyDate()
-
-        #tabControl()
-
         data = {'Student ID': [], 'Student Name': [], 'Staff ID': [], 'Staff Name': [], 'Date': [], 'Time': []}
         count = 0
         for i in range(0, len(dataMain)):
             logDate = str(dataMain[i][2]).split(" ")[0]
             logDate = datetime.datetime.strptime(logDate, '%Y-%m-%d').date()
             difference = eDate - sDate
-
             logdiff = logDate - sDate
             if ((logdiff <= difference) and (logdiff >= datetime.timedelta(days=0))):
                 count = count + 1
@@ -425,8 +395,7 @@ class System(object):
         if (int(temp[0]) < 0):
             today = QtCore.QDate.currentDate()
             mindate = today.addMonths(-1)
-            ui.popupMessage2(MainWindow,
-                             "Please, make sure the start date is before the end date.")
+            ui.popupMessage2(MainWindow, "Please, make sure the start date is before the end date.")
             ui.StartDateEdit.setDate(mindate)
             ui.EndDateEdit.setDate(today)
         horHeaders = []
@@ -1637,14 +1606,11 @@ class Ui_MainWindow(object):
                 staff = Sys.staffList[num]
             else:
                 result = Sys.searchByNameStaff(name)
-                print(len(result))
                 staff = result[num]
 
         self.StaffText_Email.setText(str(staff.Email))
         self.StaffText_ID.setText(str(staff.staffId))
         self.StaffText_Name.setText(staff.Name)
-        print("Do nothing")
-        print(os.getcwd())
 
     def keyPressEvent(self,event):
         if event.key() == QtCore.Qt.Key_0 :
@@ -1662,7 +1628,6 @@ class Ui_MainWindow(object):
             self.popupMessage2(MainWindow, "Please fill in all the fields. ")
         else:
             if (password != cpassword):
-                print(password + " " + cpassword)
                 self.popupMessage2(MainWindow, "The passwords do not match, please try again. ")
                 self.StaffText_CPass.setText("")
                 self.StaffText_Pass.setText("")
@@ -1675,8 +1640,6 @@ class Ui_MainWindow(object):
                         Sys.staffList.append(Staff(id, name, Email, password, 0))
                         Sys.addnewStaff(name, int(id), Email, password, 0)
                         self.searchByNameStaff()
-                        print("Input validated")
-                        print("Save1 Clicked")
                         self.enableLeftStaff()
                         self.clearallfunction(MainWindow)
                         self.StudentView.repaint()
@@ -1688,34 +1651,24 @@ class Ui_MainWindow(object):
         num = self.LogListWidget_Student.currentRow()
         sDate = ui.StartDateEdit.date()
         eDate = ui.EndDateEdit.date()
-
         sDate = sDate.toPyDate()
         eDate = eDate.toPyDate()
-
-        print(num)
         if name == "":
             student = Sys.studentList[num]
         else:
             result = Sys.searchByName(name)
-            print(len(result))
             student = result[num]
-        print(student.Name,"asd")
         cur.execute("SELECT * FROM LOG WHERE StudentID = "+ str(student.studentId))
         dataMain = cur.fetchall()
-
         data = {'Student ID': [], 'Staff ID': [],'Staff Name':[], 'Date': [], 'Time': []}
         count = 0
-        print("data main",dataMain)
         for i in range(0, len(dataMain)):
             logDate = str(dataMain[i][2]).split(" ")[0]
             logDate = datetime.datetime.strptime(logDate, '%Y-%m-%d').date()
             difference = eDate - sDate
-            print(difference)
             logdiff = logDate - sDate
             if((logdiff <= difference) and (logdiff >= datetime.timedelta(days=0))):
                 count = count + 1
-                print("Checks out!")
-                print(difference)
                 data['Student ID'].append(str(dataMain[i][1]))
                 data['Staff ID'].append(str(dataMain[i][0]))
                 data['Staff Name'].append(Sys.getStaffNameById(dataMain[i][0]))
@@ -1742,16 +1695,12 @@ class Ui_MainWindow(object):
         num = self.LogListWidget_Staff.currentRow()
         sDate = ui.StartDateEdit.date()
         eDate = ui.EndDateEdit.date()
-
         sDate = sDate.toPyDate()
         eDate = eDate.toPyDate()
-
-        print(num)
         if name == "":
             staff = Sys.staffList[num]
         else:
             result = Sys.searchByNameStaff(name)
-            print(len(result))
             staff = result[num]
         cur.execute("SELECT * FROM LOG WHERE StaffID = " + str(staff.staffId))
         dataMain = cur.fetchall()
@@ -1762,7 +1711,6 @@ class Ui_MainWindow(object):
             logDate = str(dataMain[i][2]).split(" ")[0]
             logDate = datetime.datetime.strptime(logDate, '%Y-%m-%d').date()
             difference = eDate - sDate
-            print(difference)
             logdiff = logDate - sDate
             if((logdiff <= difference) and (logdiff >= datetime.timedelta(days=0))):
                 count = count + 1
@@ -1796,8 +1744,6 @@ class Ui_MainWindow(object):
                 destination = destination + str(ts) + '.png'
             else:
                 destination = destination + str(ts) + '.jpg'
-            # filename = destination
-            print( "File: " + filename + ", Destination: " + destination)
             shutil.copy(filename, destination)
         pic = destination
         Sys.editStudent(id,grade,rfid,name,gname,pic)
@@ -1854,9 +1800,6 @@ class Ui_MainWindow(object):
         self.StudentButton_SaveEdit.hide()
         self.StudentButton_Cancel.hide()
 
-
-        print("Save2 Clicked")
-
     def handleClearLeft(self):
         items = ui.LeftList.count()
         if (items == 0):
@@ -1870,7 +1813,6 @@ class Ui_MainWindow(object):
                 item = ui.LeftList.takeItem(i)
                 break
             count = count - 1
-        print(Sys.listL)
         if(Sys.listL[count] != -1):
             print("Calling Log with ID: " + str(Sys.listL[count]))
             Sys.logEntry(Sys.listL[count])
@@ -1883,7 +1825,7 @@ class Ui_MainWindow(object):
         # remove picture if list is empty
         else:
             #doesn't clear picture need an empty picture
-            ui.RightStudentPicture.setText("")
+            ui.RightStudentPicture.setPixmap("")
 
     def handleClearRight(self):
         items = ui.RightList.count()
@@ -1892,26 +1834,31 @@ class Ui_MainWindow(object):
             return
         rangedList = range(items)
         rangedList = rangedList.__reversed__()
+        count = len(Sys.listR) - 1
         for i in rangedList:
             if ui.RightList.isItemSelected(ui.RightList.item(i)) == True:
                 ui.RightList.takeItem(i)
                 break
+            count = count -1
+        if (Sys.listR[count] != -1):
+            print("Calling Log with ID: " + str(Sys.listR[count]))
+            Sys.logEntry(Sys.listR[count])
+            del Sys.listR[count]
+        else:
+            del Sys.listR[count]
         #reset picture to next student
         if (len(ui.RightList) > 0):
             self.RightStudentPicture.setPixmap(self.listItemToPicture(self.RightList.item(0).text()))
         #remove picture if list is empty
         else:
-            ui.RightStudentPicture.setText("")
+            ui.RightStudentPicture.setPixmap("")
 
     def handleViewDetail(self):
         picpath = "../pictures/"
-        # item = self.StudentView.currentItem().text()
-        # print(item)
         name = self.StudentSearch_Name.text()
         num = self.StudentView.currentRow()
         id = self.StudentSearch_ID.text()
         student =[]
-        print(num)
         if searchStudentStatus == 2:
             if id =="":
                 student = Sys.studentList[num]
@@ -1923,7 +1870,6 @@ class Ui_MainWindow(object):
                 student = Sys.studentList[num]
             else:
                 result = Sys.searchByName(name)
-                print(len(result))
                 student = result[num]
 
         self.StudentText_GName.setText(student.guardian)
@@ -1935,12 +1881,9 @@ class Ui_MainWindow(object):
         #self.StudentLabel_Picture_2.setPixmap(QtGui.QPixmap(os.getcwd() + picpath + "student1.jpg"))
         self.StudentLabel_Picture_2.setPixmap(pixmap)
         self.StudentText_RFID.setText(student.tagId)
-        print("Do nothing")
-        print(os.getcwd())
 
     def handleAddSave(self, MainWindow):
         global filename
-        print(filename,"this this")
         temp = filename.split("/")
         temp = temp[-1]
         destination = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/"
@@ -2222,8 +2165,6 @@ class Ui_MainWindow(object):
                 else:
                     self.Login_password.clear()
                     self.popupMessage2(MainWindow, "Incorrect Username and/or Password!")
-
-                    # print("Show Incorrect Password message!")
             conn.close()
         except:
             print("db error")
@@ -2254,7 +2195,6 @@ class Ui_MainWindow(object):
             self.handleClearRight()
 
     def PromoteFunction (self):
-        print('this')
         global Sys
         id = self.StaffText_ID.text()
         if(Sys.promoteStaff(id)):
@@ -2278,7 +2218,6 @@ class Ui_MainWindow(object):
                         Sys.staffList[i].isAdmin = 1
                         break
                 self.searchByNameStaff("")
-                print(Sys.staffList[2].isAdmin, "kjkkkkkkkkkkkkkkkkkkkk")
             else:
                 print("admin canceled")
 
@@ -2289,7 +2228,6 @@ class Ui_MainWindow(object):
         PopupMessage.setText(StringText)
         PopupMessage.setStandardButtons(QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
         result = PopupMessage.exec()
-        print(result)
         if result==4194304:
             return False
         else:
@@ -2302,7 +2240,6 @@ class Ui_MainWindow(object):
             PopupMessage2.setText(StringText)
             PopupMessage2.setStandardButtons(QtGui.QMessageBox.Ok )
             result = PopupMessage2.exec()
-            print(result)
 
     def PrintPDF(self):
         print("print")
