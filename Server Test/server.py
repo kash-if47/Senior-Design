@@ -10,6 +10,8 @@ from PyQt4.QtGui import QFileDialog
 from PyQt4.QtCore import QThread
 import pymysql
 import datetime
+import time
+import calendar
 
 filename = ""
 searchStaffStatus = 0
@@ -832,12 +834,12 @@ class Ui_MainWindow(object):
         self.LogStaffButton_SearchID.clicked.connect(self.searchIDStaffLog)
         #Log Lists
         self.LogListWidget_Student = QtGui.QListWidget(self.StudentTab)
-        self.LogListWidget_Student.setGeometry(QtCore.QRect(0, 0, 270, 400))
+        self.LogListWidget_Student.setGeometry(QtCore.QRect(0, 0, 270, 415))
         self.LogListWidget_Student.setObjectName(_fromUtf8("LogListWidget_Student"))
         self.LogListWidget_Student.itemClicked.connect(self.handleviewLogStudent)
 
         self.LogListWidget_Staff = QtGui.QListWidget(self.StaffTab)
-        self.LogListWidget_Staff.setGeometry(QtCore.QRect(0, 0, 270, 400))
+        self.LogListWidget_Staff.setGeometry(QtCore.QRect(0, 0, 270, 415))
         self.LogListWidget_Staff.setObjectName(_fromUtf8("LogListWidget_Staff"))
         self.LogListWidget_Staff.itemClicked.connect(self.handleviewLogStaff)
 
@@ -1299,6 +1301,7 @@ class Ui_MainWindow(object):
     def CancelActionfunc(self, MainWindow):
         self.hideall()
         self.showMainAdmin()
+
         ui.StudentView.clear()
         ui.StaffView.clear()
 
@@ -1451,22 +1454,26 @@ class Ui_MainWindow(object):
         self.StudentView.setEnabled(False)
 
     def editStudentfunc(self, MainWindow):
-        self.hideall()
-        self.showStudentWindow()
-        self.StudentButton_Cancel.show()
-        self.StudentButton_SaveEdit.show()
-        self.enable()
-        self.StudentButton_Cancel.setEnabled(True)
-        self.StudentButton_SaveEdit.setEnabled(True)
-        self.StudentText_Name.setEnabled(True)
-        self.StudentText_RFID.setEnabled(True)
-        self.StudentText_Grade.setEnabled(True)
-        self.StudentText_GName.setEnabled(True)
-        #getting student id that is being editted
-        Sys.editstudentid = int(self.StudentText_ID.text())
-        self.StudentText_ID.setEnabled(True)
-        self.StudentText_Picture.setEnabled(True)
-        self.StudentButton_Picture.setEnabled(True)
+        if self.StudentText_ID.text() == "":
+            ui.popupMessage2(MainWindow,
+                             "Please, Select a Student from the List.")
+        else:
+            self.hideall()
+            self.showStudentWindow()
+            self.StudentButton_Cancel.show()
+            self.StudentButton_SaveEdit.show()
+            self.enable()
+            self.StudentButton_Cancel.setEnabled(True)
+            self.StudentButton_SaveEdit.setEnabled(True)
+            self.StudentText_Name.setEnabled(True)
+            self.StudentText_RFID.setEnabled(True)
+            self.StudentText_Grade.setEnabled(True)
+            self.StudentText_GName.setEnabled(True)
+            #getting student id that is being editted
+            Sys.editstudentid = int(self.StudentText_ID.text())
+            self.StudentText_ID.setEnabled(True)
+            self.StudentText_Picture.setEnabled(True)
+            self.StudentButton_Picture.setEnabled(True)
 
     def enableStaff(self):
         self.StaffButton_Add.setEnabled(False)
@@ -1531,13 +1538,18 @@ class Ui_MainWindow(object):
         self.Login_password.raise_()
 
     def EditstaffFunc(self):
-        Sys.editstaffid = int(self.StaffText_ID.text())
-        Sys.editstaffemail = self.StaffText_Email.text()
-        self.enableRightStaff()
-        self.StaffButton_SaveEdit.show()
-        self.StaffButton_Cancel.show()
-        Sys.editstaffid = int(self.StaffText_ID.text())
-        Sys.editstaffemail = self.StaffText_Email.text()
+        if self.StaffText_ID.text() == "":
+            ui.popupMessage2(MainWindow,
+                             "Please, Select a Staff Member from the List.")
+        else:
+            Sys.editstaffid = int(self.StaffText_ID.text())
+            print("Edit ID: " + str(Sys.editstaffid))
+            Sys.editstaffemail = self.StaffText_Email.text()
+            self.enableRightStaff()
+            self.StaffButton_SaveEdit.show()
+            self.StaffButton_Cancel.show()
+            Sys.editstaffid = int(self.StaffText_ID.text())
+            Sys.editstaffemail = self.StaffText_Email.text()
 
     def enableLeftStaff(self):
         self.enableStaff()
@@ -1592,8 +1604,10 @@ class Ui_MainWindow(object):
         self.StaffText_CPass.clear()
 
     def handleBrowse(self):
+
         global filename
-        filename = QtGui.QFileDialog.getOpenFileName()
+        file_dialog = QFileDialog()
+        filename = file_dialog.getOpenFileName(file_dialog, "Select Image", os.getcwd(), "Images (*.png *.jpg)")
         if filename != "":
             pixmap = QtGui.QPixmap(filename)
             pixmap = pixmap.scaled(510, 440, QtCore.Qt.KeepAspectRatio)
@@ -1769,23 +1783,29 @@ class Ui_MainWindow(object):
             ui.LogTableView_Staff.show()
 
     def handleEditSaveStudent(self, MainWindow):
-
+        global filename
+        destination = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/"
         id = self.StudentText_ID.text()
         grade = self.StudentText_Grade.text()
         rfid = self.StudentText_RFID.text()
         name = self.StudentText_Name.text()
         gname = self.StudentText_GName.text()
-        pic = filename
+        if (filename != ""):
+            ts = calendar.timegm(time.gmtime())
+            if (filename.endswith('.png')):
+                destination = destination + str(ts) + '.png'
+            else:
+                destination = destination + str(ts) + '.jpg'
+            # filename = destination
+            print( "File: " + filename + ", Destination: " + destination)
+            shutil.copy(filename, destination)
+        pic = destination
         Sys.editStudent(id,grade,rfid,name,gname,pic)
         Ui_MainWindow.searchByName(self)
-
         self.enable()
-
         self.StudentView.setEnabled(True)
         self.StudentButton_Exit.setEnabled(True)
-
         self.StudentButton_SearchName.setEnabled(True)
-        #self.StudentButton_ViewDetails.setEnabled(True)
         self.StudentButton_Add.setEnabled(True)
         self.StudentButton_Edit.setEnabled(True)
         self.StudentButton_Remove.setEnabled(True)
@@ -1914,8 +1934,6 @@ class Ui_MainWindow(object):
         pixmap = pixmap.scaled(510,440,QtCore.Qt.KeepAspectRatio)
         #self.StudentLabel_Picture_2.setPixmap(QtGui.QPixmap(os.getcwd() + picpath + "student1.jpg"))
         self.StudentLabel_Picture_2.setPixmap(pixmap)
-        #self.StudentLabel_Picture_2.setText("aaa")
-        #QtCoreApplication::processEvents()
         self.StudentText_RFID.setText(student.tagId)
         print("Do nothing")
         print(os.getcwd())
@@ -1925,19 +1943,13 @@ class Ui_MainWindow(object):
         print(filename,"this this")
         temp = filename.split("/")
         temp = temp[-1]
-        print(temp)
         destination = "C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/"
-        pic = destination +"/"+ temp
-        print("pp"+pic)
-
-
+        # pic = destination + temp
         id = self.StudentText_ID.text()
         grade = self.StudentText_Grade.text()
         rfid = self.StudentText_RFID.text()
         name = self.StudentText_Name.text()
         gname = self.StudentText_GName.text()
-
-
         if(id == "" or grade == "" or rfid == "" or name == "" or gname == ""):
             print("One of the inputs is blank")
             self.popupMessage2(MainWindow, "Please fill in all the fields. ")
@@ -1951,18 +1963,20 @@ class Ui_MainWindow(object):
                     if (filename == destination):
                         print("File already exists")
                     else:
+                        ts = calendar.timegm(time.gmtime())
+                        if(temp.endswith('.png')):
+                            destination = destination + str(ts) + '.png'
+                        else:
+                            destination = destination + str(ts) + '.jpg'
+                        filename = destination
                         shutil.copy(filename, destination)
-                    Sys.studentList.append(Student(name,int(id),rfid,gname,pic,int(grade)))
-                    Sys.addnewStudent(name,int(id),rfid,gname,pic,int(grade))
+                    Sys.studentList.append(Student(name,int(id),rfid,gname,filename,int(grade)))
+                    Sys.addnewStudent(name,int(id),rfid,gname,filename,int(grade))
                     self.searchByName()
-                    print("Input validated")
-                    print("Save1 Clicked")
                     self.enable()
                     self.StudentView.setEnabled(True)
                     self.StudentButton_Exit.setEnabled(True)
-
                     self.StudentButton_SearchName.setEnabled(True)
-                    #self.StudentButton_ViewDetails.setEnabled(True)
                     self.StudentButton_Add.setEnabled(True)
                     self.StudentButton_Edit.setEnabled(True)
                     self.StudentButton_Remove.setEnabled(True)
@@ -1973,13 +1987,8 @@ class Ui_MainWindow(object):
                     self.LogOffAdmin.setEnabled(True)
                     self.StudentSearch_Name.setEnabled(True)
                     self.StudentSearch_ID.setEnabled(True)
-
                     self.clearallfunction(MainWindow)
                     self.StudentView.repaint()
-
-        # confirmation=QMessage()
-        # confirmation.exec()
-        #
 
     def handleAddCancel(self, MainWindow):
         self.StudentButton_SaveAdd.hide()
@@ -2194,7 +2203,8 @@ class Ui_MainWindow(object):
             currentUser = username
             temp = cur.execute("Select * FROM staff WHERE Email = %s", username)
             if temp == 0:
-                print("Invalid Username")
+                self.Login_password.clear()
+                self.popupMessage2(MainWindow, "Incorrect Username and/or Password!")
             else:
                 check = cur.fetchone()
                 password = check[2]
@@ -2210,9 +2220,10 @@ class Ui_MainWindow(object):
 
                         print("Show Staff Page")
                 else:
-                    self.popupMessage2(MainWindow, "Incorrect Password!!!")
+                    self.Login_password.clear()
+                    self.popupMessage2(MainWindow, "Incorrect Username and/or Password!")
 
-                    print("Show Incorrect Password message!")
+                    # print("Show Incorrect Password message!")
             conn.close()
         except:
             print("db error")
@@ -2348,6 +2359,8 @@ class Ui_MainWindow(object):
         for i in range(0, len(result)):
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Student.addItem(item)
+        ui.LogTableView_Student.hide()
+
 
     def searchNameStaffLog(self):
         result = []
@@ -2361,6 +2374,10 @@ class Ui_MainWindow(object):
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Staff.addItem(item)
 
+        ui.LogTableView_Staff.hide()
+
+
+
     def searchIDStaffLog(self):
         result = []
         id = self.LogStaffText_SearchID.text()
@@ -2373,6 +2390,7 @@ class Ui_MainWindow(object):
         for i in range(0, len(result)):
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Staff.addItem(item)
+        ui.LogTableView_Staff.hide()
 
     def searchByName(self):
         global searchStudentStatus
@@ -2518,6 +2536,7 @@ class Ui_MainWindow(object):
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Student.addItem(item)
         ui.LogListWidget_Student.show()
+        ui.LogTableView_Student.hide()
 
 	## This method shows the edit student page, it also gets all the student names in the system and displays it in the selection list.  
     def showStudentWindow(self):
