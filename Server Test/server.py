@@ -51,6 +51,9 @@ class System(object):
     editstaffemail = ""
     listL = []
     listR = []
+    listSearchStudentLog = []
+    listSearchStaffLog = []
+
 
     ##System Functions
     def __init__(self):
@@ -407,16 +410,24 @@ class System(object):
             ui.LogTableView_Generic.setHorizontalHeaderLabels(horHeaders)
             ui.LogTableView_Generic.show()
 
-        result = Sys.getStudentNames()
+        if(len(Sys.listSearchStudentLog) == 0):
+            result = Sys.studentList
+        else:
+            result = Sys.listSearchStudentLog
+
         for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i])
+            item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Student.addItem(item)
 
-        result = Sys.getStaffNames()
+        if len(Sys.listSearchStaffLog) == 0:
+            result = Sys.staffList
+        else:
+            result = Sys.listSearchStaffLog
+
         for i in range(0, len(result)):
-            item = QtGui.QListWidgetItem(result[i])
+            item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Staff.addItem(item)
-        print(result)
+        # print(result)
 
     ## Not used in any other location, just defined below
     def showStudentReport(self):
@@ -490,6 +501,8 @@ class Log(object):
         self.timestamp = time
 
 class Ui_MainWindow(object):
+
+
     # UI Functions
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
@@ -553,21 +566,21 @@ class Ui_MainWindow(object):
         #=======================================================
         #login Page
         self.Username = QtGui.QLabel(MainWindow)
-        self.Username.setGeometry(QtCore.QRect(220, 180, 191, 101))
+        self.Username.setGeometry(QtCore.QRect(220, 380, 191, 101))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.Username.setFont(font)
         self.Username.setObjectName(_fromUtf8("Username"))
 
         self.Password = QtGui.QLabel(MainWindow)
-        self.Password.setGeometry(QtCore.QRect(220, 260, 191, 101))
+        self.Password.setGeometry(QtCore.QRect(220, 460, 191, 101))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.Password.setFont(font)
         self.Password.setObjectName(_fromUtf8("Password"))
 
         self.Login_uname = QtGui.QLineEdit(MainWindow)
-        self.Login_uname.setGeometry(QtCore.QRect(430, 210, 271, 41))
+        self.Login_uname.setGeometry(QtCore.QRect(430, 410, 271, 41))
         font = QtGui.QFont()
         font.setPointSize(22)
         self.Login_uname.setFont(font)
@@ -575,25 +588,47 @@ class Ui_MainWindow(object):
 
         self.Login_password = QtGui.QLineEdit(MainWindow)
         self.Login_password.setEchoMode(QtGui.QLineEdit.Password)
-        self.Login_password.setGeometry(QtCore.QRect(430, 290, 271, 41))
+        self.Login_password.setGeometry(QtCore.QRect(430, 490, 271, 41))
         self.Login_password.setObjectName(_fromUtf8("Login_password"))
 
+
+        BigRedFont2 = QtGui.QFont()
+        BigRedFont2.setPointSize(20)
+
         self.LoginButton = QtGui.QPushButton(MainWindow)
-        self.LoginButton.setGeometry(QtCore.QRect(520, 450, 211, 61))
+        self.LoginButton.setGeometry(QtCore.QRect(450, 650, 100, 40))
         self.LoginButton.setObjectName(_fromUtf8("LoginButton"))
         self.LoginButton.clicked.connect(self.MainAdminfunc)
+        self.LoginButton.setFont(BigRedFont2)
+        self.LoginButton.setStyleSheet('QPushButton {color: black;}')
+
+
+
+        self.frontimage = QtGui.QLabel(MainWindow)
+        self.frontimage.setGeometry(QtCore.QRect(300, 0, 600, 300))
+        self.frontimage.setFont(font)
+        self.frontimage.setObjectName(_fromUtf8("frontimage"))
+        pixmap = QtGui.QPixmap("C:/Users/SeniorDesign/Documents/GitHub/Senior-Design/pictures/1.jpg")
+        pixmap = pixmap.scaled(510, 440, QtCore.Qt.KeepAspectRatio)
+        self.frontimage.setPixmap(pixmap)
+
+        MainWindow.setWindowState(MainWindow.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+
 
         self.LoginTitle = QtGui.QLabel(MainWindow)
-        self.LoginTitle.setGeometry(QtCore.QRect(450, 90, 421, 80))
+        self.LoginTitle.setGeometry(QtCore.QRect(450, 290, 421, 80)) #(450, 90, 421, 80)
         self.LoginTitle.setObjectName(_fromUtf8("LoginTitle"))
+
+
         self.LoginTitle.setText("Login")
+
         BigRedFont = QtGui.QFont()
         BigRedFont.setPointSize(50)
         self.LoginTitle.setFont(BigRedFont)
         self.LoginTitle.setStyleSheet('color: red')
 
         self.LogOffStaff = QtGui.QCommandLinkButton(MainWindow)
-        self.LogOffStaff.setGeometry(QtCore.QRect(790, 780, 187, 41))
+        self.LogOffStaff.setGeometry(QtCore.QRect(790, 780, 187, 41))#(790, 780, 187, 41)
         self.LogOffStaff.setObjectName(_fromUtf8("LogOffStaff"))
         self.LogOffStaff.clicked.connect(self.LogOffStafffunc)
 
@@ -1323,6 +1358,7 @@ class Ui_MainWindow(object):
     def disableAll(self):
         #log
         #log all
+
         self.LogOffAdmin.setEnabled(False)
         self.LogOffAdmin2.setEnabled(False)
         self.LogButton_Exit.setEnabled(False)
@@ -1347,6 +1383,7 @@ class Ui_MainWindow(object):
         self.LogStaffText_SearchID.setEnabled(False)
         self.LogStaffButton_SearchName.setEnabled(False)
         self.LogStaffButton_SearchID.setEnabled(False)
+
 
         #staff
         #staff textfields
@@ -1648,16 +1685,17 @@ class Ui_MainWindow(object):
         conn = connectDB()
         cur = conn.cursor()
         name = self.LogStudentText_SearchName.text()
+        id = self.LogStudentText_SearchID.text()
         num = self.LogListWidget_Student.currentRow()
         sDate = ui.StartDateEdit.date()
         eDate = ui.EndDateEdit.date()
         sDate = sDate.toPyDate()
         eDate = eDate.toPyDate()
-        if name == "":
+        if name == "" and id == "":
+            del Sys.listSearchStudentLog[:]
             student = Sys.studentList[num]
         else:
-            result = Sys.searchByName(name)
-            student = result[num]
+            student = Sys.listSearchStudentLog[num]
         cur.execute("SELECT * FROM LOG WHERE StudentID = "+ str(student.studentId))
         dataMain = cur.fetchall()
         data = {'Student ID': [], 'Staff ID': [],'Staff Name':[], 'Date': [], 'Time': []}
@@ -1692,16 +1730,20 @@ class Ui_MainWindow(object):
         conn = connectDB()
         cur = conn.cursor()
         name = self.LogStaffText_SearchName.text()
+        id = self.LogStaffText_SearchID.text()
         num = self.LogListWidget_Staff.currentRow()
         sDate = ui.StartDateEdit.date()
         eDate = ui.EndDateEdit.date()
         sDate = sDate.toPyDate()
         eDate = eDate.toPyDate()
-        if name == "":
+
+
+        if name == "" and id == "":
+            del Sys.listSearchStaffLog[:]
             staff = Sys.staffList[num]
         else:
-            result = Sys.searchByNameStaff(name)
-            staff = result[num]
+            staff = Sys.listSearchStaffLog[num]
+
         cur.execute("SELECT * FROM LOG WHERE StaffID = " + str(staff.staffId))
         dataMain = cur.fetchall()
 
@@ -2154,10 +2196,12 @@ class Ui_MainWindow(object):
                 isAdmin = check[4]
                 if (password == userpassword):
                     if (isAdmin == 1):
+                        self.LoginButton.setEnabled(False)
                         self.hideall()
                         self.showMainAdmin()
                         print("Show Admin Page")
                     elif (isAdmin == 0):
+                        self.LoginButton.setEnabled(False)
                         self.hideall()
                         self.showMain()
 
@@ -2177,6 +2221,7 @@ class Ui_MainWindow(object):
                 self.hideall()
                 self.showMain()
                 print("Show staff Page")
+
 
     def newOnKeyPressEvent(self, event):
         if (((event.key() == QtCore.Qt.Key_Enter) or (event.key() == QtCore.Qt.Key_Return)) and (
@@ -2248,6 +2293,9 @@ class Ui_MainWindow(object):
         print("Generate Clicked")
         self.handleviewLogStudent()
         self.handleviewLogStaff()
+        # self.LogTableView_Staff.show()
+        # self.LogTableView_Student.show()
+        # MainWindow.update()
         Sys.showLogData()
 
     def RemoveStudentfunc(self, name):
@@ -2291,29 +2339,33 @@ class Ui_MainWindow(object):
         result = []
         print("by id")
         id = self.LogStudentText_SearchID.text()
-        result = Sys.searchByID(id)
+
+        if id == "":
+            result = Sys.studentList
+        else:
+            result = Sys.searchByID(id)
         ui.LogListWidget_Student.clear()
         for i in range(0, len(result)):
+            if result[i] not in Sys.listSearchStudentLog:
+                Sys.listSearchStudentLog.append(result[i])
+            print("Adding to List " + result[i].Name)
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Student.addItem(item)
         ui.LogTableView_Student.hide()
 
-
     def searchNameStaffLog(self):
         result = []
         name = self.LogStaffText_SearchName.text()
-
         result = Sys.searchByNameStaff(name)
         ui.LogListWidget_Staff.clear()
         if len(result) == 0:
             result = Sys.staffList
         for i in range(0, len(result)):
+            if result[i] not in Sys.listSearchStaffLog:
+                Sys.listSearchStaffLog.append(result[i])
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Staff.addItem(item)
-
         ui.LogTableView_Staff.hide()
-
-
 
     def searchIDStaffLog(self):
         result = []
@@ -2323,8 +2375,9 @@ class Ui_MainWindow(object):
         else:
             result = Sys.searchByIdStaff(id)
         ui.LogListWidget_Staff.clear()
-
         for i in range(0, len(result)):
+            if result[i] not in Sys.listSearchStaffLog:
+                Sys.listSearchStaffLog.append(result[i])
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Staff.addItem(item)
         ui.LogTableView_Staff.hide()
@@ -2465,11 +2518,16 @@ class Ui_MainWindow(object):
 
         #print(sDate, eDate)
         name = str(self.LogStudentText_SearchName.text())
-        result = Sys.searchByName(name)
-        print(result)
+        if name == "":
+            result = Sys.studentList
+        else:
+            result = Sys.searchByName(name)
+        # print(result)
         ui.LogListWidget_Student.clear()
 
         for i in range(0, len(result)):
+            if result[i] not in Sys.listSearchStudentLog:
+                Sys.listSearchStudentLog.append(result[i])
             item = QtGui.QListWidgetItem(result[i].Name)
             ui.LogListWidget_Student.addItem(item)
         ui.LogListWidget_Student.show()
