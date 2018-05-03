@@ -1,7 +1,0 @@
-C:\Users\kash_\Google Drive\Senior Design\Server Test\ServerTest\ServerTest\bin\Debug\ServerTest.exe.config
-C:\Users\kash_\Google Drive\Senior Design\Server Test\ServerTest\ServerTest\bin\Debug\ServerTest.exe
-C:\Users\kash_\Google Drive\Senior Design\Server Test\ServerTest\ServerTest\bin\Debug\ServerTest.pdb
-C:\Users\kash_\Google Drive\Senior Design\Server Test\ServerTest\ServerTest\obj\Debug\ServerTest.csprojResolveAssemblyReference.cache
-C:\Users\kash_\Google Drive\Senior Design\Server Test\ServerTest\ServerTest\obj\Debug\ServerTest.csproj.CoreCompileInputs.cache
-C:\Users\kash_\Google Drive\Senior Design\Server Test\ServerTest\ServerTest\obj\Debug\ServerTest.exe
-C:\Users\kash_\Google Drive\Senior Design\Server Test\ServerTest\ServerTest\obj\Debug\ServerTest.pdb

@@ -17,6 +17,7 @@ filename = ""
 searchStaffStatus = 0
 searchStudentStatus = 0
 inlanepage = False
+CurrentPassword = ""
 
 ##   function connects to the DB using pymysql module
 ##   returns the establish connection to make various queries on DB
@@ -1507,6 +1508,7 @@ class Ui_MainWindow(object):
 
     ## Function handles the details of a staff member when details are needed for logs
     def handleViewDetailStaff(self):
+        global CurrentPassword
         name = self.StaffSearch_Name.text()
         num = self.StaffView.currentRow()
         id = self.StaffSearch_ID.text()
@@ -1526,6 +1528,7 @@ class Ui_MainWindow(object):
         self.StaffText_Email.setText(str(staff.Email))
         self.StaffText_ID.setText(str(staff.staffId))
         self.StaffText_Name.setText(staff.Name)
+        CurrentPassword = staff.password
 
     ## Function keyboard press listener on the GUI
     def keyPressEvent(self,event):
@@ -1544,8 +1547,8 @@ class Ui_MainWindow(object):
         else:
             if (password != cpassword):
                 self.popupMessage2(MainWindow, "The passwords do not match, please try again. ")
-                self.StaffText_CPass.setText("")
-                self.StaffText_Pass.setText("")
+                self.StaffText_CPass.clear()
+                self.StaffText_Pass.clear()
             else:
                 result = Sys.checkDuplicateIDStaff(id)
                 if result:
@@ -1687,12 +1690,8 @@ class Ui_MainWindow(object):
         id = self.StaffText_ID.text()
         password1 = self.StaffText_Pass.text()
         password2 = self.StaffText_CPass.text()
-        for staff in(Sys.staffList):
-            
-            if(staff.Email == Email):
-                oldPassword = staff.password
         if(password1 == password2 and password1==""):
-            Sys.editStaff(name, Email, oldPassword, id)
+            Sys.editStaff(name, Email, CurrentPassword, id)
         if password1 != password2 :
             self.popupMessage2(MainWindow, "Password do not match.")
         if(password1!="" and password1 == password2):
